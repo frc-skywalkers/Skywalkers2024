@@ -2,25 +2,19 @@
   "version": 1.0,
   "startingPose": {
     "position": {
-      "x": 2.0,
-      "y": 7.0
+      "x": 2.85,
+      "y": 6.96
     },
-    "rotation": 180.0
+    "rotation": -145.0
   },
   "command": {
     "type": "sequential",
     "data": {
       "commands": [
         {
-          "type": "named",
-          "data": {
-            "name": "Run Flywheel"
-          }
-        },
-        {
           "type": "path",
           "data": {
-            "pathName": "Example Path"
+            "pathName": "New Path"
           }
         }
       ]
