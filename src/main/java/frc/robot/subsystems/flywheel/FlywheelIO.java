@@ -22,6 +22,9 @@ public interface FlywheelIO {
     public double velocityRadPerSec = 0.0;
     public double appliedVolts = 0.0;
     public double[] currentAmps = new double[] {};
+    public double followerPositionRad = 0.0;
+    public double followerVelocityRadPerSec = 0.0;
+    public double followerAppliedVolts = 0.0;
   }
 
   /** Updates the set of loggable inputs. */
