@@ -34,4 +34,8 @@ public final class Constants {
     /** Replaying from a log file. */
     REPLAY
   }
+
+  public static final class ShooterConstants {
+    public static final double[] RPMEquation = {100.0, 500.000}; // need to tune; [0] -> m, [1] -> b
+  }
 }
