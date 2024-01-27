@@ -18,7 +18,7 @@ package frc.robot;
  * constants. This class should not be used for any other purpose. All constants should be declared
  * globally (i.e. public static). Do not put anything functional in this class.
  *
- * <p>It is advised to statically import this class (or one of its inner classes) wherever the
+ * <p>It is advised to statically import this class (or done of its inner classes) wherever the
  * constants are needed, to reduce verbosity.
  */
 public final class Constants {
@@ -36,6 +36,15 @@ public final class Constants {
   }
 
   public static final class ShooterConstants {
-    public static final double[] RPMEquation = {100.0, 500.000}; // need to tune; [0] -> m, [1] -> b
+    public static final double[] RPMEquation = {350.0, 500.000}; // need to tune; [0] -> m, [1] -> b
+    public static final double[] timeEquation = {0.1, 0.15}; // need to tune; [0] -> m, [1] -> b
+    public static final double kAccelCompFactor = 0.000;
+  }
+
+  public static final class PivotConstants {
+    public static final double[] angleEquation = {Math.PI / 27.00, -Math.PI * 1.000 / 3.000};
+    public static final double mm_cruisevel = 1.5;
+    public static final double mm_accel = 3;
+    public static final double mm_jerk = 6;
   }
 }

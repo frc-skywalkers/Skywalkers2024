@@ -34,7 +34,8 @@ import frc.robot.subsystems.drive.ModuleIOTalonFX;
 import frc.robot.subsystems.flywheel.Flywheel;
 import frc.robot.subsystems.flywheel.FlywheelIO;
 import frc.robot.subsystems.flywheel.FlywheelIOSim;
-import frc.robot.subsystems.flywheel.FlywheelIOTalonFX;
+import frc.robot.subsystems.pivot.Pivot;
+import frc.robot.subsystems.pivot.PivotIOSim;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 import org.littletonrobotics.junction.networktables.LoggedDashboardNumber;
 
@@ -48,6 +49,7 @@ public class RobotContainer {
   // Subsystems
   private final Drive drive;
   private final Flywheel flywheel;
+  private final Pivot pivot;
 
   // Controller
   private final CommandXboxController controller = new CommandXboxController(0);
@@ -77,7 +79,8 @@ public class RobotContainer {
                 new ModuleIOTalonFX(1),
                 new ModuleIOTalonFX(2),
                 new ModuleIOTalonFX(3));
-        flywheel = new Flywheel(new FlywheelIOTalonFX());
+        flywheel = new Flywheel(new FlywheelIOSim());
+        pivot = new Pivot(new PivotIOSim());
         break;
 
       case SIM:
@@ -90,6 +93,8 @@ public class RobotContainer {
                 new ModuleIOSim(),
                 new ModuleIOSim());
         flywheel = new Flywheel(new FlywheelIOSim());
+        pivot = new Pivot(new PivotIOSim());
+
         break;
 
       default:
@@ -102,6 +107,7 @@ public class RobotContainer {
                 new ModuleIO() {},
                 new ModuleIO() {});
         flywheel = new Flywheel(new FlywheelIO() {});
+        pivot = new Pivot(new PivotIOSim());
         break;
     }
 
@@ -111,6 +117,7 @@ public class RobotContainer {
         Commands.startEnd(
                 () -> flywheel.runVelocity(flywheelSpeedInput.get()), flywheel::stop, flywheel)
             .withTimeout(5.0));
+
     autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
 
     // Set up feedforward characterization
@@ -122,6 +129,10 @@ public class RobotContainer {
         "Flywheel FF Characterization",
         new FeedForwardCharacterization(
             flywheel, flywheel::runVolts, flywheel::getCharacterizationVelocity));
+    autoChooser.addOption(
+        "Arm FF Characterization",
+        new FeedForwardCharacterization(
+            pivot, pivot::runVolts, pivot::getCharacterizationVelocity));
 
     // Configure the button bindings
     configureButtonBindings();
@@ -141,7 +152,10 @@ public class RobotContainer {
             () -> -controller.getLeftX(),
             () -> -controller.getRightX()));
     controller.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
-    flywheel.setDefaultCommand(FlywheelCommands.autoShoot(flywheel, drive));
+    flywheel.setDefaultCommand(FlywheelCommands.autoShoot(flywheel, drive, pivot));
+    // flywheel.setDefaultCommand(
+    //     FlywheelCommands.shootWhileMove(
+    //         flywheel, drive, () -> -controller.getLeftY(), () -> -controller.getLeftX()));
     controller
         .b()
         .onTrue(
@@ -151,6 +165,11 @@ public class RobotContainer {
                             new Pose2d(drive.getPose().getTranslation(), new Rotation2d())),
                     drive)
                 .ignoringDisable(true));
+    // controller
+    //     .a()
+    //     .whileTrue(
+    //         FlywheelCommands.shootWhileMove(
+    //             flywheel, drive, () -> -controller.getLeftY(), () -> -controller.getLeftX()));
     // controller.axisGreaterThan(2, 0.5).whileTrue(FlywheelCommands.autoShoot(flywheel, drive));
     // controller.axisLessThan(2, 0.49).onTrue(Commands.runOnce(flywheel::stop, flywheel));
   }
@@ -161,6 +180,8 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
+    // PathPlannerPath exampleChorePath = PathPlannerPath.fromChoreoTrajectory("3 Note Auto");
+    // return AutoBuilder.followPath(exampleChorePath);
     return autoChooser.get();
   }
 }

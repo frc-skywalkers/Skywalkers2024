@@ -30,6 +30,8 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.util.FieldRelativeAccel;
+import frc.robot.util.FieldRelativeSpeed;
 import frc.robot.util.LocalADStarAK;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -52,6 +54,13 @@ public class Drive extends SubsystemBase {
   private SwerveDriveKinematics kinematics = new SwerveDriveKinematics(getModuleTranslations());
   private Pose2d pose = new Pose2d();
   private Rotation2d lastGyroRotation = new Rotation2d();
+
+  private FieldRelativeSpeed m_fieldRelVel = new FieldRelativeSpeed();
+  private FieldRelativeSpeed m_lastFieldRelVel = new FieldRelativeSpeed();
+  private FieldRelativeAccel m_fieldRelAccel = new FieldRelativeAccel();
+  ;
+
+  private Pose2d virtGoal = new Pose2d();
 
   public Drive(
       GyroIO gyroIO,
@@ -140,6 +149,14 @@ public class Drive extends SubsystemBase {
       // Apply the twist (change since last sample) to the current pose
       pose = pose.exp(twist);
     }
+    m_fieldRelVel = new FieldRelativeSpeed(getChassisSpeed(), getRotation());
+    m_fieldRelAccel = new FieldRelativeAccel(m_fieldRelVel, m_lastFieldRelVel, 0.020);
+    m_lastFieldRelVel = m_fieldRelVel;
+    Logger.recordOutput("Shooting/VirtualGoal", virtGoal);
+  }
+
+  private ChassisSpeeds getChassisSpeed() {
+    return kinematics.toChassisSpeeds(getModuleStates());
   }
 
   /**
@@ -190,6 +207,10 @@ public class Drive extends SubsystemBase {
     }
   }
 
+  public void updateVirtualGoal(Translation2d virtualGoal) {
+    virtGoal = new Pose2d(virtualGoal, new Rotation2d());
+  }
+
   /** Returns the average drive velocity in radians/sec. */
   public double getCharacterizationVelocity() {
     double driveVelocityAverage = 0.0;
@@ -207,6 +228,14 @@ public class Drive extends SubsystemBase {
       states[i] = modules[i].getState();
     }
     return states;
+  }
+
+  public FieldRelativeSpeed getFieldRelativeSpeed() {
+    return m_fieldRelVel;
+  }
+
+  public FieldRelativeAccel getFieldRelativeAccel() {
+    return m_fieldRelAccel;
   }
 
   /** Returns the current odometry pose. */
