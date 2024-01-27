@@ -18,7 +18,7 @@ public class Pivot extends SubsystemBase {
   public boolean pivotenabled;
   public double pivotgoal;
   public boolean atGoal;
-
+  
   /** Creates a new Elevator. */
   public Pivot(PivotIO io) {
     this.io = io;

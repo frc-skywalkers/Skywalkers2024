@@ -11,6 +11,7 @@ public interface PivotIO {
     public double currentAmps = 0.0;
   }
 
+  
   /** Updates the set of loggable inputs. */
   public default void updateInputs(PivotIOInputs inputs) {}
 
