@@ -15,6 +15,7 @@ package frc.robot;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.GenericHID;
@@ -25,6 +26,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.commands.DriveCommands;
 import frc.robot.commands.FeedForwardCharacterization;
 import frc.robot.commands.FlywheelCommands;
+import frc.robot.commands.IntakeCommands;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.GyroIO;
 import frc.robot.subsystems.drive.GyroIOPigeon2;
@@ -35,6 +37,14 @@ import frc.robot.subsystems.flywheel.Flywheel;
 import frc.robot.subsystems.flywheel.FlywheelIO;
 import frc.robot.subsystems.flywheel.FlywheelIOSim;
 import frc.robot.subsystems.flywheel.FlywheelIOTalonFX;
+import frc.robot.subsystems.intake.Intake;
+import frc.robot.subsystems.intake.IntakeIO;
+import frc.robot.subsystems.intake.IntakeIONeo;
+import frc.robot.subsystems.intake.IntakeIOSim;
+import frc.robot.subsystems.intake.Pivot;
+import frc.robot.subsystems.intake.PivotIO;
+import frc.robot.subsystems.intake.PivotIONeo;
+import frc.robot.subsystems.intake.PivotIOSim;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 import org.littletonrobotics.junction.networktables.LoggedDashboardNumber;
 
@@ -48,6 +58,7 @@ public class RobotContainer {
   // Subsystems
   private final Drive drive;
   private final Flywheel flywheel;
+  private final Intake intake;
 
   // Controller
   private final CommandXboxController controller = new CommandXboxController(0);
@@ -78,6 +89,7 @@ public class RobotContainer {
                 new ModuleIOTalonFX(2),
                 new ModuleIOTalonFX(3));
         flywheel = new Flywheel(new FlywheelIOTalonFX());
+        intake = new Intake(new IntakeIONeo(), new Pivot(new PivotIONeo()));
         break;
 
       case SIM:
@@ -90,6 +102,7 @@ public class RobotContainer {
                 new ModuleIOSim(),
                 new ModuleIOSim());
         flywheel = new Flywheel(new FlywheelIOSim());
+        intake = new Intake(new IntakeIOSim(), new Pivot(new PivotIOSim()));
         break;
 
       default:
@@ -102,6 +115,7 @@ public class RobotContainer {
                 new ModuleIO() {},
                 new ModuleIO() {});
         flywheel = new Flywheel(new FlywheelIO() {});
+        intake = new Intake(new IntakeIO() {}, new Pivot(new PivotIO() {}) {});
         break;
     }
 
@@ -153,6 +167,26 @@ public class RobotContainer {
                 .ignoringDisable(true));
     // controller.axisGreaterThan(2, 0.5).whileTrue(FlywheelCommands.autoShoot(flywheel, drive));
     // controller.axisLessThan(2, 0.49).onTrue(Commands.runOnce(flywheel::stop, flywheel));
+
+    intake.setDefaultCommand(
+        Commands.run(
+            () -> {
+              double linearMagnitude = MathUtil.applyDeadband(-controller.getLeftY(), 0.1);
+              linearMagnitude = Math.abs(linearMagnitude) * linearMagnitude;
+              intake.pivotRunVelocity(linearMagnitude);
+            },
+            intake));
+
+    controller.y().onTrue(IntakeCommands.movetoPosition(intake, 1.5));
+    controller.x().onTrue(IntakeCommands.movetoPosition(intake, 0));
+    controller
+        .a()
+        .onTrue(
+            Commands.run(
+                () -> {
+                  intake.runVelocity(0.8);
+                },
+                intake));
   }
 
   /**
