@@ -6,8 +6,6 @@ import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 
 public class PivotIOSim implements PivotIO {
-  // the last value is the starting position
-  // not sure what jKgMetersSquared is
   private SingleJointedArmSim pivot =
       new SingleJointedArmSim(
           DCMotor.getFalcon500(1), 45.0 * 44.0 / 18.0, 0.05, 0.25, 0, Math.PI, true, 0);
@@ -42,7 +40,7 @@ public class PivotIOSim implements PivotIO {
   }
 
   public void reset() {}
-
+  
   @Override
   public void configurePID(double kP, double kI, double kD) {
     pid.setPID(kP, kI, kD);
