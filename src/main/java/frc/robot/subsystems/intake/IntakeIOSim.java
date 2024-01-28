@@ -11,40 +11,43 @@
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU General Public License for more details.
 
-package frc.robot.subsystems.pivot;
+package frc.robot.subsystems.intake;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
+import edu.wpi.first.wpilibj.simulation.FlywheelSim;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 import org.littletonrobotics.junction.Logger;
 
-public class PivotIOSim implements PivotIO {
+public class IntakeIOSim implements IntakeIO {
   private SingleJointedArmSim sim =
       new SingleJointedArmSim(
-          DCMotor.getFalcon500(1), 100.00, 0.05, 0.25, -Math.PI / 2, Math.PI / 2, true, 0.0);
+          DCMotor.getNEO(1), 100.00, 0.05, 0.25, -Math.PI / 2, Math.PI / 2, true, 0.0);
   private ProfiledPIDController pid =
       new ProfiledPIDController(6.0, 0.0, 0.0, new TrapezoidProfile.Constraints(3, 2.5));
+  private FlywheelSim wheelsim = new FlywheelSim(DCMotor.getNEO(1), 1, 0.004); //
+  private PIDController wheelpid = new PIDController(10.0, 0.0, 0.0); // acceleration
 
   private boolean closedLoop = false;
-  private boolean indexerclosedLoop = false;
   private double ffVolts = 0.0;
   private double appliedVolts = 0.0;
   private double goalPos = 0.00;
-  // private double setpointPos = 0.00;
+  private double setpointPos = 0.00;
+
+  private double wheelAppliedVolts = 0.0;
 
   @Override
-  public void updateInputs(PivotIOInputs inputs) {
-    if (closedLoop) {
+  public void updateInputs(IntakeIOInputs inputs) {
+    if (closedLoop) { // not running
       inputs.pidOut = pid.calculate(sim.getAngleRads());
       appliedVolts = MathUtil.clamp(inputs.pidOut + ffVolts, -10.0, 10.0);
-      Logger.recordOutput("Pivot/PID", ffVolts);
+      Logger.recordOutput("Intake/PID", ffVolts);
       sim.setInputVoltage(appliedVolts);
     }
-
-    sim.update(0.02);
 
     inputs.positionRad = sim.getAngleRads();
     inputs.velocityRadPerSec = sim.getVelocityRadPerSec();
@@ -54,6 +57,11 @@ public class PivotIOSim implements PivotIO {
     inputs.goalVel = pid.getSetpoint().velocity;
     inputs.setpointPos = pid.getSetpoint().position;
     inputs.ffVolts = ffVolts;
+
+    inputs.wheelVelocityRadPerSec = wheelsim.getAngularVelocityRadPerSec();
+    inputs.wheelAppliedVolts = wheelAppliedVolts;
+
+    sim.update(0.02);
   }
 
   @Override
@@ -79,7 +87,30 @@ public class PivotIOSim implements PivotIO {
   }
 
   @Override
+  public void runWheelVolts(double volts) {
+    wheelAppliedVolts = volts; // is updating
+    wheelsim.setInputVoltage(wheelAppliedVolts);
+  }
+
+  @Override
+  public void runWheelVel(double velocity) {
+    wheelsim.setState(wheelpid.calculate(wheelsim.getAngularVelocityRadPerSec(), velocity));
+  }
+
+  @Override
+  public void stopWheels() {
+    runWheelVolts(0);
+  }
+
+  @Override
   public void configurePID(double kP, double kI, double kD) {
     pid.setPID(kP, kI, kD);
+  }
+
+  @Override
+  public void configureWheelPID(double kP, double kI, double kD) {
+    wheelpid.setP(kP);
+    wheelpid.setI(kI);
+    wheelpid.setD(kD);
   }
 }

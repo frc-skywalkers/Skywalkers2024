@@ -34,6 +34,10 @@ import frc.robot.subsystems.drive.ModuleIOTalonFX;
 import frc.robot.subsystems.flywheel.Flywheel;
 import frc.robot.subsystems.flywheel.FlywheelIO;
 import frc.robot.subsystems.flywheel.FlywheelIOSim;
+import frc.robot.subsystems.indexer.Indexer;
+import frc.robot.subsystems.indexer.IndexerIOSim;
+import frc.robot.subsystems.intake.Intake;
+import frc.robot.subsystems.intake.IntakeIOSim;
 import frc.robot.subsystems.pivot.Pivot;
 import frc.robot.subsystems.pivot.PivotIOSim;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
@@ -50,6 +54,8 @@ public class RobotContainer {
   private final Drive drive;
   private final Flywheel flywheel;
   private final Pivot pivot;
+  private final Intake intake;
+  private final Indexer indexer;
 
   // Controller
   private final CommandXboxController controller = new CommandXboxController(0);
@@ -81,6 +87,8 @@ public class RobotContainer {
                 new ModuleIOTalonFX(3));
         flywheel = new Flywheel(new FlywheelIOSim());
         pivot = new Pivot(new PivotIOSim());
+        intake = new Intake(new IntakeIOSim());
+        indexer = new Indexer(new IndexerIOSim());
         break;
 
       case SIM:
@@ -94,7 +102,8 @@ public class RobotContainer {
                 new ModuleIOSim());
         flywheel = new Flywheel(new FlywheelIOSim());
         pivot = new Pivot(new PivotIOSim());
-
+        intake = new Intake(new IntakeIOSim());
+        indexer = new Indexer(new IndexerIOSim());
         break;
 
       default:
@@ -108,6 +117,8 @@ public class RobotContainer {
                 new ModuleIO() {});
         flywheel = new Flywheel(new FlywheelIO() {});
         pivot = new Pivot(new PivotIOSim());
+        intake = new Intake(new IntakeIOSim());
+        indexer = new Indexer(new IndexerIOSim());
         break;
     }
 
@@ -165,6 +176,11 @@ public class RobotContainer {
                             new Pose2d(drive.getPose().getTranslation(), new Rotation2d())),
                     drive)
                 .ignoringDisable(true));
+
+    // controller.a().onTrue(Commands.runOnce(() -> intake.setPosition(1.5)));
+    // controller.b().onTrue(Commands.runOnce(() -> intake.setPosition(0)));
+
+    controller.a().whileTrue(Commands.run(() -> intake.runWheelVolts(5.0)));
     // controller
     //     .a()
     //     .whileTrue(

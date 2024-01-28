@@ -1,27 +1,17 @@
-// Copyright 2021-2024 FRC 6328
-// http://github.com/Mechanical-Advantage
-//
-// This program is free software; you can redistribute it and/or
-// modify it under the terms of the GNU General Public License
-// version 3 as published by the Free Software Foundation or
-// available in the root directory of this project.
-//
-// This program is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-// GNU General Public License for more details.
-
-package frc.robot.subsystems.pivot;
+package frc.robot.subsystems.intake;
 
 import org.littletonrobotics.junction.AutoLog;
 
-public interface PivotIO {
+public interface IntakeIO {
   @AutoLog
-  public static class PivotIOInputs {
+  public static class IntakeIOInputs {
     public double positionRad = 0.0;
     public double velocityRadPerSec = 0.0;
     public double appliedVolts = 0.0;
     public double[] currentAmps = new double[] {};
+    public double wheelPositionRad = 0.0;
+    public double wheelVelocityRadPerSec = 0.0;
+    public double wheelAppliedVolts = 0.0;
     public double goalPos = 0.0;
     public double goalVel = 0.0;
     public double setpointPos = 0.000;
@@ -30,7 +20,7 @@ public interface PivotIO {
   }
 
   /** Updates the set of loggable inputs. */
-  public default void updateInputs(PivotIOInputs inputs) {}
+  public default void updateInputs(IntakeIOInputs inputs) {}
 
   /** Run open loop at the specified voltage. */
   public default void setVoltage(double volts) {}
@@ -41,6 +31,14 @@ public interface PivotIO {
   /** Stop in open loop. */
   public default void stop() {}
 
+  public default void runWheelVolts(double volts) {}
+
+  public default void runWheelVel(double velocity) {}
+
+  public default void stopWheels() {}
+
   /** Set velocity PID constants. */
   public default void configurePID(double kP, double kI, double kD) {}
+
+  public default void configureWheelPID(double kP, double kI, double kD) {}
 }
