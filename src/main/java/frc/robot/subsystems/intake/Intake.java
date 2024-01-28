@@ -20,17 +20,14 @@ public class Intake extends SubsystemBase {
       case REAL:
         ffModel = new ArmFeedforward(0.0, 0.0, 0); // need to determine
         io.configurePID(0.5, 0.0, 0.0); // need to determine
-        io.configureWheelPID(0.5, 0.0, 0.0);
         break;
       case REPLAY:
         ffModel = new ArmFeedforward(0.1, 0.05, 0);
         io.configurePID(1.0, 0.0, 0.0);
-        io.configureWheelPID(0.5, 0.0, 0.0);
         break;
       case SIM:
         ffModel = new ArmFeedforward(0.01, 0.05, 1.5);
         io.configurePID(6.0, 0.0, 0.0);
-        io.configureWheelPID(5.0, 0.0, 0.0);
         break;
       default:
         ffModel = new ArmFeedforward(0.0, 0.0, 0);
@@ -51,10 +48,6 @@ public class Intake extends SubsystemBase {
 
   public void runWheelVolts(double volts) {
     io.runWheelVolts(volts);
-  }
-
-  public void runWheelVel(double velocity) {
-    io.runWheelVel(velocity);
   }
 
   public void setPosition(double positionRad) {

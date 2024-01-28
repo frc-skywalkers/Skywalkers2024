@@ -14,7 +14,6 @@
 package frc.robot.subsystems.intake;
 
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
@@ -30,7 +29,6 @@ public class IntakeIOSim implements IntakeIO {
   private ProfiledPIDController pid =
       new ProfiledPIDController(6.0, 0.0, 0.0, new TrapezoidProfile.Constraints(3, 2.5));
   private FlywheelSim wheelsim = new FlywheelSim(DCMotor.getNEO(1), 1, 0.004); //
-  private PIDController wheelpid = new PIDController(10.0, 0.0, 0.0); // acceleration
 
   private boolean closedLoop = false;
   private double ffVolts = 0.0;
@@ -60,8 +58,9 @@ public class IntakeIOSim implements IntakeIO {
 
     inputs.wheelVelocityRadPerSec = wheelsim.getAngularVelocityRadPerSec();
     inputs.wheelAppliedVolts = wheelAppliedVolts;
-
+    Logger.recordOutput("Intake/wheelcurrent", wheelsim.getCurrentDrawAmps());
     sim.update(0.02);
+    wheelsim.update(0.02);
   }
 
   @Override
@@ -93,11 +92,6 @@ public class IntakeIOSim implements IntakeIO {
   }
 
   @Override
-  public void runWheelVel(double velocity) {
-    wheelsim.setState(wheelpid.calculate(wheelsim.getAngularVelocityRadPerSec(), velocity));
-  }
-
-  @Override
   public void stopWheels() {
     runWheelVolts(0);
   }
@@ -105,12 +99,5 @@ public class IntakeIOSim implements IntakeIO {
   @Override
   public void configurePID(double kP, double kI, double kD) {
     pid.setPID(kP, kI, kD);
-  }
-
-  @Override
-  public void configureWheelPID(double kP, double kI, double kD) {
-    wheelpid.setP(kP);
-    wheelpid.setI(kI);
-    wheelpid.setD(kD);
   }
 }

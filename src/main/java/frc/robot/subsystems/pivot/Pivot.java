@@ -22,15 +22,15 @@ public class Pivot extends SubsystemBase {
     this.io = io;
     switch (Constants.currentMode) {
       case REAL:
-        ffModel = new ArmFeedforward(0.0, 0.0, 0); // need to determine
-        io.configurePID(0.5, 0.0, 0.0); // need to determine
+        ffModel = new ArmFeedforward(0.0945, 0.5185, 0); // need to determine
+        io.configurePID(6.0, 0.0, 0.0); // need to determine
         break;
       case REPLAY:
         ffModel = new ArmFeedforward(0.1, 0.05, 0);
         io.configurePID(1.0, 0.0, 0.0);
         break;
       case SIM:
-        ffModel = new ArmFeedforward(0.01, 0.05, 1.5);
+        ffModel = new ArmFeedforward(0.0945, 0.5185, 1.5);
         io.configurePID(6.0, 0.0, 0.0);
         break;
       default:

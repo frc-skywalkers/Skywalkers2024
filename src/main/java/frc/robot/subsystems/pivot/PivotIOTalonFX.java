@@ -44,7 +44,7 @@ public class PivotIOTalonFX implements PivotIO {
     var config = new TalonFXConfiguration();
     config.CurrentLimits.StatorCurrentLimit = 30.0;
     config.CurrentLimits.StatorCurrentLimitEnable = true;
-    config.MotorOutput.NeutralMode = NeutralModeValue.Coast;
+    config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
     leader.getConfigurator().apply(config);
 
     MotionMagicConfigs mm_configs = config.MotionMagic;
@@ -99,5 +99,6 @@ public class PivotIOTalonFX implements PivotIO {
     config.kI = kI;
     config.kD = kD;
     leader.getConfigurator().apply(config);
+    // leader.Slot0Configs = config;
   }
 }

@@ -17,7 +17,6 @@ public class IntakeIOSparkMax implements IntakeIO {
 
   private final CANSparkMax wheel = new CANSparkMax(1, MotorType.kBrushless);
   private final RelativeEncoder wheelencoder = wheel.getEncoder();
-  private final SparkPIDController wheelpid = wheel.getPIDController();
 
   public IntakeIOSparkMax() {
     leader.restoreFactoryDefaults();
@@ -69,11 +68,6 @@ public class IntakeIOSparkMax implements IntakeIO {
   }
 
   @Override
-  public void runWheelVel(double velocity) {
-    wheelpid.setReference(velocity, ControlType.kVelocity); // ?
-  }
-
-  @Override
   public void stopWheels() {
     wheel.stopMotor();
   }
@@ -91,13 +85,5 @@ public class IntakeIOSparkMax implements IntakeIO {
     pid.setI(kI);
     pid.setD(kD);
     pid.setFF(0);
-  }
-
-  @Override
-  public void configureWheelPID(double kP, double kI, double kD) {
-    wheelpid.setP(kP);
-    wheelpid.setI(kI);
-    wheelpid.setD(kD);
-    wheelpid.setFF(0);
   }
 }

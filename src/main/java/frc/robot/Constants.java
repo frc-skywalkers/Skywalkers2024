@@ -43,8 +43,8 @@ public final class Constants {
 
   public static final class PivotConstants {
     public static final double[] angleEquation = {Math.PI / 27.00, -Math.PI * 1.000 / 3.000};
-    public static final double mm_cruisevel = 1.5;
-    public static final double mm_accel = 3;
+    public static final double mm_cruisevel = 3;
+    public static final double mm_accel = 2.5;
     public static final double mm_jerk = 6;
   }
 }

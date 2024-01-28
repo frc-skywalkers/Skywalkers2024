@@ -180,7 +180,8 @@ public class RobotContainer {
     // controller.a().onTrue(Commands.runOnce(() -> intake.setPosition(1.5)));
     // controller.b().onTrue(Commands.runOnce(() -> intake.setPosition(0)));
 
-    controller.a().whileTrue(Commands.run(() -> intake.runWheelVolts(5.0)));
+    // controller.a().whileTrue(Commands.run(() -> intake.runWheelVolts(5.0)));
+    controller.axisGreaterThan(2, 0.5).whileTrue(Commands.run(() -> intake.runWheelVolts(5.0)));
     // controller
     //     .a()
     //     .whileTrue(
