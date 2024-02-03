@@ -40,6 +40,7 @@ public class IndexerIOSim implements IndexerIO {
     inputs.velocityRadPerSec = sim.getAngularVelocityRadPerSec();
     inputs.appliedVolts = appliedVolts;
     inputs.currentAmps = new double[] {sim.getCurrentDrawAmps()};
+    inputs.hasPiece = hasPiece();
   }
 
   @Override
@@ -64,5 +65,9 @@ public class IndexerIOSim implements IndexerIO {
   @Override
   public void configurePID(double kP, double kI, double kD) {
     pid.setPID(kP, kI, kD);
+  }
+
+  private boolean hasPiece() {
+    return false;
   }
 }

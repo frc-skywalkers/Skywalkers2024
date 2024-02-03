@@ -72,4 +72,8 @@ public class Indexer extends SubsystemBase {
   public double getCharacterizationVelocity() {
     return inputs.velocityRadPerSec;
   }
+
+  public boolean hasPiece() {
+    return inputs.hasPiece;
+  }
 }

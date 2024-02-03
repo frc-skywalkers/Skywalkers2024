@@ -79,7 +79,7 @@ public class PivotIOSim implements PivotIO {
   }
 
   @Override
-  public void configurePID(double kP, double kI, double kD) {
+  public void configurePIDFF(double kP, double kI, double kD, double kG, double kS) {
     pid.setPID(kP, kI, kD);
   }
 }

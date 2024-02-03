@@ -93,7 +93,7 @@ public class PivotIOTalonFX implements PivotIO {
   }
 
   @Override
-  public void configurePID(double kP, double kI, double kD) {
+  public void configurePIDFF(double kP, double kI, double kD, double kG, double kS) {
     var config = new Slot0Configs();
     config.kP = kP;
     config.kI = kI;

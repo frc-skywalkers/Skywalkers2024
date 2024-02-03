@@ -23,6 +23,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.subsystems.drive.Drive;
 import java.util.function.DoubleSupplier;
+import org.littletonrobotics.junction.Logger;
 
 public class DriveCommands {
   private static final double DEADBAND = 0.1;
@@ -36,10 +37,16 @@ public class DriveCommands {
       Drive drive,
       DoubleSupplier xSupplier,
       DoubleSupplier ySupplier,
-      DoubleSupplier omegaSupplier) {
+      DoubleSupplier omegaSupplier,
+      DoubleSupplier slowMode,
+      DoubleSupplier autoAlign) {
     return Commands.run(
         () -> {
           double scle = 1.0;
+
+          //   if (slowMode.getAsDouble() > 0.5) {
+          // scle = 0.4;
+          //   }
           // Apply deadband
           double linearMagnitude =
               MathUtil.applyDeadband(
@@ -47,24 +54,29 @@ public class DriveCommands {
                   DEADBAND);
           Rotation2d linearDirection =
               new Rotation2d(xSupplier.getAsDouble(), ySupplier.getAsDouble());
-          double omega = MathUtil.applyDeadband(omegaSupplier.getAsDouble(), DEADBAND);
-
+          double omega = MathUtil.applyDeadband(omegaSupplier.getAsDouble(), DEADBAND) * 0.75;
+          //   double omega = 0;
           // Square values
           linearMagnitude = linearMagnitude * linearMagnitude;
-          omega = Math.copySign(omega * omega, omega);
-
+          omega = Math.copySign(omega * omega, omega) * drive.getMaxAngularSpeedRadPerSec();
+          if (autoAlign.getAsDouble() > 0.5) {
+            // omega = drive.getAlignOutput(drive.get)
+            omega = drive.getAlignOutput();
+          }
           // Calcaulate new linear velocity
           Translation2d linearVelocity =
               new Pose2d(new Translation2d(), linearDirection)
                   .transformBy(new Transform2d(linearMagnitude, 0.0, new Rotation2d()))
                   .getTranslation();
 
+          Logger.recordOutput("Swerve/linearVelocity", linearVelocity);
+
           // Convert to field relative speeds & send command
           drive.runVelocity(
               ChassisSpeeds.fromFieldRelativeSpeeds(
                   linearVelocity.getX() * drive.getMaxLinearSpeedMetersPerSec(),
                   linearVelocity.getY() * drive.getMaxLinearSpeedMetersPerSec(),
-                  omega * drive.getMaxAngularSpeedRadPerSec(),
+                  omega,
                   drive.getRotation()));
         },
         drive);

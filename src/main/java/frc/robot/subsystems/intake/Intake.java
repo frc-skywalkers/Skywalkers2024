@@ -3,6 +3,7 @@ package frc.robot.subsystems.intake;
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+import frc.robot.Constants.IntakeConstants;
 import frc.robot.Constants.Mode;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
@@ -33,6 +34,7 @@ public class Intake extends SubsystemBase {
         ffModel = new ArmFeedforward(0.0, 0.0, 0);
         break;
     }
+    Logger.recordOutput("Intake/Mode", 0.000);
   }
 
   @Override
@@ -40,6 +42,7 @@ public class Intake extends SubsystemBase {
     // This method will be called once per scheduler run
     io.updateInputs(inputs);
     Logger.processInputs(("Intake"), inputs);
+    Logger.recordOutput("Intake/atPosition", hasPiece());
   }
 
   public void runVolts(double volts) {
@@ -48,6 +51,18 @@ public class Intake extends SubsystemBase {
 
   public void runWheelVolts(double volts) {
     io.runWheelVolts(volts);
+  }
+
+  public void runWheel() {
+    runWheelVolts(IntakeConstants.intakeVolts);
+  }
+
+  public void holdPiece() {
+    runWheelVolts(IntakeConstants.holdVolts);
+  }
+
+  public void outtakeWheel() {
+    runWheelVolts(IntakeConstants.outtakeVolts);
   }
 
   public void setPosition(double positionRad) {
@@ -78,5 +93,17 @@ public class Intake extends SubsystemBase {
 
   public double getCharacterizationVelocity() {
     return inputs.velocityRadPerSec;
+  }
+
+  public boolean hasPiece() {
+    return false;
+  }
+
+  public boolean atPosition() {
+    return Math.abs(getPositionRad() - inputs.goalPos) < IntakeConstants.tolerance;
+  }
+
+  public boolean atPosition(double goalPos) {
+    return Math.abs(getPositionRad() - goalPos) < IntakeConstants.tolerance;
   }
 }

@@ -8,6 +8,7 @@ import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Constants.Mode;
+import frc.robot.Constants.PivotConstants;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
@@ -23,15 +24,15 @@ public class Pivot extends SubsystemBase {
     switch (Constants.currentMode) {
       case REAL:
         ffModel = new ArmFeedforward(0.0945, 0.5185, 0); // need to determine
-        io.configurePID(6.0, 0.0, 0.0); // need to determine
+        io.configurePIDFF(6.0, 0.0, 0.0); // need to determine
         break;
       case REPLAY:
         ffModel = new ArmFeedforward(0.1, 0.05, 0);
-        io.configurePID(1.0, 0.0, 0.0);
+        io.configurePIDFF(1.0, 0.0, 0.0);
         break;
       case SIM:
         ffModel = new ArmFeedforward(0.0945, 0.5185, 1.5);
-        io.configurePID(6.0, 0.0, 0.0);
+        io.configurePIDFF(6.0, 0.0, 0.0);
         break;
       default:
         ffModel = new ArmFeedforward(0.0, 0.0, 0);
@@ -74,5 +75,13 @@ public class Pivot extends SubsystemBase {
 
   public double getCharacterizationVelocity() {
     return inputs.velocityRadPerSec;
+  }
+
+  public boolean atPosition() {
+    return Math.abs(getPositionRad() - inputs.goalPos) < PivotConstants.tolerance;
+  }
+
+  public boolean atPosition(double goalPos) {
+    return Math.abs(getPositionRad() - goalPos) < PivotConstants.tolerance;
   }
 }

@@ -17,6 +17,7 @@ import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+import frc.robot.Constants.ShooterConstants;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
@@ -24,6 +25,8 @@ public class Flywheel extends SubsystemBase {
   private final FlywheelIO io;
   private final FlywheelIOInputsAutoLogged inputs = new FlywheelIOInputsAutoLogged();
   private final SimpleMotorFeedforward ffModel;
+
+  private double desiredRPM = 0.000;
 
   /** Creates a new Flywheel. */
   public Flywheel(FlywheelIO io) {
@@ -65,6 +68,7 @@ public class Flywheel extends SubsystemBase {
   public void runVelocity(double velocityRPM) {
     var velocityRadPerSec = Units.rotationsPerMinuteToRadiansPerSecond(velocityRPM);
     io.setVelocity(velocityRadPerSec, ffModel.calculate(velocityRadPerSec));
+    desiredRPM = velocityRPM;
 
     // Log flywheel setpoint
     Logger.recordOutput("Flywheel/SetpointRPM", velocityRPM);
@@ -73,6 +77,14 @@ public class Flywheel extends SubsystemBase {
   /** Stops the flywheel. */
   public void stop() {
     io.stop();
+  }
+
+  public boolean atDesiredRPM() {
+    return Math.abs(getVelocityRPM() - desiredRPM) < ShooterConstants.tolerance;
+  }
+
+  public boolean atDesiredRPM(double requestRPM) {
+    return Math.abs(getVelocityRPM() - requestRPM) < ShooterConstants.tolerance;
   }
 
   /** Returns the current velocity in RPM. */
@@ -84,5 +96,9 @@ public class Flywheel extends SubsystemBase {
   /** Returns the current velocity in radians per second. */
   public double getCharacterizationVelocity() {
     return inputs.velocityRadPerSec;
+  }
+
+  public double getAppliedVolts() {
+    return inputs.appliedVolts;
   }
 }

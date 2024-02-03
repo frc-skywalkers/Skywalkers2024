@@ -42,5 +42,7 @@ public interface PivotIO {
   public default void stop() {}
 
   /** Set velocity PID constants. */
-  public default void configurePID(double kP, double kI, double kD) {}
+  public default void configurePIDFF(double kP, double kI, double kD, double kG, double kS) {}
+
+  public default void configurePIDFF(double kP, double kI, double kD) {}
 }

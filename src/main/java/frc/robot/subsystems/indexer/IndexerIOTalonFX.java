@@ -26,7 +26,7 @@ import edu.wpi.first.math.util.Units;
 public class IndexerIOTalonFX implements IndexerIO {
   private static final double GEAR_RATIO = 1.5;
 
-  private final TalonFX leader = new TalonFX(0);
+  private final TalonFX leader = new TalonFX(22);
 
   private final StatusSignal<Double> leaderPosition = leader.getPosition();
   private final StatusSignal<Double> leaderVelocity = leader.getVelocity();
@@ -53,6 +53,7 @@ public class IndexerIOTalonFX implements IndexerIO {
         Units.rotationsToRadians(leaderVelocity.getValueAsDouble()) / GEAR_RATIO;
     inputs.appliedVolts = leaderAppliedVolts.getValueAsDouble();
     inputs.currentAmps = new double[] {leaderCurrent.getValueAsDouble()};
+    inputs.hasPiece = hasPiece();
   }
 
   @Override
@@ -86,5 +87,9 @@ public class IndexerIOTalonFX implements IndexerIO {
     config.kI = kI;
     config.kD = kD;
     leader.getConfigurator().apply(config);
+  }
+
+  private boolean hasPiece() {
+    return false;
   }
 }

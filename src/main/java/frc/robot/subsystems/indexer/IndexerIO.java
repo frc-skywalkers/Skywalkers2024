@@ -22,6 +22,7 @@ public interface IndexerIO {
     public double velocityRadPerSec = 0.0;
     public double appliedVolts = 0.0;
     public double[] currentAmps = new double[] {};
+    public boolean hasPiece = false;
   }
 
   /** Updates the set of loggable inputs. */

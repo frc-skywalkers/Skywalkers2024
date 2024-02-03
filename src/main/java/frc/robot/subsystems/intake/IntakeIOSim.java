@@ -25,7 +25,7 @@ import org.littletonrobotics.junction.Logger;
 public class IntakeIOSim implements IntakeIO {
   private SingleJointedArmSim sim =
       new SingleJointedArmSim(
-          DCMotor.getNEO(1), 100.00, 0.05, 0.25, -Math.PI / 2, Math.PI / 2, true, 0.0);
+          DCMotor.getNEO(1), 100.00, 0.05, 0.25, -Math.PI / 4, Math.PI, true, Math.PI / 2);
   private ProfiledPIDController pid =
       new ProfiledPIDController(6.0, 0.0, 0.0, new TrapezoidProfile.Constraints(3, 2.5));
   private FlywheelSim wheelsim = new FlywheelSim(DCMotor.getNEO(1), 1, 0.004); //
