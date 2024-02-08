@@ -19,10 +19,12 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.Constants.FieldConstants;
+import frc.robot.Constants.IndexerConstants;
 import frc.robot.Constants.PivotConstants;
 import frc.robot.Constants.ShooterConstants;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.flywheel.Flywheel;
+import frc.robot.subsystems.indexer.Indexer;
 import frc.robot.subsystems.pivot.Pivot;
 
 public class FlywheelCommands {
@@ -75,5 +77,14 @@ public class FlywheelCommands {
         },
         shooter,
         pivot);
+  }
+
+  public static Command shoot(Indexer indexer) {
+    return Commands.run(
+            () -> {
+              indexer.runVolts(IndexerConstants.outtakeVolts);
+            },
+            indexer)
+        .withTimeout(0.5);
   }
 }

@@ -48,19 +48,19 @@ public final class Constants {
 
   public static final class PivotConstants {
     public static final double[] angleEquation = {Math.PI / 27.00, -Math.PI * 1.000 / 3.000};
-    public static final double mm_cruisevel = 3;
-    public static final double mm_accel = 2.5;
-    public static final double mm_jerk = 6;
+    public static final double mm_cruisevel = 0.4;
+    public static final double mm_accel = 1.2;
+    public static final double mm_jerk = 3.6;
 
-    public static final double handoff = -Math.PI / 4;
+    public static final double handoff = -0.15;
 
     public static final double tolerance = 0.05;
   }
 
   public static final class IntakeConstants {
-    public static final double dropDown = -Math.PI / 4;
+    public static final double dropDown = 0;
     public static final double home = Math.PI / 2;
-    public static final double handoff = 3 * Math.PI / 4;
+    public static final double handoff = 4 * Math.PI / 4;
 
     public static final double intakeVolts = 8.0;
     public static final double holdVolts = 1.0;
@@ -97,5 +97,7 @@ public final class Constants {
 
     public static final double shooterAngleOffset = 180.0;
     public static final double shooterMultiplier = -1.0;
+
+    public static final double scale = 1.0 / 29.0;
   }
 }

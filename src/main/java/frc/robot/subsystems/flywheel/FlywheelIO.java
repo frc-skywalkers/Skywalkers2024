@@ -25,6 +25,10 @@ public interface FlywheelIO {
     public double followerPositionRad = 0.0;
     public double followerVelocityRadPerSec = 0.0;
     public double followerAppliedVolts = 0.0;
+    public double goalRadPerSec = 0.0;
+    public double pidError = 0.0;
+    public double feedforwardOut = 0.0;
+    public double leadGoal = 0.0;
   }
 
   /** Updates the set of loggable inputs. */

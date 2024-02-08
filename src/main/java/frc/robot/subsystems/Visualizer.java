@@ -36,27 +36,44 @@ public class Visualizer extends SubsystemBase {
   public Visualizer(Intake intake, Pivot pivot) {
     this.intake = intake;
     this.pivot = pivot;
-    mech = new Mechanism2d(29.0, 29.0);
+    mech = new Mechanism2d(29.0 * VisualizerConstants.scale, 29.0 * VisualizerConstants.scale);
 
-    intakeRoot = mech.getRoot("intake", 5, 3);
-    pivotRoot = mech.getRoot("pivot", 25, 3);
+    intakeRoot =
+        mech.getRoot("intake", 5 * VisualizerConstants.scale, 3 * VisualizerConstants.scale);
+    pivotRoot =
+        mech.getRoot("pivot", 25 * VisualizerConstants.scale, 3 * VisualizerConstants.scale);
 
     intakeMount =
         intakeRoot.append(
-            new MechanismLigament2d("Intake Mount", 2, VisualizerConstants.intakeMountAngle));
+            new MechanismLigament2d(
+                "Intake Mount",
+                2 * VisualizerConstants.scale,
+                VisualizerConstants.intakeMountAngle));
     intakeHandle =
         intakeMount.append(
-            new MechanismLigament2d("Intake Handle", 6.5, -VisualizerConstants.intakeMountAngle));
-    intakeDropDown = intakeHandle.append(new MechanismLigament2d("Drop Down Intake", 5.5, 45));
+            new MechanismLigament2d(
+                "Intake Handle",
+                5.5 * VisualizerConstants.scale,
+                -VisualizerConstants.intakeMountAngle));
+    intakeDropDown =
+        intakeHandle.append(
+            new MechanismLigament2d("Drop Down Intake", 4.5 * VisualizerConstants.scale, 45));
 
     pivotMount =
         pivotRoot.append(
-            new MechanismLigament2d("Pivot Mount", 20, VisualizerConstants.pivotMountAngle));
+            new MechanismLigament2d(
+                "Pivot Mount",
+                20 * VisualizerConstants.scale,
+                VisualizerConstants.pivotMountAngle));
     shooterHandle =
         pivotMount.append(
             new MechanismLigament2d(
-                "Shooter Handle", 4, 0 - VisualizerConstants.pivotMountAngle + 180));
-    shooter = shooterHandle.append(new MechanismLigament2d("Shooter", 16, 45));
+                "Shooter Handle",
+                2 * VisualizerConstants.scale,
+                0 - VisualizerConstants.pivotMountAngle + 180));
+    shooter =
+        shooterHandle.append(
+            new MechanismLigament2d("Shooter", 15 * VisualizerConstants.scale, 45));
     Logger.recordOutput("SuperStructure/mechanism", mech);
   }
 
@@ -66,7 +83,7 @@ public class Visualizer extends SubsystemBase {
     intakeHandle.setAngle(
         180 - intake.getPositionRad() * (180.00 / Math.PI) - VisualizerConstants.intakeMountAngle);
     shooterHandle.setAngle(
-        180 + pivot.getPositionRad() * (180.000 / Math.PI) - VisualizerConstants.pivotMountAngle);
+        180 - pivot.getPositionRad() * (180.000 / Math.PI) - VisualizerConstants.pivotMountAngle);
 
     Logger.recordOutput("SuperStructure/mechanism", mech);
   }

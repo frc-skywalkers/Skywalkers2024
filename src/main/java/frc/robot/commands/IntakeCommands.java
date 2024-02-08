@@ -46,7 +46,7 @@ public class IntakeCommands {
               Logger.recordOutput("Intake/intakingPiece", true);
             },
             intake)
-        .withTimeout(5.0);
+        .until(() -> intake.atPosition(IntakeConstants.dropDown));
   }
 
   public static Command passPieceIntake(Intake intake, Pivot pivot, Indexer indexer) {
@@ -62,8 +62,8 @@ public class IntakeCommands {
         .until(
             () ->
                 intake.atPosition(IntakeConstants.handoff)
-                    && pivot.atPosition(PivotConstants.handoff))
-        .withTimeout(5.0);
+                    && pivot.atPosition(PivotConstants.handoff));
+    // .withTimeout(5.0);
   }
 
   public static Command transferPiece(Intake intake, Indexer indexer) {
@@ -74,7 +74,7 @@ public class IntakeCommands {
             },
             intake,
             indexer)
-        .withTimeout(4.0)
+        .withTimeout(0.5)
         .andThen(() -> indexer.runVolts(IndexerConstants.holdVolts));
   }
 

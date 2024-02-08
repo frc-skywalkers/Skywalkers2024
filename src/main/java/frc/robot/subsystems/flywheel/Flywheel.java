@@ -36,8 +36,8 @@ public class Flywheel extends SubsystemBase {
     // separate robot with different tuning)
     switch (Constants.currentMode) {
       case REAL:
-        ffModel = new SimpleMotorFeedforward(0.0, 0.0); // need to determine
-        io.configurePID(0.5, 0.0, 0.0); // need to determine
+        ffModel = new SimpleMotorFeedforward(0.196, 0.0268); // need to determine
+        io.configurePID(0.009, 0.0, 0.00025); // need to determine
         break;
       case REPLAY:
         ffModel = new SimpleMotorFeedforward(0.1, 0.05);

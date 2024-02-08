@@ -19,8 +19,8 @@ public class Intake extends SubsystemBase {
     this.io = io;
     switch (Constants.currentMode) {
       case REAL:
-        ffModel = new ArmFeedforward(0.0, 0.0, 0); // need to determine
-        io.configurePID(0.5, 0.0, 0.0); // need to determine
+        ffModel = new ArmFeedforward(0.0, 0.2, 0.764); // need to determine
+        io.configurePID(2.0, 0.0, 0.02); // need to determine
         break;
       case REPLAY:
         ffModel = new ArmFeedforward(0.1, 0.05, 0);
@@ -69,7 +69,7 @@ public class Intake extends SubsystemBase {
     if (Constants.currentMode == Mode.SIM) {
       io.setPosition(positionRad, ffModel.calculate(inputs.setpointPos, inputs.goalVel));
     } else {
-      io.setPosition(positionRad, ffModel.calculate(inputs.positionRad, 0.0));
+      io.setPosition(positionRad, ffModel.calculate(inputs.positionRad, inputs.goalVel));
     }
   }
 

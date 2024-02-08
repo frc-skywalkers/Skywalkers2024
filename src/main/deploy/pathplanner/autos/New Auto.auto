@@ -16,6 +16,19 @@
           "data": {
             "pathName": "3 Note Auto"
           }
+        },
+        {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "intake handoff"
+                }
+              }
+            ]
+          }
         }
       ]
     }

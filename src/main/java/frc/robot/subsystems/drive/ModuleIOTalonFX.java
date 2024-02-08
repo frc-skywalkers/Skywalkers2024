@@ -67,29 +67,29 @@ public class ModuleIOTalonFX implements ModuleIO {
   public ModuleIOTalonFX(int index) {
     switch (index) {
       case 0:
-        driveTalon = new TalonFX(1);
-        turnTalon = new TalonFX(2);
-        cancoder = new CANcoder(3);
+        driveTalon = new TalonFX(1, "CANivore");
+        turnTalon = new TalonFX(2, "CANivore");
+        cancoder = new CANcoder(3, "CANivore");
         absoluteEncoderOffset =
             new Rotation2d(0.065674 * 2 * Math.PI + Math.PI); // MUST BE CALIBRATED
         break;
       case 1:
-        driveTalon = new TalonFX(4);
-        turnTalon = new TalonFX(5);
-        cancoder = new CANcoder(6);
+        driveTalon = new TalonFX(4, "CANivore");
+        turnTalon = new TalonFX(5, "CANivore");
+        cancoder = new CANcoder(6, "CANivore");
         absoluteEncoderOffset = new Rotation2d(-0.354736 * 2 * Math.PI); // MUST BE CALIBRATED
         break;
       case 2:
-        driveTalon = new TalonFX(10);
-        turnTalon = new TalonFX(11);
-        cancoder = new CANcoder(12);
+        driveTalon = new TalonFX(10, "CANivore");
+        turnTalon = new TalonFX(11, "CANivore");
+        cancoder = new CANcoder(12, "CANivore");
         absoluteEncoderOffset =
             new Rotation2d(0.223145 * 2 * Math.PI + Math.PI); // MUST BE CALIBRATED
         break;
       case 3:
-        driveTalon = new TalonFX(7);
-        turnTalon = new TalonFX(8);
-        cancoder = new CANcoder(9);
+        driveTalon = new TalonFX(7, "CANivore");
+        turnTalon = new TalonFX(8, "CANivore");
+        cancoder = new CANcoder(9, "CANivore");
         absoluteEncoderOffset = new Rotation2d(-0.0632 * 2 * Math.PI); // MUST BE CALIBRATED
         break;
       default:
