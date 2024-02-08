@@ -15,36 +15,53 @@ package frc.robot.subsystems.pivot;
 
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
-import com.ctre.phoenix6.configs.FeedbackConfigs;
 import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
-import com.ctre.phoenix6.controls.MotionMagicVoltage;
+import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
-import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
+import edu.wpi.first.math.controller.ProfiledPIDController;
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
 import frc.robot.Constants.PivotConstants;
 
 public class PivotIOTalonFX implements PivotIO {
-  private static final double GEAR_RATIO = 60.00;
+  private static final double GEAR_RATIO = 200.00;
 
-  private final TalonFX leader = new TalonFX(0);
-  private final CANcoder cancoder = new CANcoder(1);
+  private final TalonFX leader = new TalonFX(23);
+  private final CANcoder cancoder = new CANcoder(16);
 
   private final StatusSignal<Double> leaderPosition = leader.getPosition();
   private final StatusSignal<Double> leaderVelocity = leader.getVelocity();
   private final StatusSignal<Double> leaderAppliedVolts = leader.getMotorVoltage();
   private final StatusSignal<Double> leaderCurrent = leader.getStatorCurrent();
+  private final StatusSignal<Double> leaderOutput = leader.getClosedLoopOutput();
+  private final StatusSignal<Double> leaderPIDError = leader.getClosedLoopError();
+  private final StatusSignal<Double> leaderPIDRef = leader.getClosedLoopReference();
+
+  private final StatusSignal<Double> absEncoderPos = cancoder.getAbsolutePosition();
+
+  private final ProfiledPIDController pid =
+      new ProfiledPIDController(10.0, 0.0, 0.10, new TrapezoidProfile.Constraints(0.25, 1.2));
+
+  private final PositionVoltage m_voltagePosition =
+      new PositionVoltage(0, 0, false, 0, 0, false, false, false);
+
+  private final double absEncoderOffset = -0.024658;
+
   private double goalPos = 0.00;
+
+  private double goalVel = 0.0;
 
   public PivotIOTalonFX() {
     var config = new TalonFXConfiguration();
-    config.CurrentLimits.StatorCurrentLimit = 30.0;
-    config.CurrentLimits.StatorCurrentLimitEnable = true;
+    // config.CurrentLimits.StatorCurrentLimit = 30.0;
+    // config.CurrentLimits.StatorCurrentLimitEnable = true;
     config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
+    config.Feedback.SensorToMechanismRatio = GEAR_RATIO;
     leader.getConfigurator().apply(config);
 
     MotionMagicConfigs mm_configs = config.MotionMagic;
@@ -53,25 +70,51 @@ public class PivotIOTalonFX implements PivotIO {
     mm_configs.MotionMagicAcceleration = PivotConstants.mm_accel;
     mm_configs.MotionMagicJerk = PivotConstants.mm_jerk;
 
-    FeedbackConfigs f_configs = config.Feedback;
+    leader.getConfigurator().apply(mm_configs);
 
-    f_configs.FeedbackRemoteSensorID = cancoder.getDeviceID();
-    f_configs.FeedbackSensorSource = FeedbackSensorSourceValue.RemoteCANcoder;
-    f_configs.RotorToSensorRatio = GEAR_RATIO;
+    // FeedbackConfigs f_configs = config.Feedback;
+
+    // f_configs.FeedbackRemoteSensorID = cancoder.getDeviceID();
+    // f_configs.FeedbackSensorSource = FeedbackSensorSourceValue.RemoteCANcoder;
+    // f_configs.RotorToSensorRatio = GEAR_RATIO;
 
     BaseStatusSignal.setUpdateFrequencyForAll(
-        50.0, leaderPosition, leaderVelocity, leaderAppliedVolts, leaderCurrent);
+        50.0,
+        leaderPosition,
+        leaderVelocity,
+        leaderAppliedVolts,
+        leaderCurrent,
+        absEncoderPos,
+        leaderOutput,
+        leaderPIDError,
+        leaderPIDRef);
     leader.optimizeBusUtilization();
+
+    leader.setPosition(absEncoderPos.getValueAsDouble() - absEncoderOffset);
+    pid.reset(absEncoderPos.getValueAsDouble() - absEncoderOffset);
   }
 
   @Override
   public void updateInputs(PivotIOInputs inputs) {
-    BaseStatusSignal.refreshAll(leaderPosition, leaderVelocity, leaderAppliedVolts, leaderCurrent);
+    BaseStatusSignal.refreshAll(
+        leaderPosition,
+        leaderVelocity,
+        leaderAppliedVolts,
+        leaderCurrent,
+        absEncoderPos,
+        leaderOutput,
+        leaderPIDError,
+        leaderPIDRef);
     inputs.positionRad = Units.rotationsToRadians(leaderPosition.getValueAsDouble());
     inputs.velocityRadPerSec = Units.rotationsToRadians(leaderVelocity.getValueAsDouble());
     inputs.appliedVolts = leaderAppliedVolts.getValueAsDouble();
     inputs.currentAmps = new double[] {leaderCurrent.getValueAsDouble()};
     inputs.goalPos = goalPos;
+    inputs.absPos = Units.rotationsToRadians(absEncoderPos.getValueAsDouble() - absEncoderOffset);
+    inputs.goalVel = goalVel;
+    // Logger.recordOutput("Pivot/PID/Output", leaderOutput.getValueAsDouble());
+    // Logger.recordOutput("Pivot/PID/Error", leaderPIDError.getValueAsDouble());
+    // Logger.recordOutput("Pivot/PID/Ref", leaderPIDRef.getValueAsDouble());
   }
 
   @Override
@@ -81,10 +124,20 @@ public class PivotIOTalonFX implements PivotIO {
 
   @Override
   public void setPosition(double positionRad, double ffVolts) {
-    leader.setControl(
-        new MotionMagicVoltage(
-            Units.radiansToRotations(positionRad), false, ffVolts, 0, false, false, false));
+    // leader.setControl(
+    // new MotionMagicVoltage(
+    // Units.radiansToRotations(positionRad), false, ffVolts, 0, false, false, false));
     goalPos = positionRad;
+    double setVolts =
+        pid.calculate(leaderPosition.getValueAsDouble(), Units.radiansToRotations(positionRad));
+
+    leader.setControl(new VoltageOut(setVolts + ffVolts));
+    goalVel = pid.getSetpoint().velocity;
+    // leader.setControl(m_voltagePosition.withPosition(Units.radiansToRotations(positionRad)));
+    // leader.setControl(
+    // new PositionVoltage(Units.radiansToRotations(positionRad), 0.0, false, ffVolts, 0, false,
+    // false, false));
+
   }
 
   @Override
@@ -95,9 +148,13 @@ public class PivotIOTalonFX implements PivotIO {
   @Override
   public void configurePIDFF(double kP, double kI, double kD, double kG, double kS) {
     var config = new Slot0Configs();
-    config.kP = kP;
+    config.kP = kP * 50;
+
     config.kI = kI;
     config.kD = kD;
+
+    // config.kV = 24.0;
+    // config.kA = 1.0;
     leader.getConfigurator().apply(config);
     // leader.Slot0Configs = config;
   }

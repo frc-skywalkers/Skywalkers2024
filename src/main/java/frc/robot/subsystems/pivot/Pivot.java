@@ -23,7 +23,7 @@ public class Pivot extends SubsystemBase {
     this.io = io;
     switch (Constants.currentMode) {
       case REAL:
-        ffModel = new ArmFeedforward(0.0945, 0.5185, 0); // need to determine
+        ffModel = new ArmFeedforward(0.1215, 0.0965, 24.0); // need to determine
         io.configurePIDFF(6.0, 0.0, 0.0); // need to determine
         break;
       case REPLAY:
@@ -55,7 +55,7 @@ public class Pivot extends SubsystemBase {
     if (Constants.currentMode == Mode.SIM) {
       io.setPosition(positionRad, ffModel.calculate(inputs.setpointPos, inputs.goalVel));
     } else {
-      io.setPosition(positionRad, ffModel.calculate(inputs.positionRad, 0.0));
+      io.setPosition(positionRad, ffModel.calculate(inputs.positionRad, inputs.goalVel));
     }
   }
 

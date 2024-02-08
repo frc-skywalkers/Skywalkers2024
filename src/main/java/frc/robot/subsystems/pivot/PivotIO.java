@@ -27,6 +27,7 @@ public interface PivotIO {
     public double setpointPos = 0.000;
     public double ffVolts = 0.0000;
     public double pidOut = 0.000;
+    public double absPos = 0.000;
   }
 
   /** Updates the set of loggable inputs. */
