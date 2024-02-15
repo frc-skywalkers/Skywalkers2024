@@ -48,30 +48,35 @@ public final class Constants {
 
   public static final class PivotConstants {
     public static final double[] angleEquation = {Math.PI / 27.00, -Math.PI * 1.000 / 3.000};
+
+    // public static InterpolatingDoubleTreeMap pivotAngleMap = new InterpolatingDoubleTreeMap({});
+
     public static final double mm_cruisevel = 0.4;
-    public static final double mm_accel = 1.2;
-    public static final double mm_jerk = 3.6;
+    public static final double mm_accel = 0.8;
+    public static final double mm_jerk = 1.6;
 
-    public static final double handoff = -0.15;
+    public static final double handoff = -0.95;
 
-    public static final double tolerance = 0.05;
+    public static final double tolerance = 0.075;
   }
 
   public static final class IntakeConstants {
-    public static final double dropDown = 0;
+    public static final double dropDown = 3.0;
     public static final double home = Math.PI / 2;
-    public static final double handoff = 4 * Math.PI / 4;
+    public static final double handoff = 0.0;
 
-    public static final double intakeVolts = 8.0;
-    public static final double holdVolts = 1.0;
+    public static final double intakeVolts = -8.0;
+    public static final double holdVolts = -2.0;
     public static final double outtakeVolts = 4.0;
 
     public static final double tolerance = 0.05;
+
+    public static final double tofTolerance = 30.00;
   }
 
   public static final class IndexerConstants {
     public static final double indexVolts = 6.0;
-    public static final double outtakeVolts = 6.0;
+    public static final double outtakeVolts = 7.0;
     public static final double holdVolts = 0.0;
   }
 

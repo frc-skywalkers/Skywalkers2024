@@ -21,6 +21,8 @@ import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
+import com.playingwithfusion.TimeOfFlight;
+import com.playingwithfusion.TimeOfFlight.RangingMode;
 import edu.wpi.first.math.util.Units;
 
 public class IndexerIOTalonFX implements IndexerIO {
@@ -33,6 +35,8 @@ public class IndexerIOTalonFX implements IndexerIO {
   private final StatusSignal<Double> leaderAppliedVolts = leader.getMotorVoltage();
   private final StatusSignal<Double> leaderCurrent = leader.getStatorCurrent();
 
+  private final TimeOfFlight tofSensor = new TimeOfFlight(15);
+
   public IndexerIOTalonFX() {
     var config = new TalonFXConfiguration();
     config.CurrentLimits.StatorCurrentLimit = 30.0;
@@ -43,6 +47,7 @@ public class IndexerIOTalonFX implements IndexerIO {
     BaseStatusSignal.setUpdateFrequencyForAll(
         50.0, leaderPosition, leaderVelocity, leaderAppliedVolts, leaderCurrent);
     leader.optimizeBusUtilization();
+    tofSensor.setRangingMode(RangingMode.Short, 30);
   }
 
   @Override
@@ -54,6 +59,8 @@ public class IndexerIOTalonFX implements IndexerIO {
     inputs.appliedVolts = leaderAppliedVolts.getValueAsDouble();
     inputs.currentAmps = new double[] {leaderCurrent.getValueAsDouble()};
     inputs.hasPiece = hasPiece();
+    inputs.tofDistance = tofSensor.getRange();
+    inputs.tofSD = tofSensor.getRangeSigma();
   }
 
   @Override
@@ -90,6 +97,6 @@ public class IndexerIOTalonFX implements IndexerIO {
   }
 
   private boolean hasPiece() {
-    return false;
+    return tofSensor.getRange() < 140.000;
   }
 }

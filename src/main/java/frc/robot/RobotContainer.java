@@ -27,18 +27,23 @@ import frc.robot.subsystems.Visualizer;
 // import frc.robot.commands.IntakePiece;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.GyroIO;
+import frc.robot.subsystems.drive.GyroIOPigeon2;
 import frc.robot.subsystems.drive.ModuleIO;
 import frc.robot.subsystems.drive.ModuleIOSim;
+import frc.robot.subsystems.drive.ModuleIOTalonFX;
 import frc.robot.subsystems.flywheel.Flywheel;
 import frc.robot.subsystems.flywheel.FlywheelIO;
 import frc.robot.subsystems.flywheel.FlywheelIOSim;
+import frc.robot.subsystems.flywheel.FlywheelIOTalonFX;
 import frc.robot.subsystems.indexer.Indexer;
 import frc.robot.subsystems.indexer.IndexerIOSim;
+import frc.robot.subsystems.indexer.IndexerIOTalonFX;
 import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.intake.IntakeIOSim;
 import frc.robot.subsystems.intake.IntakeIOSparkMax;
 import frc.robot.subsystems.pivot.Pivot;
 import frc.robot.subsystems.pivot.PivotIOSim;
+import frc.robot.subsystems.pivot.PivotIOTalonFX;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 import org.littletonrobotics.junction.networktables.LoggedDashboardNumber;
 
@@ -94,31 +99,31 @@ public class RobotContainer {
         // indexer = new Indexer(new IndexerIOSim());
         // visualizer = new Visualizer(intake, pivot);
 
+        drive =
+            new Drive(
+                new GyroIOPigeon2(true),
+                new ModuleIOTalonFX(0),
+                new ModuleIOTalonFX(1),
+                new ModuleIOTalonFX(2),
+                new ModuleIOTalonFX(3));
+        flywheel = new Flywheel(new FlywheelIOTalonFX());
+        pivot = new Pivot(new PivotIOTalonFX());
+        intake = new Intake(new IntakeIOSparkMax());
+        indexer = new Indexer(new IndexerIOTalonFX());
+        visualizer = new Visualizer(intake, pivot);
+
         // drive =
         //     new Drive(
-        //         new GyroIOPigeon2(true),
-        //         new ModuleIOTalonFX(0),
-        //         new ModuleIOTalonFX(1),
-        //         new ModuleIOTalonFX(2),
-        //         new ModuleIOTalonFX(3));
+        //         new GyroIO() {},
+        //         new ModuleIOSim(),
+        //         new ModuleIOSim(),
+        //         new ModuleIOSim(),
+        //         new ModuleIOSim());
         // flywheel = new Flywheel(new FlywheelIOTalonFX());
         // pivot = new Pivot(new PivotIOTalonFX());
         // intake = new Intake(new IntakeIOSparkMax());
         // indexer = new Indexer(new IndexerIOTalonFX());
         // visualizer = new Visualizer(intake, pivot);
-
-        drive =
-            new Drive(
-                new GyroIO() {},
-                new ModuleIOSim(),
-                new ModuleIOSim(),
-                new ModuleIOSim(),
-                new ModuleIOSim());
-        flywheel = new Flywheel(new FlywheelIOSim());
-        pivot = new Pivot(new PivotIOSim());
-        intake = new Intake(new IntakeIOSparkMax());
-        indexer = new Indexer(new IndexerIOSim());
-        visualizer = new Visualizer(intake, pivot);
 
         break;
 
@@ -159,6 +164,8 @@ public class RobotContainer {
 
     SmartDashboard.putNumber("Indexer Volt Wanted", 0.0);
     SmartDashboard.putNumber("Shooter Volt Wanted", 0.0);
+    SmartDashboard.putNumber("Pivot Angle Wanted", -0.65);
+    SmartDashboard.putNumber("Shooter RPM Wanted", 3500);
 
     // Set up auto routines
     NamedCommands.registerCommand(
@@ -209,10 +216,19 @@ public class RobotContainer {
     //         () -> controller.getLeftTriggerAxis(),
     //         () -> controller.getRightTriggerAxis()));
     // controller.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
-    // flywheel.setDefaultCommand(FlywheelCommands.autoShoot(flywheel, drive, pivot));
+    // flywheel.setDefaultCommand(FlywheelCommands.autoShoot(flywheel, drive));
 
     // intake.setDefaultCommand(
-    //     Commands.runOnce(() -> intake.setPosition(IntakeConstants.home), intake));
+    //     Commands.runOnce(
+    //         () -> {
+    //           intake.setPosition(IntakeConstants.handoff);
+    //           intake.stopWheels();
+    //         },
+    //         intake));
+
+    // pivot.setDefaultCommand(FlywheelCommands.autoPivotAim(pivot, drive));
+    // indexer.setDefaultCommand(
+    //     Commands.runOnce(() -> indexer.runVolts(IndexerConstants.holdVolts), indexer));
     // controller.a().onTrue(Commands.run(() -> pivot.setPosition(-0.25), pivot));
     // controller.b().onTrue(Commands.run(() -> pivot.setPosition(0.0), pivot));
 
@@ -264,24 +280,25 @@ public class RobotContainer {
 
     // controller.x().onTrue(Commands.runOnce(() -> intake.runVolts(1.0)));
 
-    controller
-        .b()
-        .onTrue(
-            Commands.runOnce(
-                () -> intake.runVolts(SmartDashboard.getNumber("Shooter Volt Wanted", 0.0))));
+    // controller
+    //     .b()
+    //     .onTrue(
+    //         Commands.runOnce(
+    //             () -> intake.runVolts(SmartDashboard.getNumber("Shooter Volt Wanted", 0.0))));
 
-    controller
-        .x()
-        .onTrue(Commands.run(() -> intake.setPosition(0.05)).until(() -> intake.atPosition(0.05)));
+    // controller
+    //     .x()
+    //     .onTrue(Commands.run(() -> intake.setPosition(0.05)).until(() ->
+    // intake.atPosition(0.05)));
 
     // controller.a().onTrue(Commands.runOnce(() -> intake.runVolts(-1.0)));
 
-    controller
-        .y()
-        .onTrue(Commands.run(() -> intake.setPosition(3.0)).until(() -> intake.atPosition(3.0)));
+    // controller
+    //     .y()
+    //     .onTrue(Commands.run(() -> intake.setPosition(3.0)).until(() -> intake.atPosition(3.0)));
 
     // controller.leftBumper().onTrue(Commands.run(() -> intake.reset))
-
+    // controller.a().onTrue(Commands.runOnce(() -> intake.runWheelVolts(-6.0)));
     // controller.b().onTrue(Commands.runOnce(() -> intake.runWheelVolts(0.0)));
 
     // controller.axisGreaterThan(2, 0.5).onTrue(new IntakePiece(intake, pivot, indexer));
@@ -301,13 +318,42 @@ public class RobotContainer {
     // 3. outtake through intake + index
 
     // controller
-    //     .button(1)
+    //     .x()
     //     .onTrue(
     //         IntakeCommands.intakePiece(intake)
     //             .andThen(IntakeCommands.passPieceIntake(intake, pivot, indexer))
     //             .andThen(IntakeCommands.transferPiece(intake, indexer)));
 
-    // controller.button(1).onTrue(IntakeCommands.intakeHandoff(intake, indexer, pivot));
+    controller.a().onTrue(IntakeCommands.intakeHandoff(intake, indexer, pivot));
+    controller.b().onTrue(Commands.runOnce(() -> indexer.stop()));
+
+    // pivot.setDefaultCommand(
+    //     Commands.runOnce(
+    //         () -> pivot.setPosition(SmartDashboard.getNumber("Pivot Angle Wanted", 0.65)),
+    // pivot));
+    controller
+        .x()
+        .onTrue(
+            Commands.runOnce(
+                () -> flywheel.runVelocity(SmartDashboard.getNumber("Shooter RPM Wanted", 3500)),
+                flywheel));
+    controller.y().onTrue(Commands.runOnce(() -> flywheel.runVelocity(0.0)));
+
+    controller
+        .leftBumper()
+        .onTrue(
+            Commands.runOnce(
+                () -> pivot.setPosition(SmartDashboard.getNumber("Pivot Angle Wanted", 0.45))));
+    controller
+        .rightBumper()
+        .onTrue(
+            Commands.runOnce(
+                () -> indexer.runVolts(SmartDashboard.getNumber("Indexer Volt Wanted", 0.45))));
+
+    // controller.leftBumper().onTrue(FlywheelCommands.shoot(indexer));
+    // controller.rightBumper().onTrue(Commands.runOnce(() -> indexer.stop()));
+    // operator.leftBumper().onTrue(IntakeCommands.transferPiece(intake, indexer));
+
     // // controller.button(2).onTrue(IntakeCommands.passPieceIntake(intake));
 
     // controller.

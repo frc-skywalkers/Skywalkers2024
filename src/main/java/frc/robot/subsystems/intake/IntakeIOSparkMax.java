@@ -26,6 +26,8 @@ public class IntakeIOSparkMax implements IntakeIO {
   private final CANSparkMax wheel = new CANSparkMax(34, MotorType.kBrushless);
   private final RelativeEncoder wheelencoder = wheel.getEncoder();
 
+  // private final TimeOfFlight m_rangeSensor = new TimeOfFlight(1);
+
   public IntakeIOSparkMax() {
     leader.restoreFactoryDefaults();
     wheel.restoreFactoryDefaults();
@@ -56,7 +58,7 @@ public class IntakeIOSparkMax implements IntakeIO {
     inputs.velocityRadPerSec =
         Units.rotationsPerMinuteToRadiansPerSecond(encoder.getVelocity() / GEAR_RATIO) - 100;
     inputs.appliedVolts = leader.getAppliedOutput() * leader.getBusVoltage();
-    inputs.currentAmps = new double[] {leader.getOutputCurrent()};
+    inputs.currentAmps = new double[] {leader.getOutputCurrent(), wheel.getOutputCurrent()};
     inputs.goalPos = goalPos;
     inputs.goalVel = goalVel;
 

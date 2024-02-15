@@ -15,13 +15,14 @@ package frc.robot.subsystems.flywheel;
 
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
+import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.controls.MotionMagicVelocityVoltage;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
-import com.ctre.phoenix6.sim.TalonFXSimState;
 import edu.wpi.first.math.util.Units;
 
 public class FlywheelIOTalonFX implements FlywheelIO {
@@ -31,6 +32,8 @@ public class FlywheelIOTalonFX implements FlywheelIO {
   private final TalonFX follower = new TalonFX(21);
 
   private final VelocityVoltage vel = new VelocityVoltage(0);
+
+  private final MotionMagicVelocityVoltage mm_vel = new MotionMagicVelocityVoltage(0);
 
   private final StatusSignal<Double> leaderPosition = leader.getPosition();
   private final StatusSignal<Double> leaderVelocity = leader.getVelocity();
@@ -52,10 +55,24 @@ public class FlywheelIOTalonFX implements FlywheelIO {
     config.CurrentLimits.StatorCurrentLimit = 30.0;
     config.CurrentLimits.StatorCurrentLimitEnable = true;
     config.MotorOutput.NeutralMode = NeutralModeValue.Coast;
+
+    MotionMagicConfigs mm_configs = config.MotionMagic;
+
+    mm_configs.MotionMagicCruiseVelocity = 80.0;
+    mm_configs.MotionMagicAcceleration = 160.0;
+    mm_configs.MotionMagicJerk = 80.0;
+
+    Slot0Configs slot0 = config.Slot0;
+
+    slot0.kP = 0.00009;
+    slot0.kI = 0.0;
+    slot0.kD = 0.0000025;
+    slot0.kS = 0.113;
+    slot0.kV = 0.018 * (2 * Math.PI);
+    slot0.kA = 0.001;
+
     leader.getConfigurator().apply(config);
     follower.getConfigurator().apply(config);
-
-    TalonFXSimState sim = leader.getSimState();
 
     follower.setInverted(true);
 
@@ -115,19 +132,23 @@ public class FlywheelIOTalonFX implements FlywheelIO {
 
   @Override
   public void setVelocity(double velocityRadPerSec, double ffVolts) {
-    leader.setControl(
-        new VelocityVoltage(
-            Units.radiansToRotations(velocityRadPerSec), 0.0, false, 0, 0, false, false, false));
+    // leader.setControl(
+    //     new VelocityVoltage(
+    //         Units.radiansToRotations(velocityRadPerSec), 0.0, false, 0, 0, false, false, false));
+    // follower.setControl(
+    //     new VelocityVoltage(
+    //         Units.radiansToRotations(velocityRadPerSec * 0.8),
+    //         0.0,
+    //         false,
+    //         0,
+    //         0,
+    //         false,
+    //         false,
+    //         false));
+
+    leader.setControl(mm_vel.withVelocity(Units.radiansToRotations(velocityRadPerSec)).withSlot(0));
     follower.setControl(
-        new VelocityVoltage(
-            Units.radiansToRotations(velocityRadPerSec * 0.8),
-            0.0,
-            false,
-            0,
-            0,
-            false,
-            false,
-            false));
+        mm_vel.withVelocity(Units.radiansToRotations(velocityRadPerSec * 0.8)).withSlot(0));
     goalRadPerSec = velocityRadPerSec;
   }
 
@@ -139,14 +160,14 @@ public class FlywheelIOTalonFX implements FlywheelIO {
 
   @Override
   public void configurePID(double kP, double kI, double kD) {
-    var config = new Slot0Configs();
-    config.kP = kP;
-    config.kI = kI;
-    config.kD = kD;
-    config.kS = 0.196;
-    config.kV = 0.018 * (2 * Math.PI);
+    // var config = new Slot0Configs();
+    // config.kP = kP;
+    // config.kI = kI;
+    // config.kD = kD;
+    // config.kS = 0.196;
+    // config.kV = 0.018 * (2 * Math.PI);
 
-    leader.getConfigurator().apply(config);
-    follower.getConfigurator().apply(config);
+    // leader.getConfigurator().apply(config);
+    // follower.getConfigurator().apply(config);
   }
 }

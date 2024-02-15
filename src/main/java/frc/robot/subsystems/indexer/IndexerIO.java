@@ -23,6 +23,9 @@ public interface IndexerIO {
     public double appliedVolts = 0.0;
     public double[] currentAmps = new double[] {};
     public boolean hasPiece = false;
+    public double tofDistance = 0.0;
+    public double tofSD = 0.0;
+    public boolean tofStatus = false;
   }
 
   /** Updates the set of loggable inputs. */

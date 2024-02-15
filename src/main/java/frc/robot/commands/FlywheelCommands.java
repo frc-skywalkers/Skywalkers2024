@@ -40,6 +40,7 @@ public class FlywheelCommands {
     double shootDistance = curPose.getDistance(goalPose);
     double shootRPM =
         ShooterConstants.RPMEquation[0] * shootDistance + ShooterConstants.RPMEquation[1];
+
     return shootRPM;
   }
 
@@ -55,7 +56,7 @@ public class FlywheelCommands {
     return PivotConstants.angleEquation[0] * shootDistance + PivotConstants.angleEquation[1];
   }
 
-  public static Command autoShoot(Flywheel shooter, Drive drive, Pivot pivot) {
+  public static Command autoShoot(Flywheel shooter, Drive drive) {
     return Commands.run(
         () -> {
           // first we figure out distance necessary to shoot
@@ -72,10 +73,24 @@ public class FlywheelCommands {
           // double shootDistance = curTranslation.getDistance(goalTranslation2d);
           // double shootRPM =
           // ShooterConstants.RPMEquation[0] * shootDistance + ShooterConstants.RPMEquation[1];
-          shooter.runVelocity(calcShootRPM(curTranslation, goalTranslation2d));
-          pivot.setPosition(calcPivotPos(curTranslation, goalTranslation2d));
+          shooter.runVelocity(calcShootRPM(curTranslation, goalPos));
         },
-        shooter,
+        shooter);
+  }
+
+  public static Command autoPivotAim(Pivot pivot, Drive drive) {
+    return Commands.run(
+        () -> {
+          Pose2d curPose = drive.getPose();
+          Translation2d curTranslation = curPose.getTranslation(); // Translation2d
+          Translation2d goalPos;
+          if (drive.getShootMode()) {
+            goalPos = drive.calcVirtualGoal();
+          } else {
+            goalPos = FieldConstants.getSpeaker();
+          }
+          pivot.setPosition(calcPivotPos(curTranslation, goalPos));
+        },
         pivot);
   }
 

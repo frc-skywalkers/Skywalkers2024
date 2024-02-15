@@ -59,10 +59,10 @@ public class DriveCommands {
           // Square values
           linearMagnitude = linearMagnitude * linearMagnitude;
           omega = Math.copySign(omega * omega, omega) * drive.getMaxAngularSpeedRadPerSec();
-          if (autoAlign.getAsDouble() > 0.5) {
-            // omega = drive.getAlignOutput(drive.get)
-            omega = drive.getAlignOutput();
-          }
+          // if (autoAlign.getAsDouble() > 0.5) {
+          //   // omega = drive.getAlignOutput(drive.get)
+          //   omega = drive.getAlignOutput();
+          // }
           // Calcaulate new linear velocity
           Translation2d linearVelocity =
               new Pose2d(new Translation2d(), linearDirection)

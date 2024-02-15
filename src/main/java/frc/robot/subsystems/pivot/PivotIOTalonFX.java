@@ -14,14 +14,18 @@
 package frc.robot.subsystems.pivot;
 
 import com.ctre.phoenix6.BaseStatusSignal;
+import com.ctre.phoenix6.StatusCode;
 import com.ctre.phoenix6.StatusSignal;
+import com.ctre.phoenix6.configs.FeedbackConfigs;
 import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
@@ -45,7 +49,7 @@ public class PivotIOTalonFX implements PivotIO {
   private final StatusSignal<Double> absEncoderPos = cancoder.getAbsolutePosition();
 
   private final ProfiledPIDController pid =
-      new ProfiledPIDController(10.0, 0.0, 0.10, new TrapezoidProfile.Constraints(0.25, 1.2));
+      new ProfiledPIDController(10.0, 0.0, 0.10, new TrapezoidProfile.Constraints(0.3, 0.4));
 
   private final PositionVoltage m_voltagePosition =
       new PositionVoltage(0, 0, false, 0, 0, false, false, false);
@@ -56,13 +60,24 @@ public class PivotIOTalonFX implements PivotIO {
 
   private double goalVel = 0.0;
 
+  private final MotionMagicVoltage mm_volt = new MotionMagicVoltage(0);
+
   public PivotIOTalonFX() {
     var config = new TalonFXConfiguration();
     // config.CurrentLimits.StatorCurrentLimit = 30.0;
     // config.CurrentLimits.StatorCurrentLimitEnable = true;
     config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
-    config.Feedback.SensorToMechanismRatio = GEAR_RATIO;
-    leader.getConfigurator().apply(config);
+
+    Slot0Configs pidConfigs = config.Slot0;
+
+    pidConfigs.GravityType = GravityTypeValue.Arm_Cosine;
+    pidConfigs.kS = 0.13;
+    pidConfigs.kG = 0.16;
+    pidConfigs.kP = 15.0;
+    pidConfigs.kI = 0.0;
+    pidConfigs.kD = 0.15;
+    pidConfigs.kV = 24.0;
+    pidConfigs.kA = 1.0;
 
     MotionMagicConfigs mm_configs = config.MotionMagic;
 
@@ -70,7 +85,20 @@ public class PivotIOTalonFX implements PivotIO {
     mm_configs.MotionMagicAcceleration = PivotConstants.mm_accel;
     mm_configs.MotionMagicJerk = PivotConstants.mm_jerk;
 
-    leader.getConfigurator().apply(mm_configs);
+    FeedbackConfigs fdb_configs = config.Feedback;
+
+    fdb_configs.SensorToMechanismRatio = GEAR_RATIO;
+
+    // leader.getConfigurator().apply(config);
+
+    StatusCode status = StatusCode.StatusCodeNotInitialized;
+    for (int i = 0; i < 5; ++i) {
+      status = leader.getConfigurator().apply(config);
+      if (status.isOK()) break;
+    }
+    if (!status.isOK()) {
+      System.out.println("Real Error, Could not configure device. Error: " + status.toString());
+    }
 
     // FeedbackConfigs f_configs = config.Feedback;
 
@@ -79,7 +107,7 @@ public class PivotIOTalonFX implements PivotIO {
     // f_configs.RotorToSensorRatio = GEAR_RATIO;
 
     BaseStatusSignal.setUpdateFrequencyForAll(
-        50.0,
+        250.0,
         leaderPosition,
         leaderVelocity,
         leaderAppliedVolts,
@@ -125,14 +153,18 @@ public class PivotIOTalonFX implements PivotIO {
   @Override
   public void setPosition(double positionRad, double ffVolts) {
     // leader.setControl(
-    // new MotionMagicVoltage(
-    // Units.radiansToRotations(positionRad), false, ffVolts, 0, false, false, false));
-    goalPos = positionRad;
+    // new PositionVoltage(
+    // Units.radiansToRotations(positionRad), 0.0, false, ffVolts, 0, false, false, false));
     double setVolts =
         pid.calculate(leaderPosition.getValueAsDouble(), Units.radiansToRotations(positionRad));
 
-    leader.setControl(new VoltageOut(setVolts + ffVolts));
+    // leader.setControl(new VoltageOut(setVolts + ffVolts));
     goalVel = pid.getSetpoint().velocity;
+    // goalPos = pid.getSetpoint().position;
+    goalPos = positionRad;
+
+    leader.setControl(mm_volt.withPosition(Units.radiansToRotations(positionRad)).withSlot(0));
+
     // leader.setControl(m_voltagePosition.withPosition(Units.radiansToRotations(positionRad)));
     // leader.setControl(
     // new PositionVoltage(Units.radiansToRotations(positionRad), 0.0, false, ffVolts, 0, false,
@@ -147,15 +179,15 @@ public class PivotIOTalonFX implements PivotIO {
 
   @Override
   public void configurePIDFF(double kP, double kI, double kD, double kG, double kS) {
-    var config = new Slot0Configs();
-    config.kP = kP * 50;
+    // var config = new Slot0Configs();
+    // config.kP = kP * 50;
 
-    config.kI = kI;
-    config.kD = kD;
+    // config.kI = kI;
+    // config.kD = kD;
 
     // config.kV = 24.0;
     // config.kA = 1.0;
-    leader.getConfigurator().apply(config);
+    // leader.getConfigurator().apply(config);
     // leader.Slot0Configs = config;
   }
 }

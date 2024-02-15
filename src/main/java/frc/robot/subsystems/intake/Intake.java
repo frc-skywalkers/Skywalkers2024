@@ -96,7 +96,8 @@ public class Intake extends SubsystemBase {
   }
 
   public boolean hasPiece() {
-    return false;
+    // return inputs.tofDistance > IntakeConstants.tofTolerance;
+    return inputs.currentAmps[1] > 25.0;
   }
 
   public boolean atPosition() {

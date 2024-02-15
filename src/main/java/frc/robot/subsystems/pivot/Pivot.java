@@ -23,8 +23,8 @@ public class Pivot extends SubsystemBase {
     this.io = io;
     switch (Constants.currentMode) {
       case REAL:
-        ffModel = new ArmFeedforward(0.1215, 0.0965, 24.0); // need to determine
-        io.configurePIDFF(6.0, 0.0, 0.0); // need to determine
+        ffModel = new ArmFeedforward(0.13, 0.15, 24.0); // need to determine
+        io.configurePIDFF(15.0, 0.0, 0.15); // need to determine
         break;
       case REPLAY:
         ffModel = new ArmFeedforward(0.1, 0.05, 0);
