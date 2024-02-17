@@ -100,6 +100,7 @@ public class FlywheelCommands {
               indexer.runVolts(IndexerConstants.outtakeVolts);
             },
             indexer)
-        .withTimeout(0.5);
+        .withTimeout(1.0)
+        .andThen(() -> indexer.stop());
   }
 }

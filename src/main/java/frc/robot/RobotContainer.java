@@ -22,6 +22,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.commands.FeedForwardCharacterization;
+import frc.robot.commands.FlywheelCommands;
 import frc.robot.commands.IntakeCommands;
 import frc.robot.subsystems.Visualizer;
 // import frc.robot.commands.IntakePiece;
@@ -163,9 +164,12 @@ public class RobotContainer {
     }
 
     SmartDashboard.putNumber("Indexer Volt Wanted", 0.0);
+    SmartDashboard.putNumber("Indexer Volt Wanted 1", 0.0);
+
     SmartDashboard.putNumber("Shooter Volt Wanted", 0.0);
     SmartDashboard.putNumber("Pivot Angle Wanted", -0.65);
     SmartDashboard.putNumber("Shooter RPM Wanted", 3500);
+    SmartDashboard.putNumber("Indexer Position Back", 1.0);
 
     // Set up auto routines
     NamedCommands.registerCommand(
@@ -325,18 +329,22 @@ public class RobotContainer {
     //             .andThen(IntakeCommands.transferPiece(intake, indexer)));
 
     controller.a().onTrue(IntakeCommands.intakeHandoff(intake, indexer, pivot));
-    controller.b().onTrue(Commands.runOnce(() -> indexer.stop()));
+    controller
+        .b()
+        .onTrue(
+            Commands.runOnce(
+                () -> flywheel.runVelocity(SmartDashboard.getNumber("Shooter RPM Wanted", 3500))));
 
     // pivot.setDefaultCommand(
     //     Commands.runOnce(
     //         () -> pivot.setPosition(SmartDashboard.getNumber("Pivot Angle Wanted", 0.65)),
     // pivot));
-    controller
-        .x()
-        .onTrue(
-            Commands.runOnce(
-                () -> flywheel.runVelocity(SmartDashboard.getNumber("Shooter RPM Wanted", 3500)),
-                flywheel));
+    // controller`
+    //     .x()
+    //     .onTrue(
+    //         Commands.runOnce(
+    //             () -> flywheel.runVelocity(SmartDashboard.getNumber("Shooter RPM Wanted", 3500)),
+    //             flywheel));
     controller.y().onTrue(Commands.runOnce(() -> flywheel.runVelocity(0.0)));
 
     controller
@@ -344,11 +352,11 @@ public class RobotContainer {
         .onTrue(
             Commands.runOnce(
                 () -> pivot.setPosition(SmartDashboard.getNumber("Pivot Angle Wanted", 0.45))));
-    controller
-        .rightBumper()
-        .onTrue(
-            Commands.runOnce(
-                () -> indexer.runVolts(SmartDashboard.getNumber("Indexer Volt Wanted", 0.45))));
+
+    // controller.x().onTrue(IntakeCommands.bringOutPiece(indexer));
+    controller.x().onTrue(FlywheelCommands.shoot(indexer));
+
+    controller.rightBumper().onTrue(IntakeCommands.transferPiece(intake, indexer));
 
     // controller.leftBumper().onTrue(FlywheelCommands.shoot(indexer));
     // controller.rightBumper().onTrue(Commands.runOnce(() -> indexer.stop()));
