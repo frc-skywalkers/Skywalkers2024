@@ -13,6 +13,12 @@
 
 package frc.robot;
 
+import static edu.wpi.first.math.util.Units.degreesToRadians;
+
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.math.geometry.Translation3d;
+
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean
  * constants. This class should not be used for any other purpose. All constants should be declared
@@ -37,5 +43,41 @@ public final class Constants {
 
   public static final class ShooterConstants {
     public static final double[] RPMEquation = {100.0, 500.000}; // need to tune; [0] -> m, [1] -> b
+  }
+
+  public static final class LimelightConstants {
+
+    // public static int RTheight; //meters
+    public static int cameraheight; // meters
+
+    public static double kPx;
+    public static double kIx;
+    public static double kDx;
+    public static double kPy;
+    public static double kIy;
+    public static double kDy;
+    public static double kPr;
+    public static double kIr;
+    public static double kDr;
+
+    public static double xtolerance;
+    public static double ytolerance;
+    public static double rtolerance;
+
+    public static int xclamp;
+    public static int yclamp;
+
+    public static int rclamp;
+
+    public static double limelightOffsetCenter;
+  }
+
+  public static final class VisionConstants {
+
+    // Fix these constants
+    public static final Transform3d CAMERA_TO_ROBOT =
+        new Transform3d(
+            new Translation3d(-0.06, 0.2, -0.2127),
+            new Rotation3d(0.0, degreesToRadians(15.0), degreesToRadians(-3.0)));
   }
 }
