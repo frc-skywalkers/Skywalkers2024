@@ -13,7 +13,6 @@
 
 package frc.robot.commands;
 
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.Constants.IndexerConstants;
@@ -78,14 +77,15 @@ public class IntakeCommands {
     // .withTimeout(5.0);
   }
 
-  public static Command transferPiece(Intake intake, Indexer indexer) {
+  public static Command transferPiece(Intake intake, Indexer indexer, Pivot pivot) {
     return Commands.run(
             () -> {
               intake.outtakeWheel();
               indexer.runVolts(IndexerConstants.indexVolts);
             },
             intake,
-            indexer)
+            indexer,
+            pivot)
         .until(() -> indexer.hasPiece())
         .andThen(
             () -> {
@@ -100,7 +100,7 @@ public class IntakeCommands {
               indexer.runVolts(-0.2);
             },
             indexer)
-        .withTimeout(SmartDashboard.getNumber("Indexer Position Back", 0.15))
+        .withTimeout(0.15)
         .andThen(() -> indexer.stop());
   }
 
@@ -108,7 +108,7 @@ public class IntakeCommands {
     return intakePiece(intake)
         .andThen(gotPiece(intake))
         .andThen(passPieceIntake(intake, pivot, indexer))
-        .andThen(transferPiece(intake, indexer))
+        .andThen(transferPiece(intake, indexer, pivot))
         .andThen(bringOutPiece(indexer));
   }
 }

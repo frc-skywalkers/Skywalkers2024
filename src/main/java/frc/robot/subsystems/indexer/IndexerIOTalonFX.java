@@ -85,6 +85,7 @@ public class IndexerIOTalonFX implements IndexerIO {
   @Override
   public void stop() {
     leader.stopMotor();
+    leader.stopMotor();
   }
 
   @Override
@@ -97,6 +98,6 @@ public class IndexerIOTalonFX implements IndexerIO {
   }
 
   private boolean hasPiece() {
-    return tofSensor.getRange() < 140.000;
+    return tofSensor.getRange() < 175.000;
   }
 }
