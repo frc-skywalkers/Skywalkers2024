@@ -1,19 +1,19 @@
 package frc.robot.lightstrip;
 
 public class TempLedState extends LedState {
-    private int seconds;
+  private int seconds;
 
-    public TempLedState(int kRed, int kGreen, int kBlue, String kEffect, int kSeconds) {
-        super(kRed, kGreen, kBlue, kEffect);
-        
-        seconds = kSeconds;
-    }
-    
-    public int getSeconds() {
-        return seconds;
-    }
+  public TempLedState(int kRed, int kGreen, int kBlue, String kEffect, int kSeconds) {
+    super(kRed, kGreen, kBlue, kEffect);
 
-    public LedState getLedState() {
-        return new LedState(getRed(), getGreen(), getBlue(), getEffect());
-    }
+    seconds = kSeconds;
+  }
+
+  public int getSeconds() {
+    return seconds;
+  }
+
+  public LedState getLedState() {
+    return new LedState(getRed(), getGreen(), getBlue(), getEffect());
+  }
 }

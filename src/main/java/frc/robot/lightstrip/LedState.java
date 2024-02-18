@@ -1,41 +1,44 @@
 package frc.robot.lightstrip;
 
 public class LedState {
-    private int red;
-    private int green;
-    private int blue;
-    private String effect;
-    private int[] range;
+  private int red;
+  private int green;
+  private int blue;
+  private String effect;
+  private int[] range;
 
-    public LedState(int kRed, int kGreen, int kBlue, String kEffect) {
-        red = kRed;
-        green = kGreen;
-        blue = kBlue;
-        effect = kEffect;
-    }
+  public LedState(int kRed, int kGreen, int kBlue, String kEffect) {
+    red = kRed;
+    green = kGreen;
+    blue = kBlue;
+    effect = kEffect;
+  }
 
-    public double[] getState() {
-        double[] state = {red, green, blue};
-        return state; 
-    }
+  public double[] getState() {
+    double[] state = {red, green, blue};
+    return state;
+  }
 
-    public int getRed() {
-        return red;
-    }
+  public int getRed() {
+    return red;
+  }
 
-    public int getBlue() {
-        return blue;
-    }
+  public int getBlue() {
+    return blue;
+  }
 
-    public int getGreen() {
-        return green;
-    }
+  public int getGreen() {
+    return green;
+  }
 
-    public String getEffect() {
-        return effect;
-    }
+  public String getEffect() {
+    return effect;
+  }
 
-    public boolean compare(LedState state) {
-        return (state.getRed() == getRed() && state.getGreen() == getGreen() && state.getBlue() == getBlue() && state.getEffect() == getEffect());
-    }
+  public boolean compare(LedState state) {
+    return (state.getRed() == getRed()
+        && state.getGreen() == getGreen()
+        && state.getBlue() == getBlue()
+        && state.getEffect() == getEffect());
+  }
 }

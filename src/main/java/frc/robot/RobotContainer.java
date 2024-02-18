@@ -86,6 +86,9 @@ public class RobotContainer {
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
+
+    lightstrip = new Lightstrip();
+
     switch (Constants.currentMode) {
       case REAL:
         // Real robot, instantiate hardware IO implementations
@@ -123,7 +126,6 @@ public class RobotContainer {
         intake = new Intake(new IntakeIOTalonFX());
         indexer = new Indexer(new IndexerIOTalonFX());
         visualizer = new Visualizer(intake, pivot);
-        lightstrip = new Lightstrip();
 
         // drive =
         //     new Drive(
@@ -393,7 +395,7 @@ public class RobotContainer {
     operator
         .rightBumper()
         .onTrue(
-            IntakeCommands.ampPrep(intake, indexer, pivot)
+            IntakeCommands.ampPrep(intake, indexer, pivot, lightstrip)
                 .andThen(FlywheelCommands.aimAmp(pivot))
                 .andThen(FlywheelCommands.outtakeAmp(indexer, flywheel, pivot)));
 

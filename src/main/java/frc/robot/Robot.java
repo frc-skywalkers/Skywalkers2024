@@ -88,9 +88,9 @@ public class Robot extends LoggedRobot {
     // and put our autonomous chooser on the dashboard.
     robotContainer = new RobotContainer();
 
-    switch(Constants.currentMode) { 
+    switch (Constants.currentMode) {
       case REAL:
-        robotContainer.lightstrip.setDefault(true);   
+        robotContainer.lightstrip.setDefault(true);
     }
   }
 
@@ -108,9 +108,9 @@ public class Robot extends LoggedRobot {
   /** This function is called once when the robot is disabled. */
   @Override
   public void disabledInit() {
-    switch(Constants.currentMode) { 
+    switch (Constants.currentMode) {
       case REAL:
-        robotContainer.lightstrip.setDefault(true);   
+        robotContainer.lightstrip.setDefault(true);
     }
   }
 

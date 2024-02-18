@@ -115,14 +115,21 @@ public class IntakeCommands {
     // .andThen(bringOutPiece(indexer));
   }
 
-  public static Command ampPrep(Intake intake, Indexer indexer, Pivot pivot, Lightstrip lightstrip) {
+  public static Command ampPrep(
+      Intake intake, Indexer indexer, Pivot pivot, Lightstrip lightstrip) {
     return Commands.run(
-        () -> {
-          lightstrip.toggleOnColor(LightstripConstants.intake, LightstripConstants.Ranges.full);
-        }, 
-        lightstrip)
-      .andThen(passPieceIntake(intake, pivot, indexer)).andThen(transferPiece(intake, indexer, pivot)).andThen(Commands.run(() -> {
-        lightstrip.toggleOffColor(LightstripConstants.intake, LightstripConstants.Ranges.full);
-      }, lightstrip));
+            () -> {
+              lightstrip.toggleOnColor(LightstripConstants.intake, LightstripConstants.Ranges.full);
+            },
+            lightstrip)
+        .andThen(passPieceIntake(intake, pivot, indexer))
+        .andThen(transferPiece(intake, indexer, pivot))
+        .andThen(
+            Commands.run(
+                () -> {
+                  lightstrip.toggleOffColor(
+                      LightstripConstants.intake, LightstripConstants.Ranges.full);
+                },
+                lightstrip));
   }
 }
