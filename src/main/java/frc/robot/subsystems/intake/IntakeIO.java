@@ -17,6 +17,8 @@ public interface IntakeIO {
     public double setpointPos = 0.000;
     public double ffVolts = 0.0000;
     public double pidOut = 0.000;
+    public double tofDistance = 0.000;
+    public double tofSD = 0.0;
   }
 
   /** Updates the set of loggable inputs. */

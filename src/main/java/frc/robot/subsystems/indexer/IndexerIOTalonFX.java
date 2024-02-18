@@ -21,9 +21,8 @@ import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
-import com.playingwithfusion.TimeOfFlight;
-import com.playingwithfusion.TimeOfFlight.RangingMode;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.DigitalInput;
 
 public class IndexerIOTalonFX implements IndexerIO {
   private static final double GEAR_RATIO = 1.5;
@@ -34,20 +33,26 @@ public class IndexerIOTalonFX implements IndexerIO {
   private final StatusSignal<Double> leaderVelocity = leader.getVelocity();
   private final StatusSignal<Double> leaderAppliedVolts = leader.getMotorVoltage();
   private final StatusSignal<Double> leaderCurrent = leader.getStatorCurrent();
+  // private final StatusSignal<Double> leaderA = leader.getLimitSw
 
-  private final TimeOfFlight tofSensor = new TimeOfFlight(15);
+  private final DigitalInput bb_sensor = new DigitalInput(9);
+
+  // private final TimeOfFlight tofSensor = new TimeOfFlight(15);
 
   public IndexerIOTalonFX() {
     var config = new TalonFXConfiguration();
     config.CurrentLimits.StatorCurrentLimit = 30.0;
     config.CurrentLimits.StatorCurrentLimitEnable = true;
     config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
+
+    // config.HardwareLimitSwitch.ForwardLimitSource = ForwardLimitSourceValue.LimitSwitchPin;
+
     leader.getConfigurator().apply(config);
 
     BaseStatusSignal.setUpdateFrequencyForAll(
         50.0, leaderPosition, leaderVelocity, leaderAppliedVolts, leaderCurrent);
     leader.optimizeBusUtilization();
-    tofSensor.setRangingMode(RangingMode.Short, 30);
+    // tofSensor.setRangingMode(RangingMode.Short, 30);
   }
 
   @Override
@@ -59,8 +64,8 @@ public class IndexerIOTalonFX implements IndexerIO {
     inputs.appliedVolts = leaderAppliedVolts.getValueAsDouble();
     inputs.currentAmps = new double[] {leaderCurrent.getValueAsDouble()};
     inputs.hasPiece = hasPiece();
-    inputs.tofDistance = tofSensor.getRange();
-    inputs.tofSD = tofSensor.getRangeSigma();
+    // inputs.tofDistance = tofSensor.getRange();
+    // inputs.tofSD = tofSensor.getRangeSigma();
   }
 
   @Override
@@ -98,6 +103,6 @@ public class IndexerIOTalonFX implements IndexerIO {
   }
 
   private boolean hasPiece() {
-    return tofSensor.getRange() < 175.000;
+    return bb_sensor.get();
   }
 }

@@ -77,6 +77,10 @@ public final class Constants {
     public static final double tolerance = 0.05;
 
     public static final double tofTolerance = 30.00;
+
+    public static final double mm_cruisevel = 0.4;
+    public static final double mm_accel = 0.8;
+    public static final double mm_jerk = 1.6;
   }
 
   public static final class IndexerConstants {

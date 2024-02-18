@@ -23,6 +23,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import frc.robot.Constants.IntakeConstants;
 import frc.robot.Constants.PivotConstants;
 import frc.robot.commands.DriveCommands;
 import frc.robot.commands.FeedForwardCharacterization;
@@ -46,7 +47,7 @@ import frc.robot.subsystems.indexer.IndexerIOSim;
 import frc.robot.subsystems.indexer.IndexerIOTalonFX;
 import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.intake.IntakeIOSim;
-import frc.robot.subsystems.intake.IntakeIOSparkMax;
+import frc.robot.subsystems.intake.IntakeIOTalonFX;
 import frc.robot.subsystems.pivot.Pivot;
 import frc.robot.subsystems.pivot.PivotIOSim;
 import frc.robot.subsystems.pivot.PivotIOTalonFX;
@@ -117,7 +118,7 @@ public class RobotContainer {
         vision = new Vision(new PhotonCamera("camera1"), new PhotonCamera("camera2"), drive);
         flywheel = new Flywheel(new FlywheelIOTalonFX());
         pivot = new Pivot(new PivotIOTalonFX());
-        intake = new Intake(new IntakeIOSparkMax());
+        intake = new Intake(new IntakeIOTalonFX());
         indexer = new Indexer(new IndexerIOTalonFX());
         visualizer = new Visualizer(intake, pivot);
 
@@ -342,10 +343,16 @@ public class RobotContainer {
     //             .andThen(IntakeCommands.passPieceIntake(intake, pivot, indexer))
     //             .andThen(IntakeCommands.transferPiece(intake, indexer)));
 
-    operator
-        .a()
-        .onTrue(
-            IntakeCommands.intakeHandoff(intake, indexer, pivot).unless(() -> indexer.hasPiece()));
+    // operator
+    //     .a()
+    //     .onTrue(
+    //         IntakeCommands.intakeHandoff(intake, indexer, pivot).unless(() ->
+    // indexer.hasPiece()));
+
+    operator.a().onTrue(Commands.run(() -> intake.setPosition(IntakeConstants.handoff), intake));
+
+    operator.b().onTrue(Commands.run(() -> intake.runWheelVolts(4.0), intake));
+
     // operator
     //     .b()
     //     .onTrue(
