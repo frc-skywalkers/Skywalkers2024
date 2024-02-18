@@ -28,6 +28,7 @@ import frc.robot.commands.DriveCommands;
 import frc.robot.commands.FeedForwardCharacterization;
 import frc.robot.commands.FlywheelCommands;
 import frc.robot.commands.IntakeCommands;
+import frc.robot.subsystems.Vision;
 import frc.robot.subsystems.Visualizer;
 // import frc.robot.commands.IntakePiece;
 import frc.robot.subsystems.drive.Drive;
@@ -51,6 +52,7 @@ import frc.robot.subsystems.pivot.PivotIOSim;
 import frc.robot.subsystems.pivot.PivotIOTalonFX;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 import org.littletonrobotics.junction.networktables.LoggedDashboardNumber;
+import org.photonvision.PhotonCamera;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -66,6 +68,7 @@ public class RobotContainer {
   private final Intake intake;
   private final Indexer indexer;
   private final Visualizer visualizer;
+  private final Vision vision;
 
   // Controller
   private final CommandXboxController controller = new CommandXboxController(0);
@@ -111,6 +114,7 @@ public class RobotContainer {
                 new ModuleIOTalonFX(1),
                 new ModuleIOTalonFX(2),
                 new ModuleIOTalonFX(3));
+        vision = new Vision(new PhotonCamera("camera1"), new PhotonCamera("camera2"), drive);
         flywheel = new Flywheel(new FlywheelIOTalonFX());
         pivot = new Pivot(new PivotIOTalonFX());
         intake = new Intake(new IntakeIOSparkMax());
@@ -141,6 +145,8 @@ public class RobotContainer {
                 new ModuleIOSim(),
                 new ModuleIOSim(),
                 new ModuleIOSim());
+
+        vision = new Vision(null, null, drive);
         flywheel = new Flywheel(new FlywheelIOSim());
         pivot = new Pivot(new PivotIOSim());
         intake = new Intake(new IntakeIOSim());
@@ -158,6 +164,8 @@ public class RobotContainer {
                 new ModuleIO() {},
                 new ModuleIO() {},
                 new ModuleIO() {});
+
+        vision = new Vision(null, null, drive);
         flywheel = new Flywheel(new FlywheelIO() {});
         pivot = new Pivot(new PivotIOSim());
         intake = new Intake(new IntakeIOSim());

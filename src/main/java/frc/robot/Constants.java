@@ -13,7 +13,12 @@
 
 package frc.robot;
 
+import static edu.wpi.first.math.util.Units.degreesToRadians;
+
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 
@@ -104,5 +109,14 @@ public final class Constants {
     public static final double shooterMultiplier = -1.0;
 
     public static final double scale = 1.0 / 29.0;
+  }
+
+  public static final class VisionConstants {
+
+    // Fix these constants
+    public static final Transform3d CAMERA_TO_ROBOT =
+        new Transform3d(
+            new Translation3d(-0.06, 0.2, -0.2127),
+            new Rotation3d(0.0, degreesToRadians(15.0), degreesToRadians(-3.0)));
   }
 }
