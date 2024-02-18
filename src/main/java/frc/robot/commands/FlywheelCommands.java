@@ -128,6 +128,7 @@ public class FlywheelCommands {
             indexer,
             flywheel,
             pivot)
-        .withTimeout(1.0);
+        .withTimeout(1.0)
+        .andThen(() -> indexer.stop());
   }
 }

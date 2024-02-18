@@ -6,6 +6,7 @@ import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkPIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
+import edu.wpi.first.math.filter.LinearFilter;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
 import org.littletonrobotics.junction.Logger;
@@ -26,6 +27,8 @@ public class IntakeIOSparkMax implements IntakeIO {
 
   private final CANSparkMax wheel = new CANSparkMax(34, MotorType.kBrushless);
   private final RelativeEncoder wheelencoder = wheel.getEncoder();
+
+  private LinearFilter intakenPiece = LinearFilter.movingAverage(5);
 
   // private final TimeOfFlight m_rangeSensor = new TimeOfFlight(1);
 
@@ -103,6 +106,11 @@ public class IntakeIOSparkMax implements IntakeIO {
 
     leader.setVoltage(pa + pb);
     goalVel = pidd.getSetpoint().velocity;
+  }
+
+  public double getCurrent() {
+    // return intakenPiece.calculate(wheel.getOutputCurrent());
+    return wheel.getOutputCurrent();
   }
 
   @Override

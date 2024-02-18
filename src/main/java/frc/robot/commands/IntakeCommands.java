@@ -114,6 +114,6 @@ public class IntakeCommands {
   }
 
   public static Command ampPrep(Intake intake, Indexer indexer, Pivot pivot) {
-    return transferPiece(intake, indexer, pivot);
+    return passPieceIntake(intake, pivot, indexer).andThen(transferPiece(intake, indexer, pivot));
   }
 }
