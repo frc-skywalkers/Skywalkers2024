@@ -29,6 +29,7 @@ import frc.robot.commands.DriveCommands;
 import frc.robot.commands.FeedForwardCharacterization;
 import frc.robot.commands.FlywheelCommands;
 import frc.robot.commands.IntakeCommands;
+import frc.robot.subsystems.Lightstrip;
 import frc.robot.subsystems.Vision;
 import frc.robot.subsystems.Visualizer;
 // import frc.robot.commands.IntakePiece;
@@ -70,6 +71,7 @@ public class RobotContainer {
   private final Indexer indexer;
   private final Visualizer visualizer;
   private final Vision vision;
+  public final Lightstrip lightstrip;
 
   // Controller
   private final CommandXboxController controller = new CommandXboxController(0);
@@ -121,6 +123,7 @@ public class RobotContainer {
         intake = new Intake(new IntakeIOTalonFX());
         indexer = new Indexer(new IndexerIOTalonFX());
         visualizer = new Visualizer(intake, pivot);
+        lightstrip = new Lightstrip();
 
         // drive =
         //     new Drive(
