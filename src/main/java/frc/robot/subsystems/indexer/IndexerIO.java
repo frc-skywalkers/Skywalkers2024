@@ -11,28 +11,25 @@
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU General Public License for more details.
 
-package frc.robot.subsystems.flywheel;
+package frc.robot.subsystems.indexer;
 
 import org.littletonrobotics.junction.AutoLog;
 
-public interface FlywheelIO {
+public interface IndexerIO {
   @AutoLog
-  public static class FlywheelIOInputs {
+  public static class IndexerIOInputs {
     public double positionRad = 0.0;
     public double velocityRadPerSec = 0.0;
     public double appliedVolts = 0.0;
     public double[] currentAmps = new double[] {};
-    public double followerPositionRad = 0.0;
-    public double followerVelocityRadPerSec = 0.0;
-    public double followerAppliedVolts = 0.0;
-    public double goalRadPerSec = 0.0;
-    public double pidError = 0.0;
-    public double feedforwardOut = 0.0;
-    public double leadGoal = 0.0;
+    public boolean hasPiece = false;
+    public double tofDistance = 0.0;
+    public double tofSD = 0.0;
+    public boolean tofStatus = false;
   }
 
   /** Updates the set of loggable inputs. */
-  public default void updateInputs(FlywheelIOInputs inputs) {}
+  public default void updateInputs(IndexerIOInputs inputs) {}
 
   /** Run open loop at the specified voltage. */
   public default void setVoltage(double volts) {}

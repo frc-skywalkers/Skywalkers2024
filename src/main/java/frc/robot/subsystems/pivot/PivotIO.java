@@ -11,38 +11,39 @@
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU General Public License for more details.
 
-package frc.robot.subsystems.flywheel;
+package frc.robot.subsystems.pivot;
 
 import org.littletonrobotics.junction.AutoLog;
 
-public interface FlywheelIO {
+public interface PivotIO {
   @AutoLog
-  public static class FlywheelIOInputs {
+  public static class PivotIOInputs {
     public double positionRad = 0.0;
     public double velocityRadPerSec = 0.0;
     public double appliedVolts = 0.0;
     public double[] currentAmps = new double[] {};
-    public double followerPositionRad = 0.0;
-    public double followerVelocityRadPerSec = 0.0;
-    public double followerAppliedVolts = 0.0;
-    public double goalRadPerSec = 0.0;
-    public double pidError = 0.0;
-    public double feedforwardOut = 0.0;
-    public double leadGoal = 0.0;
+    public double goalPos = 0.0;
+    public double goalVel = 0.0;
+    public double setpointPos = 0.000;
+    public double ffVolts = 0.0000;
+    public double pidOut = 0.000;
+    public double absPos = 0.000;
   }
 
   /** Updates the set of loggable inputs. */
-  public default void updateInputs(FlywheelIOInputs inputs) {}
+  public default void updateInputs(PivotIOInputs inputs) {}
 
   /** Run open loop at the specified voltage. */
   public default void setVoltage(double volts) {}
 
   /** Run closed loop at the specified velocity. */
-  public default void setVelocity(double velocityRadPerSec, double ffVolts) {}
+  public default void setPosition(double positionRad, double ffVolts) {}
 
   /** Stop in open loop. */
   public default void stop() {}
 
   /** Set velocity PID constants. */
-  public default void configurePID(double kP, double kI, double kD) {}
+  public default void configurePIDFF(double kP, double kI, double kD, double kG, double kS) {}
+
+  public default void configurePIDFF(double kP, double kI, double kD) {}
 }

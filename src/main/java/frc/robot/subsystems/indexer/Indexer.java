@@ -1,43 +1,27 @@
-// Copyright 2021-2024 FRC 6328
-// http://github.com/Mechanical-Advantage
-//
-// This program is free software; you can redistribute it and/or
-// modify it under the terms of the GNU General Public License
-// version 3 as published by the Free Software Foundation or
-// available in the root directory of this project.
-//
-// This program is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-// GNU General Public License for more details.
-
-package frc.robot.subsystems.flywheel;
+package frc.robot.subsystems.indexer;
 
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
-import frc.robot.Constants.ShooterConstants;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
-public class Flywheel extends SubsystemBase {
-  private final FlywheelIO io;
-  private final FlywheelIOInputsAutoLogged inputs = new FlywheelIOInputsAutoLogged();
+public class Indexer extends SubsystemBase {
+  private final IndexerIO io;
+  private final IndexerIOInputsAutoLogged inputs = new IndexerIOInputsAutoLogged();
   private final SimpleMotorFeedforward ffModel;
 
-  private double desiredRPM = 0.000;
-
   /** Creates a new Flywheel. */
-  public Flywheel(FlywheelIO io) {
+  public Indexer(IndexerIO io) {
     this.io = io;
 
     // Switch constants based on mode (the physics simulator is treated as a
     // separate robot with different tuning)
     switch (Constants.currentMode) {
       case REAL:
-        ffModel = new SimpleMotorFeedforward(0.196, 0.0268); // need to determine
-        io.configurePID(0.0009, 0.0, 0.000025); // need to determine
+        ffModel = new SimpleMotorFeedforward(0.0, 0.0); // need to determine
+        io.configurePID(0.5, 0.0, 0.0); // need to determine
         break;
       case REPLAY:
         ffModel = new SimpleMotorFeedforward(0.1, 0.05);
@@ -45,7 +29,7 @@ public class Flywheel extends SubsystemBase {
         break;
       case SIM:
         ffModel = new SimpleMotorFeedforward(0.0, 0.03);
-        io.configurePID(0.5, 0.0, 0.0);
+        io.configurePID(0.3, 0.0, 0.0);
         break;
       default:
         ffModel = new SimpleMotorFeedforward(0.0, 0.0);
@@ -56,7 +40,7 @@ public class Flywheel extends SubsystemBase {
   @Override
   public void periodic() {
     io.updateInputs(inputs);
-    Logger.processInputs("Flywheel", inputs);
+    Logger.processInputs("Indexer", inputs);
   }
 
   /** Run open loop at the specified voltage. */
@@ -68,23 +52,14 @@ public class Flywheel extends SubsystemBase {
   public void runVelocity(double velocityRPM) {
     var velocityRadPerSec = Units.rotationsPerMinuteToRadiansPerSecond(velocityRPM);
     io.setVelocity(velocityRadPerSec, ffModel.calculate(velocityRadPerSec));
-    desiredRPM = velocityRPM;
 
     // Log flywheel setpoint
-    Logger.recordOutput("Flywheel/SetpointRPM", velocityRPM);
+    Logger.recordOutput("Indexer/SetpointRPM", velocityRPM);
   }
 
   /** Stops the flywheel. */
   public void stop() {
     io.stop();
-  }
-
-  public boolean atDesiredRPM() {
-    return Math.abs(getVelocityRPM() - desiredRPM) < ShooterConstants.tolerance;
-  }
-
-  public boolean atDesiredRPM(double requestRPM) {
-    return Math.abs(getVelocityRPM() - requestRPM) < ShooterConstants.tolerance;
   }
 
   /** Returns the current velocity in RPM. */
@@ -98,7 +73,7 @@ public class Flywheel extends SubsystemBase {
     return inputs.velocityRadPerSec;
   }
 
-  public double getAppliedVolts() {
-    return inputs.appliedVolts;
+  public boolean hasPiece() {
+    return inputs.hasPiece;
   }
 }

@@ -18,6 +18,7 @@ import com.pathplanner.lib.pathfinding.Pathfinding;
 import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
 import com.pathplanner.lib.util.PathPlannerLogging;
 import com.pathplanner.lib.util.ReplanningConfig;
+import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -26,10 +27,15 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants.FieldConstants;
+import frc.robot.Constants.ShooterConstants;
+import frc.robot.util.FieldRelativeAccel;
+import frc.robot.util.FieldRelativeSpeed;
 import frc.robot.util.LocalADStarAK;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -38,11 +44,12 @@ import org.littletonrobotics.junction.Logger;
 
 public class Drive extends SubsystemBase {
   private static final double MAX_LINEAR_SPEED = Units.feetToMeters(14.5);
-  private static final double TRACK_WIDTH_X = Units.inchesToMeters(25.0);
-  private static final double TRACK_WIDTH_Y = Units.inchesToMeters(25.0);
+  private static final double TRACK_WIDTH_X = Units.inchesToMeters(29.0);
+  private static final double TRACK_WIDTH_Y = Units.inchesToMeters(29.0);
   private static final double DRIVE_BASE_RADIUS =
       Math.hypot(TRACK_WIDTH_X / 2.0, TRACK_WIDTH_Y / 2.0);
   private static final double MAX_ANGULAR_SPEED = MAX_LINEAR_SPEED / DRIVE_BASE_RADIUS;
+  private static final double ALIGN_MAX_ANGULAR_SPEED = MAX_LINEAR_SPEED / DRIVE_BASE_RADIUS;
 
   public static final Lock odometryLock = new ReentrantLock();
   private final GyroIO gyroIO;
@@ -52,6 +59,18 @@ public class Drive extends SubsystemBase {
   private SwerveDriveKinematics kinematics = new SwerveDriveKinematics(getModuleTranslations());
   private Pose2d pose = new Pose2d();
   private Rotation2d lastGyroRotation = new Rotation2d();
+
+  private FieldRelativeSpeed m_fieldRelVel = new FieldRelativeSpeed();
+  private FieldRelativeSpeed m_lastFieldRelVel = new FieldRelativeSpeed();
+  private FieldRelativeAccel m_fieldRelAccel = new FieldRelativeAccel();
+
+  ProfiledPIDController headingController =
+      new ProfiledPIDController(
+          3.0, 0.0, 0.05, new Constraints(ALIGN_MAX_ANGULAR_SPEED, ALIGN_MAX_ANGULAR_SPEED / 2));
+
+  private Pose2d virtGoal = new Pose2d();
+  private boolean shootOnMove = false;
+  private double alignTolerance = 0.05;
 
   public Drive(
       GyroIO gyroIO,
@@ -87,6 +106,7 @@ public class Drive extends SubsystemBase {
         (targetPose) -> {
           Logger.recordOutput("Odometry/TrajectorySetpoint", targetPose);
         });
+    headingController.enableContinuousInput(-Math.PI, Math.PI);
   }
 
   public void periodic() {
@@ -140,6 +160,17 @@ public class Drive extends SubsystemBase {
       // Apply the twist (change since last sample) to the current pose
       pose = pose.exp(twist);
     }
+    m_fieldRelVel = new FieldRelativeSpeed(getChassisSpeed(), getRotation());
+    m_fieldRelAccel = new FieldRelativeAccel(m_fieldRelVel, m_lastFieldRelVel, 0.020);
+    m_lastFieldRelVel = m_fieldRelVel;
+    calcVirtualGoal();
+    Logger.recordOutput("Shooting/VirtualGoal", virtGoal);
+    Logger.recordOutput("Swerve/velx", m_fieldRelVel.vx);
+    Logger.recordOutput("Swerve/vely", m_fieldRelVel.vy);
+  }
+
+  private ChassisSpeeds getChassisSpeed() {
+    return kinematics.toChassisSpeeds(getModuleStates());
   }
 
   /**
@@ -190,6 +221,44 @@ public class Drive extends SubsystemBase {
     }
   }
 
+  public void updateVirtualGoal(Translation2d virtualGoal) {
+    virtGoal = new Pose2d(virtualGoal, new Rotation2d());
+  }
+
+  public static double calcShootTime(Translation2d curPose, Translation2d goalPose) {
+    double shootDistance = curPose.getDistance(goalPose);
+    double shotTime =
+        ShooterConstants.timeEquation[0] * shootDistance + ShooterConstants.timeEquation[1];
+    return shotTime;
+  }
+
+  public Translation2d calcVirtualGoal() {
+    Pose2d curPose = getPose();
+    Translation2d curTranslation = curPose.getTranslation();
+
+    double a = curTranslation.getX();
+    double d = curTranslation.getY();
+
+    double b = FieldConstants.getSpeaker().getX();
+    double e = FieldConstants.getSpeaker().getY();
+
+    double c = m_fieldRelVel.vx + m_fieldRelAccel.ax * ShooterConstants.kAccelCompFactor;
+    double f = m_fieldRelVel.vy + m_fieldRelAccel.ay * ShooterConstants.kAccelCompFactor;
+
+    double l = 0.000, r = 2.000;
+    double shotTime = 1.000;
+    for (int iter = 0; iter < 40; iter++) {
+      double mid = (l + r) / 2.0000;
+      shotTime = mid;
+      Translation2d virtGoal = new Translation2d(b - c * shotTime, e - f * shotTime);
+      double actShotTime = calcShootTime(curTranslation, virtGoal);
+      if (shotTime > actShotTime) r = mid;
+      else l = mid;
+    }
+
+    updateVirtualGoal(new Translation2d(b - c * shotTime, e - f * shotTime));
+    return virtGoal.getTranslation();
+  }
   /** Returns the average drive velocity in radians/sec. */
   public double getCharacterizationVelocity() {
     double driveVelocityAverage = 0.0;
@@ -207,6 +276,14 @@ public class Drive extends SubsystemBase {
       states[i] = modules[i].getState();
     }
     return states;
+  }
+
+  public FieldRelativeSpeed getFieldRelativeSpeed() {
+    return m_fieldRelVel;
+  }
+
+  public FieldRelativeAccel getFieldRelativeAccel() {
+    return m_fieldRelAccel;
   }
 
   /** Returns the current odometry pose. */
@@ -235,6 +312,14 @@ public class Drive extends SubsystemBase {
     return MAX_ANGULAR_SPEED;
   }
 
+  public boolean getShootMode() {
+    return shootOnMove;
+  }
+
+  public void setShootMode(boolean desiredShootMode) {
+    shootOnMove = desiredShootMode;
+  }
+
   /** Returns an array of module translations. */
   public static Translation2d[] getModuleTranslations() {
     return new Translation2d[] {
@@ -243,5 +328,37 @@ public class Drive extends SubsystemBase {
       new Translation2d(-TRACK_WIDTH_X / 2.0, TRACK_WIDTH_Y / 2.0),
       new Translation2d(-TRACK_WIDTH_X / 2.0, -TRACK_WIDTH_Y / 2.0)
     };
+  }
+
+  public void resetHeadingController() {
+    headingController.reset(getRotation().getRadians(), getChassisSpeed().omegaRadiansPerSecond);
+  }
+
+  private double getAngleDif(Translation2d goalPos) {
+    double goalAngle =
+        Math.atan2(goalPos.getY() - getPose().getY(), goalPos.getX() - getPose().getX());
+    return goalAngle;
+  }
+
+  public double getAlignOutput() {
+    Translation2d goalPos;
+    if (getShootMode()) {
+      goalPos = virtGoal.getTranslation();
+    } else goalPos = FieldConstants.getSpeaker();
+    Pose2d curPose = getPose();
+    double goalAngle = getAngleDif(goalPos);
+    double omega =
+        headingController.calculate(curPose.getRotation().getRadians(), goalAngle)
+            + headingController.getSetpoint().velocity;
+
+    Logger.recordOutput("Swerve/goalAngle", goalAngle);
+    Logger.recordOutput("Swerve/actAngle", getPose().getRotation().getRadians());
+
+    return omega;
+  }
+
+  public boolean isAligned(Translation2d goalPos) {
+    double angDif = getAngleDif(goalPos);
+    return Math.abs(angDif - getRotation().getRadians()) < alignTolerance;
   }
 }

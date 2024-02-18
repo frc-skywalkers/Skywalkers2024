@@ -11,14 +11,14 @@
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU General Public License for more details.
 
-package frc.robot.subsystems.flywheel;
+package frc.robot.subsystems.indexer;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.simulation.FlywheelSim;
 
-public class FlywheelIOSim implements FlywheelIO {
+public class IndexerIOSim implements IndexerIO {
   private FlywheelSim sim = new FlywheelSim(DCMotor.getFalcon500(1), 1.5, 0.004);
   private PIDController pid = new PIDController(0.0, 0.0, 0.0);
 
@@ -27,7 +27,7 @@ public class FlywheelIOSim implements FlywheelIO {
   private double appliedVolts = 0.0;
 
   @Override
-  public void updateInputs(FlywheelIOInputs inputs) {
+  public void updateInputs(IndexerIOInputs inputs) {
     if (closedLoop) {
       appliedVolts =
           MathUtil.clamp(pid.calculate(sim.getAngularVelocityRadPerSec()) + ffVolts, -12.0, 12.0);
@@ -40,6 +40,7 @@ public class FlywheelIOSim implements FlywheelIO {
     inputs.velocityRadPerSec = sim.getAngularVelocityRadPerSec();
     inputs.appliedVolts = appliedVolts;
     inputs.currentAmps = new double[] {sim.getCurrentDrawAmps()};
+    inputs.hasPiece = hasPiece();
   }
 
   @Override
@@ -64,5 +65,9 @@ public class FlywheelIOSim implements FlywheelIO {
   @Override
   public void configurePID(double kP, double kI, double kD) {
     pid.setPID(kP, kI, kD);
+  }
+
+  private boolean hasPiece() {
+    return false;
   }
 }
