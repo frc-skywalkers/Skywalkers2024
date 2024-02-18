@@ -15,12 +15,16 @@ package frc.robot;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import frc.robot.Constants.PivotConstants;
+import frc.robot.commands.DriveCommands;
 import frc.robot.commands.FeedForwardCharacterization;
 import frc.robot.commands.FlywheelCommands;
 import frc.robot.commands.IntakeCommands;
@@ -213,15 +217,15 @@ public class RobotContainer {
    * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
   private void configureButtonBindings() {
-    // drive.setDefaultCommand(
-    //     DriveCommands.joystickDrive(
-    //         drive,
-    //         () -> -controller.getLeftY(),
-    //         () -> -controller.getLeftX(),
-    //         () -> -controller.getRightX(),
-    //         () -> controller.getLeftTriggerAxis(),
-    //         () -> controller.getRightTriggerAxis()));
-    // controller.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
+    drive.setDefaultCommand(
+        DriveCommands.joystickDrive(
+            drive,
+            () -> -controller.getLeftY(),
+            () -> -controller.getLeftX(),
+            () -> -controller.getRightX(),
+            () -> controller.getLeftTriggerAxis(),
+            () -> controller.getRightTriggerAxis()));
+    controller.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
     // flywheel.setDefaultCommand(FlywheelCommands.autoShoot(flywheel, drive));
 
     // intake.setDefaultCommand(
@@ -241,15 +245,15 @@ public class RobotContainer {
     // flywheel.setDefaultCommand(
     //     FlywheelCommands.shootWhileMove(
     //         flywheel, drive, () -> -controller.getLeftY(), () -> -controller.getLeftX()));
-    // controller
-    //     .b()
-    //     .onTrue(
-    //         Commands.runOnce(
-    //                 () ->
-    //                     drive.setPose(
-    //                         new Pose2d(drive.getPose().getTranslation(), new Rotation2d())),
-    //                 drive)
-    //             .ignoringDisable(true));
+    controller
+        .b()
+        .onTrue(
+            Commands.runOnce(
+                    () ->
+                        drive.setPose(
+                            new Pose2d(drive.getPose().getTranslation(), new Rotation2d())),
+                    drive)
+                .ignoringDisable(true));
 
     // operator.leftTrigger().onTrue(Commands.runOnce(() -> drive.setShootMode(true), drive));
     // operator.leftTrigger().onFalse(Commands.runOnce(() -> drive.setShootMode(false), drive));
@@ -330,15 +334,16 @@ public class RobotContainer {
     //             .andThen(IntakeCommands.passPieceIntake(intake, pivot, indexer))
     //             .andThen(IntakeCommands.transferPiece(intake, indexer)));
 
-    controller
+    operator
         .a()
         .onTrue(
             IntakeCommands.intakeHandoff(intake, indexer, pivot).unless(() -> indexer.hasPiece()));
-    controller
-        .b()
-        .onTrue(
-            Commands.runOnce(
-                () -> flywheel.runVelocity(SmartDashboard.getNumber("Shooter RPM Wanted", 3500))));
+    // operator
+    //     .b()
+    //     .onTrue(
+    //         Commands.runOnce(
+    //             () -> flywheel.runVelocity(SmartDashboard.getNumber("Shooter RPM Wanted",
+    // 3500))));
 
     pivot.setDefaultCommand(Commands.run(() -> pivot.setPosition(-1.2), pivot));
     flywheel.setDefaultCommand(Commands.run(() -> flywheel.runVelocity(0.0), flywheel));
@@ -348,40 +353,37 @@ public class RobotContainer {
     //         Commands.runOnce(
     //             () -> flywheel.runVelocity(SmartDashboard.getNumber("Shooter RPM Wanted", 3500)),
     //             flywheel));
-    controller.y().onTrue(Commands.runOnce(() -> flywheel.runVelocity(0.0)));
+    // operator.y().onTrue(Commands.runOnce(() -> flywheel.runVelocity(0.0)));
 
-    controller
-        .leftBumper()
-        .onTrue(
-            Commands.runOnce(
-                () -> pivot.setPosition(SmartDashboard.getNumber("Pivot Angle Wanted", 0.45))));
+    // operator
+    //     .leftBumper()
+    //     .onTrue(
+    //         Commands.runOnce(
+    //             () -> pivot.setPosition(SmartDashboard.getNumber("Pivot Angle Wanted", 0.45))));
 
-    controller
+    operator
         .leftTrigger()
         .whileTrue(
             Commands.run(
                 () -> {
-                  pivot.setPosition(SmartDashboard.getNumber("Pivot Angle Wanted", 0.45));
-                  flywheel.runVelocity(SmartDashboard.getNumber("Shooter RPM Wanted", 3500));
+                  pivot.setPosition(PivotConstants.handoff);
+                  flywheel.runVelocity(3000);
                 },
                 pivot,
                 flywheel));
 
-    controller
-        .rightTrigger()
-        .whileTrue(
-            Commands.run(
-                () -> {
-                  pivot.setPosition(SmartDashboard.getNumber("Pivot Angle Wanted 1", 0.85));
-                  flywheel.runVelocity(1000);
-                },
-                pivot,
-                flywheel));
+    operator
+        .rightBumper()
+        .onTrue(
+            IntakeCommands.ampPrep(intake, indexer, pivot)
+                .andThen(FlywheelCommands.aimAmp(pivot))
+                .andThen(FlywheelCommands.outtakeAmp(indexer, flywheel, pivot)));
 
     // controller.x().onTrue(IntakeCommands.bringOutPiece(indexer));
-    controller.x().onTrue(FlywheelCommands.shoot(indexer));
+    operator.leftBumper().onTrue(FlywheelCommands.shoot(indexer, intake));
+    // operator.rightBumper().onTrue(FlywheelCommands.outtakeAmp(indexer, flywheel, pivot));
 
-    controller.rightBumper().onTrue(IntakeCommands.transferPiece(intake, indexer, pivot));
+    // operator.rightBumper().onTrue(IntakeCommands.transferPiece(intake, indexer, pivot));
 
     // controller.leftBumper().onTrue(FlywheelCommands.shoot(indexer));
     // controller.rightBumper().onTrue(Commands.runOnce(() -> indexer.stop()));

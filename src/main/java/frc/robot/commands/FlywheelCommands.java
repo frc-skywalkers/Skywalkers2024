@@ -25,6 +25,7 @@ import frc.robot.Constants.ShooterConstants;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.flywheel.Flywheel;
 import frc.robot.subsystems.indexer.Indexer;
+import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.pivot.Pivot;
 
 public class FlywheelCommands {
@@ -94,13 +95,39 @@ public class FlywheelCommands {
         pivot);
   }
 
-  public static Command shoot(Indexer indexer) {
+  public static Command shoot(Indexer indexer, Intake intake) {
     return Commands.run(
             () -> {
               indexer.runVolts(IndexerConstants.outtakeVolts);
+              intake.outtakeWheel();
             },
             indexer)
-        .withTimeout(1.0)
-        .andThen(() -> indexer.stop());
+        .withTimeout(2.0)
+        .andThen(
+            () -> {
+              indexer.stop();
+              intake.stopWheels();
+            });
+  }
+
+  public static Command aimAmp(Pivot pivot) {
+    return Commands.run(
+            () -> {
+              pivot.setPosition(0.8);
+            },
+            pivot)
+        .until(() -> pivot.atPosition(0.8));
+  }
+
+  public static Command outtakeAmp(Indexer indexer, Flywheel flywheel, Pivot pivot) {
+    return Commands.run(
+            () -> {
+              indexer.runVolts(IndexerConstants.outtakeVolts);
+              flywheel.runVelocity(1000);
+            },
+            indexer,
+            flywheel,
+            pivot)
+        .withTimeout(1.0);
   }
 }

@@ -21,7 +21,8 @@ public class IntakeIOSparkMax implements IntakeIO {
   private final SparkPIDController pid = leader.getPIDController();
 
   private final ProfiledPIDController pidd =
-      new ProfiledPIDController(0.0, 0.0, 0.0, new TrapezoidProfile.Constraints(Math.PI, Math.PI));
+      new ProfiledPIDController(
+          0.0, 0.0, 0.0, new TrapezoidProfile.Constraints(2 * Math.PI, 1.75 * Math.PI));
 
   private final CANSparkMax wheel = new CANSparkMax(34, MotorType.kBrushless);
   private final RelativeEncoder wheelencoder = wheel.getEncoder();
