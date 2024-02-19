@@ -103,6 +103,6 @@ public class IndexerIOTalonFX implements IndexerIO {
   }
 
   private boolean hasPiece() {
-    return bb_sensor.get();
+    return !bb_sensor.get();
   }
 }

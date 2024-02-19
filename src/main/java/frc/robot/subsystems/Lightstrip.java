@@ -19,7 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Lightstrip extends SubsystemBase {
-  CANdle candle = new CANdle(LightstripConstants.candlePort, "CANivore");
+  CANdle candle = new CANdle(LightstripConstants.candlePort);
   RainbowAnimation rainbowAnim = new RainbowAnimation(1, 0.5, LightstripConstants.ledCount + 8);
 
   private LedState defaultColor = LightstripConstants.defaultState;
@@ -56,6 +56,8 @@ public class Lightstrip extends SubsystemBase {
       System.out.println("Default Lightstrip: " + isDefault);
       return;
     }
+
+    candle.clearAnimation(0);
 
     update(defaultColor, timer, LightstripConstants.Ranges.full);
 
