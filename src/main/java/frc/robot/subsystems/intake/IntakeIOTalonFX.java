@@ -34,11 +34,12 @@ public class IntakeIOTalonFX implements IntakeIO {
   private final StatusSignal<Double> leaderPosition = leader.getPosition();
   private final StatusSignal<Double> leaderVelocity = leader.getVelocity();
   private final StatusSignal<Double> leaderAppliedVolts = leader.getMotorVoltage();
-  private final StatusSignal<Double> leaderCurrent = leader.getStatorCurrent();
+  private final StatusSignal<Double> leaderCurrent = leader.getTorqueCurrent();
+  // private final StatusSignal<Double> leaderGoal = leader.get
 
   private final StatusSignal<Double> wheelVelocity = wheel.getVelocity();
   private final StatusSignal<Double> wheelAppliedVolts = wheel.getMotorVoltage();
-  private final StatusSignal<Double> wheelCurrent = wheel.getStatorCurrent();
+  private final StatusSignal<Double> wheelCurrent = wheel.getTorqueCurrent();
 
   private final MotionMagicVoltage mm_volt = new MotionMagicVoltage(0);
 
@@ -106,7 +107,8 @@ public class IntakeIOTalonFX implements IntakeIO {
     leader.setPosition(0.0);
 
     pidd.reset(0.0);
-    tofSensor.setRangingMode(RangingMode.Short, 30);
+    tofSensor.setRangingMode(RangingMode.Long, 30);
+    tofSensor.setRangeOfInterest(7, 7, 9, 9);
   }
 
   @Override

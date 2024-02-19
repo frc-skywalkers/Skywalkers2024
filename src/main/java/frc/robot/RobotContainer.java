@@ -23,7 +23,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import frc.robot.Constants.IntakeConstants;
 import frc.robot.Constants.PivotConstants;
 import frc.robot.commands.DriveCommands;
 import frc.robot.commands.FeedForwardCharacterization;
@@ -348,16 +347,16 @@ public class RobotContainer {
     //             .andThen(IntakeCommands.passPieceIntake(intake, pivot, indexer))
     //             .andThen(IntakeCommands.transferPiece(intake, indexer)));
 
-    // operator
-    //     .a()
-    //     .onTrue(
-    //         IntakeCommands.intakeHandoff(intake, indexer, pivot).unless(() ->
-    // indexer.hasPiece()));
+    operator
+        .a()
+        .onTrue(
+            IntakeCommands.intakeHandoff(intake, indexer, pivot).unless(() -> indexer.hasPiece()));
 
-    operator.a().onTrue(Commands.run(() -> intake.setPosition(IntakeConstants.handoff), intake));
+    // operator.a().onTrue(Commands.run(() -> intake.setPosition(IntakeConstants.dropDown),
+    // intake));
 
-    operator.b().onTrue(Commands.run(() -> intake.runWheelVolts(4.0), intake));
-
+    // operator.b().onTrue(Commands.run(() -> intake.runWheelVolts(-4.0), intake));
+    //
     // operator
     //     .b()
     //     .onTrue(

@@ -74,7 +74,7 @@ public final class Constants {
     public static final double handoff = 0.0;
 
     public static final double intakeVolts = -7.0;
-    public static final double holdVolts = -0.5;
+    public static final double holdVolts = -0.25;
     public static final double outtakeVolts = 4.0;
 
     public static final double tolerance = 0.05;

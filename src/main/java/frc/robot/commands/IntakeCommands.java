@@ -17,7 +17,6 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.Constants.IndexerConstants;
 import frc.robot.Constants.IntakeConstants;
-import frc.robot.Constants.LightstripConstants;
 import frc.robot.Constants.PivotConstants;
 import frc.robot.subsystems.Lightstrip;
 import frc.robot.subsystems.indexer.Indexer;
@@ -117,19 +116,6 @@ public class IntakeCommands {
 
   public static Command ampPrep(
       Intake intake, Indexer indexer, Pivot pivot, Lightstrip lightstrip) {
-    return Commands.run(
-            () -> {
-              lightstrip.toggleOnColor(LightstripConstants.intake, LightstripConstants.Ranges.full);
-            },
-            lightstrip)
-        .andThen(passPieceIntake(intake, pivot, indexer))
-        .andThen(transferPiece(intake, indexer, pivot))
-        .andThen(
-            Commands.run(
-                () -> {
-                  lightstrip.toggleOffColor(
-                      LightstripConstants.intake, LightstripConstants.Ranges.full);
-                },
-                lightstrip));
+    return passPieceIntake(intake, pivot, indexer).andThen(transferPiece(intake, indexer, pivot));
   }
 }
