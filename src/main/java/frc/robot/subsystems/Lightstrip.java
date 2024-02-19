@@ -24,11 +24,11 @@ public class Lightstrip extends SubsystemBase {
 
   private LedState defaultColor = LightstripConstants.defaultState;
   private Timer timer = new Timer();
-  private List<LedState> currentColor;
-  private List<Range> currentRange;
-  private List<TempLedState> tempColor;
-  private List<Range> tempRange;
-  private List<Double> tempStart;
+  private List<LedState> currentColor = new ArrayList<LedState>();
+  private List<Range> currentRange = new ArrayList<Range>();
+  private List<TempLedState> tempColor = new ArrayList<TempLedState>();
+  private List<Range> tempRange = new ArrayList<Range>();
+  private List<Double> tempStart = new ArrayList<Double>();
 
   private boolean isDefault = false;
 
