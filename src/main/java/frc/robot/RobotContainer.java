@@ -348,7 +348,7 @@ public class RobotContainer {
     //             .andThen(IntakeCommands.transferPiece(intake, indexer)));
 
     operator
-        .a()
+        .b()
         .onTrue(
             IntakeCommands.intakeHandoff(intake, indexer, pivot).unless(() -> indexer.hasPiece()));
 

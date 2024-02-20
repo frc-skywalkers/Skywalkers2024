@@ -97,32 +97,35 @@ public class IntakeIOTalonFX implements IntakeIO {
     }
 
     BaseStatusSignal.setUpdateFrequencyForAll(
-        250.0, leaderPosition, leaderVelocity, leaderAppliedVolts, leaderCurrent);
+        50.0, leaderPosition, leaderVelocity, leaderAppliedVolts, leaderCurrent);
     leader.optimizeBusUtilization();
 
-    BaseStatusSignal.setUpdateFrequencyForAll(
-        250.0, wheelVelocity, wheelAppliedVolts, wheelCurrent);
+    BaseStatusSignal.setUpdateFrequencyForAll(50.0, wheelVelocity, wheelAppliedVolts, wheelCurrent);
     wheel.optimizeBusUtilization();
-
-    leader.setPosition(0.0);
 
     pidd.reset(0.0);
     tofSensor.setRangingMode(RangingMode.Long, 30);
     tofSensor.setRangeOfInterest(7, 7, 9, 9);
+
+    leader.setPosition(0.0);
   }
 
   @Override
   public void updateInputs(IntakeIOInputs inputs) {
-    inputs.positionRad = leaderPosition.getValueAsDouble();
-    inputs.velocityRadPerSec = leaderVelocity.getValueAsDouble();
+
+    BaseStatusSignal.refreshAll(leaderPosition, leaderVelocity, leaderAppliedVolts, leaderCurrent);
+
+    BaseStatusSignal.refreshAll(wheelVelocity, wheelAppliedVolts, wheelCurrent);
+
+    inputs.positionRad = Units.rotationsToRadians(leaderPosition.getValueAsDouble());
+    inputs.velocityRadPerSec = Units.rotationsToRadians(leaderVelocity.getValueAsDouble());
     inputs.appliedVolts = leaderAppliedVolts.getValueAsDouble();
     inputs.currentAmps =
         new double[] {leaderCurrent.getValueAsDouble(), wheelCurrent.getValueAsDouble()};
     inputs.goalPos = goalPos;
     inputs.goalVel = goalVel;
 
-    inputs.wheelAppliedVolts = wheelAppliedVolts.getValueAsDouble();
-    inputs.wheelVelocityRadPerSec = wheelVelocity.getValueAsDouble();
+    inputs.wheelVelocityRadPerSec = Units.rotationsToRadians(wheelVelocity.getValueAsDouble());
     inputs.tofDistance = tofSensor.getRange();
     inputs.tofSD = tofSensor.getRangeSigma();
   }

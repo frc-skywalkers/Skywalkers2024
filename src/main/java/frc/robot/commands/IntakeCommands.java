@@ -58,7 +58,7 @@ public class IntakeCommands {
               intake.setPosition(IntakeConstants.dropDown);
               intake.runWheel();
             })
-        .until(() -> intake.hasPiece());
+        .until(() -> intake.hasPiece() && intake.atPosition(IntakeConstants.dropDown));
   }
 
   public static Command passPieceIntake(Intake intake, Pivot pivot, Indexer indexer) {
