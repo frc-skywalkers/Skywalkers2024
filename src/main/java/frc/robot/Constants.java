@@ -63,7 +63,7 @@ public final class Constants {
     public static final double mm_accel = 0.8;
     public static final double mm_jerk = 1.6;
 
-    public static final double handoff = -0.95;
+    public static final double handoff = -1.00;
 
     public static final double tolerance = 0.075;
   }

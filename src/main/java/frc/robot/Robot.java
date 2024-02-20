@@ -127,6 +127,11 @@ public class Robot extends LoggedRobot {
     if (autonomousCommand != null) {
       autonomousCommand.schedule();
     }
+
+    switch (Constants.currentMode) {
+      case REAL:
+        robotContainer.lightstrip.setDefault(false);
+    }
   }
 
   /** This function is called periodically during autonomous. */
@@ -142,6 +147,11 @@ public class Robot extends LoggedRobot {
     // this line or comment it out.
     if (autonomousCommand != null) {
       autonomousCommand.cancel();
+    }
+
+    switch (Constants.currentMode) {
+      case REAL:
+        robotContainer.lightstrip.setDefault(false);
     }
   }
 

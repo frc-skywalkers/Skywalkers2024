@@ -35,7 +35,7 @@ public class IntakeIOTalonFX implements IntakeIO {
   private final StatusSignal<Double> leaderVelocity = leader.getVelocity();
   private final StatusSignal<Double> leaderAppliedVolts = leader.getMotorVoltage();
   private final StatusSignal<Double> leaderCurrent = leader.getTorqueCurrent();
-  // private final StatusSignal<Double> leaderGoal = leader.get
+  private final StatusSignal<Double> leaderGoal = leader.getClosedLoopReference();
 
   private final StatusSignal<Double> wheelVelocity = wheel.getVelocity();
   private final StatusSignal<Double> wheelAppliedVolts = wheel.getMotorVoltage();
@@ -97,10 +97,11 @@ public class IntakeIOTalonFX implements IntakeIO {
     }
 
     BaseStatusSignal.setUpdateFrequencyForAll(
-        50.0, leaderPosition, leaderVelocity, leaderAppliedVolts, leaderCurrent);
+        250.0, leaderPosition, leaderVelocity, leaderAppliedVolts, leaderCurrent, leaderGoal);
     leader.optimizeBusUtilization();
 
-    BaseStatusSignal.setUpdateFrequencyForAll(50.0, wheelVelocity, wheelAppliedVolts, wheelCurrent);
+    BaseStatusSignal.setUpdateFrequencyForAll(
+        250.0, wheelVelocity, wheelAppliedVolts, wheelCurrent);
     wheel.optimizeBusUtilization();
 
     pidd.reset(0.0);
@@ -113,7 +114,8 @@ public class IntakeIOTalonFX implements IntakeIO {
   @Override
   public void updateInputs(IntakeIOInputs inputs) {
 
-    BaseStatusSignal.refreshAll(leaderPosition, leaderVelocity, leaderAppliedVolts, leaderCurrent);
+    BaseStatusSignal.refreshAll(
+        leaderPosition, leaderVelocity, leaderAppliedVolts, leaderCurrent, leaderGoal);
 
     BaseStatusSignal.refreshAll(wheelVelocity, wheelAppliedVolts, wheelCurrent);
 
@@ -128,6 +130,7 @@ public class IntakeIOTalonFX implements IntakeIO {
     inputs.wheelVelocityRadPerSec = Units.rotationsToRadians(wheelVelocity.getValueAsDouble());
     inputs.tofDistance = tofSensor.getRange();
     inputs.tofSD = tofSensor.getRangeSigma();
+    inputs.setpointPos = leaderGoal.getValueAsDouble();
   }
 
   @Override

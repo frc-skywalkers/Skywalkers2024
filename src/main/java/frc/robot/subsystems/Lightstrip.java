@@ -88,7 +88,7 @@ public class Lightstrip extends SubsystemBase {
     isDefault = defaultState;
 
     if (isDefault) {
-      candle.animate(rainbowAnim);
+      candle.animate(rainbowAnim, 0);
     }
   }
 
