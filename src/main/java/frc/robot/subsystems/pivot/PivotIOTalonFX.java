@@ -64,8 +64,8 @@ public class PivotIOTalonFX implements PivotIO {
 
   public PivotIOTalonFX() {
     var config = new TalonFXConfiguration();
-    // config.CurrentLimits.StatorCurrentLimit = 30.0;
-    // config.CurrentLimits.StatorCurrentLimitEnable = true;
+    config.CurrentLimits.StatorCurrentLimit = 30.0;
+    config.CurrentLimits.StatorCurrentLimitEnable = true;
     config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
 
     Slot0Configs pidConfigs = config.Slot0;

@@ -57,7 +57,7 @@ public class IntakeCommands {
               intake.setPosition(IntakeConstants.dropDown);
               intake.runWheel();
             })
-        .until(() -> intake.hasPiece());
+        .until(() -> intake.hasPiece() && intake.atPosition(IntakeConstants.dropDown));
   }
 
   public static Command passPieceIntake(Intake intake, Pivot pivot, Indexer indexer) {
@@ -106,14 +106,23 @@ public class IntakeCommands {
   }
 
   public static Command intakeHandoff(Intake intake, Indexer indexer, Pivot pivot) {
-    return intakePiece(intake)
-        .andThen(gotPiece(intake))
-        .andThen(passPieceIntake(intake, pivot, indexer));
+    // return intakePiece(intake)
+    //     .andThen(gotPiece(intake))
+    //     .andThen(passPieceIntake(intake, pivot, indexer));
+
+    return gotPiece(intake).andThen(passPieceIntake(intake, pivot, indexer));
     // .andThen(transferPiece(intake, indexer, pivot))
     // .andThen(bringOutPiece(indexer));
   }
 
   public static Command ampPrep(Intake intake, Indexer indexer, Pivot pivot) {
     return passPieceIntake(intake, pivot, indexer).andThen(transferPiece(intake, indexer, pivot));
+    // .andThen(
+    //     Commands.run(
+    //         () -> {
+    //           lightstrip.toggleOffColor(
+    //               LightstripConstants.intake, LightstripConstants.Ranges.full);
+    //         },
+    //         lightstrip));
   }
 }

@@ -13,9 +13,17 @@
 
 package frc.robot;
 
+import static edu.wpi.first.math.util.Units.degreesToRadians;
+
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import frc.robot.lightstrip.LedState;
+import frc.robot.lightstrip.Range;
+import frc.robot.lightstrip.TempLedState;
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean
@@ -55,23 +63,27 @@ public final class Constants {
     public static final double mm_accel = 0.8;
     public static final double mm_jerk = 1.6;
 
-    public static final double handoff = -0.95;
+    public static final double handoff = -1.00;
 
     public static final double tolerance = 0.075;
   }
 
   public static final class IntakeConstants {
-    public static final double dropDown = 3.0;
+    public static final double dropDown = 3.14;
     public static final double home = Math.PI / 2;
     public static final double handoff = 0.0;
 
     public static final double intakeVolts = -7.0;
-    public static final double holdVolts = -0.5;
+    public static final double holdVolts = -0.25;
     public static final double outtakeVolts = 4.0;
 
-    public static final double tolerance = 0.05;
+    public static final double tolerance = 0.075;
 
     public static final double tofTolerance = 30.00;
+
+    public static final double mm_cruisevel = 0.4;
+    public static final double mm_accel = 0.8;
+    public static final double mm_jerk = 1.6;
   }
 
   public static final class IndexerConstants {
@@ -104,5 +116,31 @@ public final class Constants {
     public static final double shooterMultiplier = -1.0;
 
     public static final double scale = 1.0 / 29.0;
+  }
+
+  public static final class VisionConstants {
+
+    // Fix these constants
+    public static final Transform3d CAMERA_TO_ROBOT =
+        new Transform3d(
+            new Translation3d(-0.06, 0.2, -0.2127),
+            new Rotation3d(0.0, degreesToRadians(15.0), degreesToRadians(-3.0)));
+  }
+
+  public static final class LightstripConstants {
+    public static int candlePort = 37;
+    public static int ledCount = 150;
+
+    public static final class Ranges {
+      public static Range intake = new Range(0, 19);
+      public static Range drivetrain = new Range(20, 99);
+      public static Range superstructure = new Range(100, 149);
+      public static Range shooter = new Range(150, 199);
+      public static Range full = new Range(0, ledCount);
+    }
+
+    public static LedState defaultState = new LedState(255, 0, 0, "Signal");
+    public static TempLedState successSignal = new TempLedState(0, 255, 0, "Solid", 2);
+    public static TempLedState intake = new TempLedState(255, 255, 0, "Wave", 10);
   }
 }

@@ -42,11 +42,11 @@ public class DriveCommands {
       DoubleSupplier autoAlign) {
     return Commands.run(
         () -> {
-          double scle = 1.0;
+          double scle = 0.95;
 
-          //   if (slowMode.getAsDouble() > 0.5) {
-          // scle = 0.4;
-          //   }
+          if (slowMode.getAsDouble() > 0.5) {
+            scle = 0.7;
+          }
           // Apply deadband
           double linearMagnitude =
               MathUtil.applyDeadband(
