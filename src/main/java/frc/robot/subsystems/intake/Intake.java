@@ -42,7 +42,8 @@ public class Intake extends SubsystemBase {
     // This method will be called once per scheduler run
     io.updateInputs(inputs);
     Logger.processInputs(("Intake"), inputs);
-    Logger.recordOutput("Intake/atPosition", hasPiece());
+    Logger.recordOutput("Intake/hasPiece", hasPiece());
+    Logger.recordOutput("Intake/atPosition", atPosition(IntakeConstants.dropDown));
   }
 
   public void runVolts(double volts) {
