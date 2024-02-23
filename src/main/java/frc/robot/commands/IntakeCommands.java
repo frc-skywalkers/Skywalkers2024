@@ -38,17 +38,28 @@ public class IntakeCommands {
         intake);
   }
 
+  public static Command homeIntake(Intake intake) {
+    return Commands.run(
+            () -> {
+              intake.runVolts(-2.0);
+            },
+            intake)
+        .until(() -> intake.isHoned())
+        .andThen(
+            () -> {
+              intake.resetPosition();
+              intake.stop();
+            });
+  }
+
   public static Command intakePiece(Intake intake) {
     return Commands.run(
             () -> {
               intake.setPosition(IntakeConstants.dropDown);
               intake.runWheel();
-              Logger.recordOutput("Intake/intakingPiece", true);
             },
             intake)
         .withTimeout(0.25);
-    // .until(() -> intake.hasPiece());
-    // .until(() -> intake.atPosition(IntakeConstants.dropDown));
   }
 
   public static Command gotPiece(Intake intake) {
@@ -56,6 +67,7 @@ public class IntakeCommands {
             () -> {
               intake.setPosition(IntakeConstants.dropDown);
               intake.runWheel();
+              Logger.recordOutput("Intake/intakingPiece", true);
             })
         .until(() -> intake.hasPiece() && intake.atPosition(IntakeConstants.dropDown));
   }
@@ -66,6 +78,7 @@ public class IntakeCommands {
               intake.setPosition(IntakeConstants.handoff);
               intake.holdPiece();
               pivot.setPosition(PivotConstants.handoff);
+              Logger.recordOutput("Intake/intakingPiece", false);
             },
             intake,
             pivot,

@@ -40,8 +40,14 @@ public interface ModuleIO {
   /** Run the drive motor at the specified voltage. */
   public default void setDriveVoltage(double volts) {}
 
+  /** Run the drive motor at the specified voltage with MM. */
+  public default void setDriveMMV(double velocityRadPerSec) {}
+
   /** Run the turn motor at the specified voltage. */
   public default void setTurnVoltage(double volts) {}
+
+  /** Run the turn motor at the specified voltage with MM. */
+  public default void setTurnMM(double rad) {}
 
   /** Enable or disable brake mode on the drive motor. */
   public default void setDriveBrakeMode(boolean enable) {}

@@ -39,6 +39,8 @@ public interface IntakeIO {
 
   public default void stopWheels() {}
 
+  public default void resetPosition() {}
+
   /** Set velocity PID constants. */
   public default void configurePID(double kP, double kI, double kD) {}
 }

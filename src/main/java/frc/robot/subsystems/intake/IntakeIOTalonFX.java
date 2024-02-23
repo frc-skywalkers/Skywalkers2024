@@ -131,6 +131,7 @@ public class IntakeIOTalonFX implements IntakeIO {
     inputs.tofDistance = tofSensor.getRange();
     inputs.tofSD = tofSensor.getRangeSigma();
     inputs.setpointPos = leaderGoal.getValueAsDouble();
+    inputs.wheelAppliedVolts = wheelAppliedVolts.getValueAsDouble();
   }
 
   @Override
@@ -155,7 +156,13 @@ public class IntakeIOTalonFX implements IntakeIO {
 
   @Override
   public void setPosition(double positionRad, double ffVolts) {
+    goalPos = positionRad;
     leader.setControl(mm_volt.withPosition(Units.radiansToRotations(positionRad)).withSlot(0));
+  }
+
+  @Override
+  public void resetPosition() {
+    leader.setPosition(0);
   }
 
   public double getCurrent() {

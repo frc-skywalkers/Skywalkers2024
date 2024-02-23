@@ -50,7 +50,7 @@ public class IntakeIOSim implements IntakeIO {
     inputs.positionRad = sim.getAngleRads();
     inputs.velocityRadPerSec = sim.getVelocityRadPerSec();
     inputs.appliedVolts = appliedVolts;
-    inputs.currentAmps = new double[] {sim.getCurrentDrawAmps()};
+    inputs.currentAmps = new double[] {sim.getCurrentDrawAmps(), wheelsim.getCurrentDrawAmps()};
     inputs.goalPos = goalPos;
     inputs.goalVel = pid.getSetpoint().velocity;
     inputs.setpointPos = pid.getSetpoint().position;

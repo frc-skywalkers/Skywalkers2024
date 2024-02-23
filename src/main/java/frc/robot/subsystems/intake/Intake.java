@@ -42,7 +42,8 @@ public class Intake extends SubsystemBase {
     // This method will be called once per scheduler run
     io.updateInputs(inputs);
     Logger.processInputs(("Intake"), inputs);
-    Logger.recordOutput("Intake/atPosition", hasPiece());
+    Logger.recordOutput("Intake/hasPiece", hasPiece());
+    Logger.recordOutput("Intake/atPosition", atPosition(IntakeConstants.dropDown));
   }
 
   public void runVolts(double volts) {
@@ -71,6 +72,10 @@ public class Intake extends SubsystemBase {
     } else {
       io.setPosition(positionRad, ffModel.calculate(inputs.positionRad, inputs.goalVel));
     }
+  }
+
+  public void resetPosition() {
+    io.resetPosition();
   }
 
   public void stop() {
@@ -111,5 +116,9 @@ public class Intake extends SubsystemBase {
 
   public boolean atPosition(double goalPos) {
     return Math.abs(getPositionRad() - goalPos) < IntakeConstants.tolerance;
+  }
+
+  public boolean isHoned() {
+    return inputs.currentAmps[0] > 20.0;
   }
 }

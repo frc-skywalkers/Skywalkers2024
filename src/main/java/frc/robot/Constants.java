@@ -15,6 +15,8 @@ package frc.robot;
 
 import static edu.wpi.first.math.util.Units.degreesToRadians;
 
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -69,7 +71,7 @@ public final class Constants {
   }
 
   public static final class IntakeConstants {
-    public static final double dropDown = 3.14;
+    public static final double dropDown = 3.0;
     public static final double home = Math.PI / 2;
     public static final double handoff = 0.0;
 
@@ -77,13 +79,13 @@ public final class Constants {
     public static final double holdVolts = -0.25;
     public static final double outtakeVolts = 4.0;
 
-    public static final double tolerance = 0.075;
+    public static final double tolerance = 0.15;
 
     public static final double tofTolerance = 30.00;
 
-    public static final double mm_cruisevel = 0.4;
-    public static final double mm_accel = 0.8;
-    public static final double mm_jerk = 1.6;
+    public static final double mm_cruisevel = 0.4 * 2.5;
+    public static final double mm_accel = 0.8 * 2.5 * 1.5;
+    public static final double mm_jerk = 1.6 * 2.5 * 1.5;
   }
 
   public static final class IndexerConstants {
@@ -96,6 +98,11 @@ public final class Constants {
     public static final Translation2d BLUE_SPEAKER_POSE = new Translation2d(-0.086473, 5.757474);
     public static final Translation2d RED_SPEAKER_POSE = new Translation2d(16.389722, 5.757474);
 
+    public static final Pose2d RED_AMP_POSE =
+        new Pose2d(14.483249, 7.57, new Rotation2d(1.5 * Math.PI));
+    public static final Pose2d BLUE_AMP_POSE =
+        new Pose2d(1.82, 7.57, new Rotation2d(1.5 * Math.PI));
+
     public static Translation2d getSpeaker() {
       if (DriverStation.getAlliance().isPresent()) {
         return DriverStation.getAlliance().get() == Alliance.Red
@@ -103,6 +110,14 @@ public final class Constants {
             : BLUE_SPEAKER_POSE;
       } else {
         return BLUE_SPEAKER_POSE; // default to blue
+      }
+    }
+
+    public static Pose2d getAmp() {
+      if (DriverStation.getAlliance().isPresent()) {
+        return DriverStation.getAlliance().get() == Alliance.Red ? RED_AMP_POSE : BLUE_AMP_POSE;
+      } else {
+        return BLUE_AMP_POSE;
       }
     }
   }
