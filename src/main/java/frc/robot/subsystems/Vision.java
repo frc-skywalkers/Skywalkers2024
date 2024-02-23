@@ -20,10 +20,12 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
 import frc.robot.Constants.*;
 import frc.robot.subsystems.drive.Drive;
 import java.io.IOException;
 import java.util.Optional;
+import org.littletonrobotics.junction.Logger;
 import org.photonvision.PhotonCamera;
 
 public class Vision extends SubsystemBase {
@@ -51,18 +53,21 @@ public class Vision extends SubsystemBase {
     this.photonCamera2 = photonCamera2;
     this.swerveSubsystem = swerveSubsystem;
 
+    Logger.recordOutput("Odometry/camera 1 name", photonCamera1.getName());
     AprilTagFieldLayout layout;
 
     try {
       layout = AprilTagFieldLayout.loadFromResource(AprilTagFields.k2024Crescendo.m_resourceFile);
       var alliance = DriverStation.getAlliance();
+      Logger.recordOutput("Odometry/Alliance", alliance.isPresent());
       if (alliance.isPresent()) {
         layout.setOrigin(
             alliance.get() == Alliance.Blue
                 ? OriginPosition.kBlueAllianceWallRightSide
                 : OriginPosition.kRedAllianceWallRightSide);
       } else {
-        layout = null;
+        layout.setOrigin(OriginPosition.kBlueAllianceWallRightSide);
+        Logger.recordOutput("Odometry/bad things have happened", true);
       }
     } catch (IOException e) {
       DriverStation.reportError("Failed to load AprilTagFieldLayout", e.getStackTrace());
@@ -82,7 +87,12 @@ public class Vision extends SubsystemBase {
 
   @Override
   public void periodic() {
+    if (Constants.currentMode == Mode.SIM) {
+      return;
+    }
     // This method will be called once per scheduler run
+
+    photonCamera1.getPipelineIndex();
 
     // Update pose estimator with the best visible target
     var pipelineResult1 = photonCamera1.getLatestResult();
@@ -90,6 +100,9 @@ public class Vision extends SubsystemBase {
 
     var resultTimestamp1 = pipelineResult1.getTimestampSeconds();
     var resultTimestamp2 = pipelineResult2.getTimestampSeconds();
+
+    Logger.recordOutput("Odometry/resultTimestamp1", resultTimestamp1);
+    Logger.recordOutput("Odometry/hasTargets", pipelineResult2.hasTargets());
 
     if (resultTimestamp1 != previousPipelineTimestamp && pipelineResult1.hasTargets()) {
 
@@ -130,6 +143,9 @@ public class Vision extends SubsystemBase {
           aprilTagFieldLayout == null
               ? Optional.empty()
               : aprilTagFieldLayout.getTagPose(fiducialId2);
+      Logger.recordOutput("Odometry/pose ambiguity", target2.getPoseAmbiguity());
+      Logger.recordOutput("Odometry/tag present", tagPose2.isPresent());
+      Logger.recordOutput("Odometry/id", fiducialId2);
 
       if (target2.getPoseAmbiguity() <= .2 && fiducialId2 >= 0 && tagPose2.isPresent()) {
         var targetPose2 = tagPose2.get();
@@ -153,5 +169,10 @@ public class Vision extends SubsystemBase {
 
   public Pose2d getCurrentPose() {
     return poseEstimator.getEstimatedPosition();
+  }
+
+  public void setCurrentPose(Pose2d pose) {
+    poseEstimator.resetPosition(
+        swerveSubsystem.getRotation(), swerveSubsystem.getModulePositions(), pose);
   }
 }

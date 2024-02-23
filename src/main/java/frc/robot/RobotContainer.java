@@ -75,6 +75,9 @@ public class RobotContainer {
   // private final CommandPS4Controller controller = new CommandPS4Controller(0);
 
   private final CommandXboxController operator = new CommandXboxController(1);
+  //   private final CommandPS4Controller operator = new CommandPS4Controller(1);
+
+  //   private final CommandJoystick op = new CommandJoystick(1);
 
   // Dashboard inputs
   private final LoggedDashboardChooser<Command> autoChooser;
@@ -233,11 +236,13 @@ public class RobotContainer {
             drive,
             () -> -controller.getLeftY(),
             () -> -controller.getLeftX(),
-            () -> -controller.getRightX(),
+            () -> -controller.getRawAxis(2),
             () -> controller.getLeftTriggerAxis(),
             () -> controller.getRightTriggerAxis()));
     controller.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
     // flywheel.setDefaultCommand(FlywheelCommands.autoShoot(flywheel, drive));
+
+    controller.leftBumper().onTrue(DriveCommands.autoAlignAmp(drive));
 
     // intake.setDefaultCommand(
     //     Commands.runOnce(
@@ -361,7 +366,7 @@ public class RobotContainer {
     //             () -> flywheel.runVelocity(SmartDashboard.getNumber("Shooter RPM Wanted",
     // 3500))));
 
-    pivot.setDefaultCommand(Commands.run(() -> pivot.setPosition(-1.2), pivot));
+    pivot.setDefaultCommand(Commands.run(() -> pivot.setPosition(-1.3), pivot));
     flywheel.setDefaultCommand(Commands.run(() -> flywheel.runVelocity(0.0), flywheel));
     // controller`
     //     .x()

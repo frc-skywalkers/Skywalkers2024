@@ -71,6 +71,7 @@ public class Drive extends SubsystemBase {
   private Pose2d virtGoal = new Pose2d();
   private boolean shootOnMove = false;
   private double alignTolerance = 0.05;
+  private double transTolerance = 0.15;
 
   public Drive(
       GyroIO gyroIO,
@@ -368,6 +369,28 @@ public class Drive extends SubsystemBase {
 
   public boolean isAligned(Translation2d goalPos) {
     double angDif = getAngleDif(goalPos);
-    return Math.abs(angDif - getRotation().getRadians()) < alignTolerance;
+    // Rotation2d aDif;
+    // return Math.abs(angDif - getRotation().getRadians()) < alignTolerance;
+    return atAngle(angDif);
+  }
+
+  // figure out better way to do this, but this works for now
+  public boolean atAngle(double rad) {
+    double dif = rad - getPose().getRotation().getRadians();
+    if (Math.abs(dif + 2 * Math.PI) < alignTolerance) return true;
+    if (Math.abs(dif) < alignTolerance) return true;
+    if (Math.abs(dif - 2 * Math.PI) < alignTolerance) return true;
+    return false;
+  }
+
+  public boolean atGoal(Pose2d goalPos) {
+    // boolean aligned = isAligned(goalPos);
+    // boolean aligned = false;
+    // double head = getPose().getRotation().getRadians();
+    double xPos = getPose().getX();
+    double yPos = getPose().getY();
+    return atAngle(goalPos.getRotation().getRadians())
+        && (Math.abs(yPos - goalPos.getY()) < transTolerance)
+        && (Math.abs(xPos - goalPos.getX()) < transTolerance);
   }
 }

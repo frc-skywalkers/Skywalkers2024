@@ -14,13 +14,16 @@
 package frc.robot.commands;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import frc.robot.Constants.FieldConstants;
 import frc.robot.subsystems.drive.Drive;
 import java.util.function.DoubleSupplier;
 import org.littletonrobotics.junction.Logger;
@@ -80,5 +83,45 @@ public class DriveCommands {
                   drive.getRotation()));
         },
         drive);
+  }
+
+  public static Command autoAlignAmp(Drive drive) {
+    ProfiledPIDController headingController =
+        new ProfiledPIDController(
+            3.0,
+            0.0,
+            0.05,
+            new Constraints(
+                drive.getMaxAngularSpeedRadPerSec(), drive.getMaxAngularSpeedRadPerSec()));
+    ProfiledPIDController xController =
+        new ProfiledPIDController(5.0, 0.0, 0.1, new Constraints(3.0, 3.0));
+    ProfiledPIDController yController =
+        new ProfiledPIDController(5.0, 0.0, 0.1, new Constraints(3.0, 3.0));
+    headingController.reset(
+        drive.getPose().getRotation().getRadians(), drive.getFieldRelativeSpeed().omega);
+    xController.reset(drive.getPose().getX(), drive.getFieldRelativeSpeed().vx);
+    yController.reset(drive.getPose().getY(), drive.getFieldRelativeSpeed().vy);
+    headingController.enableContinuousInput(-Math.PI, Math.PI);
+    Pose2d goal = FieldConstants.getAmp();
+
+    return Commands.run(
+            () -> {
+              double omegaOutput =
+                  headingController.calculate(
+                      drive.getPose().getRotation().getRadians(), goal.getRotation().getRadians());
+              double xOutput = xController.calculate(drive.getPose().getX(), goal.getX());
+              double yOutput = yController.calculate(drive.getPose().getY(), goal.getY());
+              double omegaSetpoint = headingController.getSetpoint().velocity;
+              double xSetpoint = xController.getSetpoint().velocity;
+              double ySetpoint = yController.getSetpoint().velocity;
+              drive.runVelocity(
+                  ChassisSpeeds.fromFieldRelativeSpeeds(
+                      xOutput + xSetpoint,
+                      yOutput + ySetpoint,
+                      omegaOutput + omegaSetpoint,
+                      drive.getRotation()));
+            },
+            drive)
+        .until(() -> drive.atGoal(goal));
   }
 }

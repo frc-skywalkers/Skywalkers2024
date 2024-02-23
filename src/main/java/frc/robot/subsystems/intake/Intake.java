@@ -74,6 +74,10 @@ public class Intake extends SubsystemBase {
     }
   }
 
+  public void resetPosition() {
+    io.resetPosition();
+  }
+
   public void stop() {
     io.stop();
   }
@@ -112,5 +116,9 @@ public class Intake extends SubsystemBase {
 
   public boolean atPosition(double goalPos) {
     return Math.abs(getPositionRad() - goalPos) < IntakeConstants.tolerance;
+  }
+
+  public boolean isHoned() {
+    return inputs.currentAmps[0] > 20.0;
   }
 }

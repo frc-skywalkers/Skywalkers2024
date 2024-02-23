@@ -53,7 +53,7 @@ public class Lightstrip extends SubsystemBase {
   @Override
   public void periodic() {
     if (isDefault) {
-      System.out.println("Default Lightstrip: " + isDefault);
+      // System.out.println("Default Lightstrip: " + isDefault);
       return;
     }
 
