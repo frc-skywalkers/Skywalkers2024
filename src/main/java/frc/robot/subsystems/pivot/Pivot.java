@@ -5,6 +5,7 @@
 package frc.robot.subsystems.pivot;
 
 import edu.wpi.first.math.controller.ArmFeedforward;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Constants.Mode;
@@ -38,6 +39,7 @@ public class Pivot extends SubsystemBase {
         ffModel = new ArmFeedforward(0.0, 0.0, 0);
         break;
     }
+    Logger.recordOutput("Pivot/atPositions", false);
   }
 
   @Override
@@ -45,13 +47,15 @@ public class Pivot extends SubsystemBase {
     // This method will be called once per scheduler run
     io.updateInputs(inputs);
     Logger.processInputs(("Pivot"), inputs);
+    // Logger.recordOutput("Pivot/atPosition", atPosition(PivotConstants.handoff));
   }
 
   public void runVolts(double volts) {
-    io.setVoltage(volts);
+    io.setVoltage(volts + Math.cos(getPositionRad()) * 0.08);
   }
 
   public void setPosition(double positionRad) {
+    inputs.goalPos = positionRad;
     if (Constants.currentMode == Mode.SIM) {
       io.setPosition(positionRad, ffModel.calculate(inputs.setpointPos, inputs.goalVel));
     } else {
@@ -74,7 +78,7 @@ public class Pivot extends SubsystemBase {
   }
 
   public double getCharacterizationVelocity() {
-    return inputs.velocityRadPerSec;
+    return Units.radiansToRotations(inputs.velocityRadPerSec);
   }
 
   public boolean atPosition() {
@@ -82,6 +86,8 @@ public class Pivot extends SubsystemBase {
   }
 
   public boolean atPosition(double goalPos) {
-    return Math.abs(getPositionRad() - goalPos) < PivotConstants.tolerance;
+    boolean ret = Math.abs(getPositionRad() - goalPos) < PivotConstants.tolerance;
+    Logger.recordOutput("Pivot/atPositions", ret);
+    return ret;
   }
 }

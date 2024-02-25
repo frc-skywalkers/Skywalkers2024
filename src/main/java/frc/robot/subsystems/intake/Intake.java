@@ -27,14 +27,17 @@ public class Intake extends SubsystemBase {
         io.configurePID(1.0, 0.0, 0.0);
         break;
       case SIM:
-        ffModel = new ArmFeedforward(0.01, 0.05, 1.5);
-        io.configurePID(6.0, 0.0, 0.0);
+        ffModel = new ArmFeedforward(0.0, 0.1, 0.6); // need to determine
+        io.configurePID(10.0, 0.0, 0.1); // need to determine
         break;
       default:
         ffModel = new ArmFeedforward(0.0, 0.0, 0);
         break;
     }
     Logger.recordOutput("Intake/Mode", 0.000);
+    Logger.recordOutput("Intake/atPosition", false);
+    Logger.recordOutput("Intake/atPositions", false);
+    Logger.recordOutput("Intake/measuredGoalPos", 0.0);
   }
 
   @Override
@@ -43,7 +46,7 @@ public class Intake extends SubsystemBase {
     io.updateInputs(inputs);
     Logger.processInputs(("Intake"), inputs);
     Logger.recordOutput("Intake/hasPiece", hasPiece());
-    Logger.recordOutput("Intake/atPosition", atPosition(IntakeConstants.dropDown));
+    // Logger.recordOutput("Intake/atPosition", atPosition(IntakeConstants.handoff));
   }
 
   public void runVolts(double volts) {
@@ -69,6 +72,10 @@ public class Intake extends SubsystemBase {
   public void setPosition(double positionRad) {
     if (Constants.currentMode == Mode.SIM) {
       io.setPosition(positionRad, ffModel.calculate(inputs.setpointPos, inputs.goalVel));
+      Logger.recordOutput(
+          "Intake/FFoutput", 0.2 * Math.cos(inputs.setpointPos) + 0.764 * inputs.goalVel);
+      Logger.recordOutput("Intake/goalVel", inputs.goalVel);
+
     } else {
       io.setPosition(positionRad, ffModel.calculate(inputs.positionRad, inputs.goalVel));
     }
@@ -103,6 +110,7 @@ public class Intake extends SubsystemBase {
   public boolean hasPiece() {
     // return inputs.tofDistance > IntakeConstants.tofTolerance;
     // return inputs.currentAmps[1] > 25.0;
+    if (Constants.currentMode == Mode.SIM) return true;
     return inputs.currentAmps[1] < (-25.0);
   }
 
@@ -115,10 +123,20 @@ public class Intake extends SubsystemBase {
   }
 
   public boolean atPosition(double goalPos) {
-    return Math.abs(getPositionRad() - goalPos) < IntakeConstants.tolerance;
+    boolean ret = Math.abs(getPositionRad() - goalPos) < IntakeConstants.tolerance;
+    Logger.recordOutput("Intake/atPositions", ret);
+    Logger.recordOutput("Intake/measuredGoalPos", getPositionRad());
+    return ret;
+  }
+
+  public boolean atDropDown() {
+    return Math.abs(getPositionRad() - IntakeConstants.dropDown) < IntakeConstants.tolerance;
   }
 
   public boolean isHoned() {
     return inputs.currentAmps[0] > 20.0;
   }
+
+  // public Supplier<Boolean> gotPieceFinished() {
+  // }
 }

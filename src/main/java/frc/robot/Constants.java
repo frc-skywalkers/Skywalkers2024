@@ -53,7 +53,7 @@ public final class Constants {
     public static final double[] RPMEquation = {350.0, 500.000}; // need to tune; [0] -> m, [1] -> b
     public static final double[] timeEquation = {0.05, 0.15}; // need to tune; [0] -> m, [1] -> b
     public static final double kAccelCompFactor = 0.000;
-    public static final double tolerance = 25.00;
+    public static final double tolerance = 70.0;
   }
 
   public static final class PivotConstants {
@@ -99,7 +99,7 @@ public final class Constants {
     public static final Translation2d RED_SPEAKER_POSE = new Translation2d(16.389722, 5.757474);
 
     public static final Pose2d RED_AMP_POSE =
-        new Pose2d(14.483249, 7.57, new Rotation2d(1.5 * Math.PI));
+        new Pose2d(14.483249, 7.57, new Rotation2d(0.5 * Math.PI));
     public static final Pose2d BLUE_AMP_POSE =
         new Pose2d(1.82, 7.57, new Rotation2d(1.5 * Math.PI));
 

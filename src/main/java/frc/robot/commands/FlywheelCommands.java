@@ -27,6 +27,7 @@ import frc.robot.subsystems.flywheel.Flywheel;
 import frc.robot.subsystems.indexer.Indexer;
 import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.pivot.Pivot;
+import org.littletonrobotics.junction.Logger;
 
 public class FlywheelCommands {
 
@@ -95,11 +96,17 @@ public class FlywheelCommands {
         pivot);
   }
 
-  public static Command shoot(Indexer indexer, Intake intake) {
+  public static Command waiting(Pivot pivot, Flywheel flywheel) {
+    return Commands.waitUntil(
+        () -> pivot.atPosition(PivotConstants.handoff) && flywheel.atDesiredRPM(3000));
+  }
+
+  public static Command outtake(Indexer indexer, Intake intake) {
     return Commands.run(
             () -> {
               indexer.runVolts(IndexerConstants.outtakeVolts);
               intake.outtakeWheel();
+              Logger.recordOutput("Indexer/outtaking", true);
             },
             indexer)
         .withTimeout(2.0)
@@ -107,7 +114,12 @@ public class FlywheelCommands {
             () -> {
               indexer.stop();
               intake.stopWheels();
+              Logger.recordOutput("Indexer/outtaking", false);
             });
+  }
+
+  public static Command shoot(Pivot pivot, Flywheel flywheel, Indexer indexer, Intake intake) {
+    return waiting(pivot, flywheel).andThen(outtake(indexer, intake));
   }
 
   public static Command aimAmp(Pivot pivot) {
@@ -131,4 +143,29 @@ public class FlywheelCommands {
         .withTimeout(1.0)
         .andThen(() -> indexer.stop());
   }
+
+  public static Command prepSubwoofer(Flywheel flywheel, Pivot pivot) {
+    return Commands.run(
+            () -> {
+              Logger.recordOutput("Pivot/aiming", true);
+              pivot.setPosition(PivotConstants.handoff);
+              flywheel.runVelocity(3000);
+            },
+            flywheel,
+            pivot)
+        .handleInterrupt(
+            () -> {
+              Logger.recordOutput("Pivot/aiming", false);
+            });
+  }
+
+  // public static Command subwooferShot(Flywheel flywheel, Pivot pivot, Indexer indexer, Intake
+  // intake) {
+  //   return Commands.run(
+  //     () -> {
+
+  //     },
+  //     flywheel, pivot, indexer, intake
+  //   );
+  // }
 }

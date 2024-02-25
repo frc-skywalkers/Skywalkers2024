@@ -53,7 +53,6 @@ public class Vision extends SubsystemBase {
     this.photonCamera2 = photonCamera2;
     this.swerveSubsystem = swerveSubsystem;
 
-    Logger.recordOutput("Odometry/camera 1 name", photonCamera1.getName());
     AprilTagFieldLayout layout;
 
     try {

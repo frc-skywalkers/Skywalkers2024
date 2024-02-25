@@ -77,7 +77,7 @@ public class FlywheelIOTalonFX implements FlywheelIO {
     follower.setInverted(true);
 
     BaseStatusSignal.setUpdateFrequencyForAll(
-        50.0,
+        250.0,
         leaderPosition,
         leaderVelocity,
         leaderAppliedVolts,

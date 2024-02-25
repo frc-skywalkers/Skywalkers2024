@@ -63,13 +63,15 @@ public class IntakeCommands {
   }
 
   public static Command gotPiece(Intake intake) {
+
     return Commands.run(
             () -> {
               intake.setPosition(IntakeConstants.dropDown);
               intake.runWheel();
               Logger.recordOutput("Intake/intakingPiece", true);
             })
-        .until(() -> intake.hasPiece() && intake.atPosition(IntakeConstants.dropDown));
+        .until(() -> (intake.hasPiece() && intake.atPosition(IntakeConstants.dropDown)))
+        .andThen(() -> Logger.recordOutput("Intake/intakingPiece", false));
   }
 
   public static Command passPieceIntake(Intake intake, Pivot pivot, Indexer indexer) {
@@ -78,15 +80,16 @@ public class IntakeCommands {
               intake.setPosition(IntakeConstants.handoff);
               intake.holdPiece();
               pivot.setPosition(PivotConstants.handoff);
-              Logger.recordOutput("Intake/intakingPiece", false);
+              Logger.recordOutput("Intake/intaking", true);
             },
             intake,
             pivot,
             indexer)
         .until(
             () ->
-                intake.atPosition(IntakeConstants.handoff)
-                    && pivot.atPosition(PivotConstants.handoff));
+                (pivot.atPosition(PivotConstants.handoff)
+                    & intake.atPosition(IntakeConstants.handoff)))
+        .andThen(() -> Logger.recordOutput("Intake/intaking", false));
     // .withTimeout(5.0);
   }
 
@@ -94,7 +97,7 @@ public class IntakeCommands {
     return Commands.run(
             () -> {
               intake.outtakeWheel();
-              indexer.runVolts(IndexerConstants.indexVolts);
+              indexer.runVolts(IndexerConstants.outtakeVolts);
             },
             intake,
             indexer,
@@ -122,7 +125,7 @@ public class IntakeCommands {
     // return intakePiece(intake)
     //     .andThen(gotPiece(intake))
     //     .andThen(passPieceIntake(intake, pivot, indexer));
-
+    // return gotPiece(intake);
     return gotPiece(intake).andThen(passPieceIntake(intake, pivot, indexer));
     // .andThen(transferPiece(intake, indexer, pivot))
     // .andThen(bringOutPiece(indexer));
