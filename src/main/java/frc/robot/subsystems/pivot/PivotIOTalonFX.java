@@ -73,8 +73,8 @@ public class PivotIOTalonFX implements PivotIO {
     Slot0Configs pidConfigs = config.Slot0;
 
     pidConfigs.GravityType = GravityTypeValue.Arm_Cosine;
-    pidConfigs.kS = 0.1;
-    pidConfigs.kG = 0.2;
+    pidConfigs.kS = 0.29;
+    pidConfigs.kG = 0.27; // 0.2
     pidConfigs.kP = 12.0;
     pidConfigs.kI = 0.0;
     pidConfigs.kD = 0.25;

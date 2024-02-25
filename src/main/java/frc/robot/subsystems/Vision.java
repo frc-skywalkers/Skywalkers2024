@@ -163,6 +163,10 @@ public class Vision extends SubsystemBase {
     // Update pose estimator with drivetrain sensors
     poseEstimator.update(swerveSubsystem.getRotation(), swerveSubsystem.getModulePositions());
 
+    SmartDashboard.putNumber("estimatedX", getCurrentPose().getX());
+    SmartDashboard.putNumber("estimatedY", getCurrentPose().getY());
+    SmartDashboard.putNumber("estimatedR", getCurrentPose().getRotation().getDegrees());
+
     field2d.setRobotPose(getCurrentPose());
   }
 

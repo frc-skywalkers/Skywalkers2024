@@ -67,7 +67,7 @@ public final class Constants {
 
     public static final double handoff = -1.00;
 
-    public static final double tolerance = 0.075;
+    public static final double tolerance = 0.025;
   }
 
   public static final class IntakeConstants {
