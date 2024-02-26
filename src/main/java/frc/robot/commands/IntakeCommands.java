@@ -70,6 +70,7 @@ public class IntakeCommands {
               intake.runWheel();
               Logger.recordOutput("Intake/intakingPiece", true);
             })
+        // .withTimeout(3.0)
         .until(() -> (intake.hasPiece() && intake.atPosition(IntakeConstants.dropDown)))
         .andThen(() -> Logger.recordOutput("Intake/intakingPiece", false));
   }
@@ -79,17 +80,27 @@ public class IntakeCommands {
             () -> {
               intake.setPosition(IntakeConstants.handoff);
               intake.holdPiece();
-              pivot.setPosition(PivotConstants.handoff);
+              // pivot.setPosition(PivotConstants.handoff);
               Logger.recordOutput("Intake/intaking", true);
             },
             intake,
-            pivot,
+            // pivot,
             indexer)
         .until(
             () ->
-                (pivot.atPosition(PivotConstants.handoff)
-                    & intake.atPosition(IntakeConstants.handoff)))
+                // (pivot.atPosition(PivotConstants.handoff)
+                intake.atPosition(IntakeConstants.handoff))
         .andThen(() -> Logger.recordOutput("Intake/intaking", false));
+    // .withTimeout(5.0);
+  }
+
+  public static Command pivotHandoff(Pivot pivot) {
+    return Commands.run(
+            () -> {
+              pivot.setPosition(PivotConstants.handoff);
+            },
+            pivot)
+        .until(() -> (pivot.atPosition(PivotConstants.handoff)));
     // .withTimeout(5.0);
   }
 
@@ -132,7 +143,7 @@ public class IntakeCommands {
   }
 
   public static Command ampPrep(Intake intake, Indexer indexer, Pivot pivot) {
-    return passPieceIntake(intake, pivot, indexer).andThen(transferPiece(intake, indexer, pivot));
+    return pivotHandoff(pivot).andThen(transferPiece(intake, indexer, pivot));
     // .andThen(
     //     Commands.run(
     //         () -> {
@@ -141,4 +152,20 @@ public class IntakeCommands {
     //         },
     //         lightstrip));
   }
+
+  // public static Command outtake(Intake intake) {
+  // return Commands.run(
+  //         () -> {
+  //           intake.setPosition(IntakeConstants.dropDown);
+  //           intake.runWheel();
+  //         }, intake)
+  //     .until(() -> intake.atPosition(IntakeConstants.dropDown))
+  //     .andThen(
+  //         () -> {
+  //           intake.outtakeWheel();
+  //           intake.setPosition(IntakeConstants.handoff);
+  //         })
+  //     .until(() -> intake.atPosition(IntakeConstants.handoff)).andThen(() ->
+  // intake.stopWheels());
+  // }
 }

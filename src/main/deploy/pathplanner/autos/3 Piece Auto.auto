@@ -29,6 +29,18 @@
               }
             ]
           }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Sub1Close1Sub1"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Sub1Close2Sub2"
+          }
         }
       ]
     }

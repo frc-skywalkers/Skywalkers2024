@@ -65,7 +65,7 @@ public final class Constants {
     public static final double mm_accel = 0.8;
     public static final double mm_jerk = 1.6;
 
-    public static final double handoff = -1.00;
+    public static final double handoff = -1.1;
 
     public static final double tolerance = 0.025;
   }
@@ -136,14 +136,18 @@ public final class Constants {
   public static final class VisionConstants {
 
     // Fix these constants
-    public static final Transform3d CAMERA_TO_ROBOT =
+    public static final Transform3d CAMERA_TO_ROBOT1 =
         new Transform3d(
-            new Translation3d(-0.06, 0.2, -0.2127),
-            new Rotation3d(0.0, degreesToRadians(15.0), degreesToRadians(-3.0)));
+            new Translation3d(-0.205, 0 - 0.249, -0.229),
+            new Rotation3d(0.0, degreesToRadians(-30), degreesToRadians(-60.0)));
+    public static final Transform3d CAMERA_TO_ROBOT2 =
+        new Transform3d(
+            new Translation3d(-0.205, -0.249, -0.229),
+            new Rotation3d(0.0, degreesToRadians(30.0), degreesToRadians(60.0)));
   }
 
   public static final class LightstripConstants {
-    public static int candlePort = 37;
+    public static int pwmPort = 9;
     public static int ledCount = 150;
 
     public static final class Ranges {
@@ -154,8 +158,8 @@ public final class Constants {
       public static Range full = new Range(0, ledCount);
     }
 
-    public static LedState defaultState = new LedState(255, 0, 0, "Signal");
+    public static LedState defaultState = new LedState(255, 0, 0, "Fade");
     public static TempLedState successSignal = new TempLedState(0, 255, 0, "Solid", 2);
-    public static TempLedState intake = new TempLedState(255, 255, 0, "Wave", 10);
+    public static TempLedState intake = new TempLedState(255, 255, 0, "Solid", 10);
   }
 }

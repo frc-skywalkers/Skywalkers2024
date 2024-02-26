@@ -59,7 +59,7 @@
   "constraintZones": [],
   "eventMarkers": [
     {
-      "name": "Drop Down Piece 2",
+      "name": "Drop Down Piece",
       "waypointRelativePos": 0.05,
       "command": {
         "type": "sequential",
@@ -69,6 +69,40 @@
               "type": "named",
               "data": {
                 "name": "intake handoff"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Aim Piece",
+      "waypointRelativePos": 1.45,
+      "command": {
+        "type": "sequential",
+        "data": {
+          "commands": [
+            {
+              "type": "named",
+              "data": {
+                "name": "Pivot Rev"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "New Event Marker",
+      "waypointRelativePos": 1.75,
+      "command": {
+        "type": "sequential",
+        "data": {
+          "commands": [
+            {
+              "type": "named",
+              "data": {
+                "name": "Shoot"
               }
             }
           ]

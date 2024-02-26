@@ -125,10 +125,10 @@ public class FlywheelCommands {
   public static Command aimAmp(Pivot pivot) {
     return Commands.run(
             () -> {
-              pivot.setPosition(0.8);
+              pivot.setPosition(0.6);
             },
             pivot)
-        .until(() -> pivot.atPosition(0.8));
+        .until(() -> pivot.atPosition(0.6));
   }
 
   public static Command outtakeAmp(Indexer indexer, Flywheel flywheel, Pivot pivot) {
@@ -136,6 +136,7 @@ public class FlywheelCommands {
             () -> {
               indexer.runVolts(IndexerConstants.outtakeVolts);
               flywheel.runVelocity(1000);
+              pivot.setPosition(0.6);
             },
             indexer,
             flywheel,
