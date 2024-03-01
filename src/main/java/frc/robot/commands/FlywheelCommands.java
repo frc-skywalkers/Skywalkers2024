@@ -27,6 +27,7 @@ import frc.robot.subsystems.flywheel.Flywheel;
 import frc.robot.subsystems.indexer.Indexer;
 import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.pivot.Pivot;
+import org.littletonrobotics.junction.Logger;
 
 public class FlywheelCommands {
 
@@ -95,11 +96,17 @@ public class FlywheelCommands {
         pivot);
   }
 
-  public static Command shoot(Indexer indexer, Intake intake) {
+  public static Command waiting(Pivot pivot, Flywheel flywheel) {
+    return Commands.waitUntil(
+        () -> pivot.atPosition(PivotConstants.handoff) && flywheel.atDesiredRPM(5500));
+  }
+
+  public static Command outtake(Indexer indexer, Intake intake) {
     return Commands.run(
             () -> {
               indexer.runVolts(IndexerConstants.outtakeVolts);
               intake.outtakeWheel();
+              Logger.recordOutput("Indexer/outtaking", true);
             },
             indexer)
         .withTimeout(2.0)
@@ -107,16 +114,24 @@ public class FlywheelCommands {
             () -> {
               indexer.stop();
               intake.stopWheels();
-            });
+              Logger.recordOutput("Indexer/outtaking", false);
+            },
+            indexer,
+            intake);
+  }
+
+  public static Command shoot(Pivot pivot, Flywheel flywheel, Indexer indexer, Intake intake) {
+    return waiting(pivot, flywheel).andThen(outtake(indexer, intake));
+    // return outtake(indexer, intake);
   }
 
   public static Command aimAmp(Pivot pivot) {
     return Commands.run(
             () -> {
-              pivot.setPosition(0.8);
+              pivot.setPosition(0.6);
             },
             pivot)
-        .until(() -> pivot.atPosition(0.8));
+        .until(() -> pivot.atPosition(0.6));
   }
 
   public static Command outtakeAmp(Indexer indexer, Flywheel flywheel, Pivot pivot) {
@@ -124,11 +139,37 @@ public class FlywheelCommands {
             () -> {
               indexer.runVolts(IndexerConstants.outtakeVolts);
               flywheel.runVelocity(1000);
+              pivot.setPosition(0.6);
             },
             indexer,
             flywheel,
             pivot)
         .withTimeout(1.0)
-        .andThen(() -> indexer.stop());
+        .andThen(() -> indexer.stop(), indexer);
   }
+
+  public static Command prepSubwoofer(Flywheel flywheel, Pivot pivot) {
+    return Commands.run(
+            () -> {
+              Logger.recordOutput("Pivot/aiming", true);
+              pivot.setPosition(PivotConstants.handoff);
+              flywheel.runVelocity(4500);
+            },
+            flywheel,
+            pivot)
+        .handleInterrupt(
+            () -> {
+              Logger.recordOutput("Pivot/aiming", false);
+            });
+  }
+
+  // public static Command subwooferShot(Flywheel flywheel, Pivot pivot, Indexer indexer, Intake
+  // intake) {
+  //   return Commands.run(
+  //     () -> {
+
+  //     },
+  //     flywheel, pivot, indexer, intake
+  //   );
+  // }
 }

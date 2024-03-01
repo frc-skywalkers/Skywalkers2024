@@ -4,10 +4,8 @@
 
 package frc.robot.subsystems;
 
-import com.ctre.phoenix.led.CANdle;
-import com.ctre.phoenix.led.CANdle.LEDStripType;
-import com.ctre.phoenix.led.CANdleConfiguration;
-import com.ctre.phoenix.led.RainbowAnimation;
+import edu.wpi.first.wpilibj.AddressableLED;
+import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -19,8 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Lightstrip extends SubsystemBase {
-  CANdle candle = new CANdle(LightstripConstants.candlePort);
-  RainbowAnimation rainbowAnim = new RainbowAnimation(1, 0.5, LightstripConstants.ledCount + 8);
+  AddressableLED leds = new AddressableLED(LightstripConstants.pwmPort);
 
   private LedState defaultColor = LightstripConstants.defaultState;
   private Timer timer = new Timer();
@@ -37,27 +34,18 @@ public class Lightstrip extends SubsystemBase {
     timer.reset();
     timer.start();
 
+    leds.setLength(LightstripConstants.ledCount);
+    leds.start();
+
     isDefault = false;
-
-    CANdleConfiguration config = new CANdleConfiguration();
-    config.stripType = LEDStripType.RGB;
-    config.brightnessScalar = 0.75;
-    candle.configAllSettings(config);
-
-    setColor(new LedState(255, 0, 0, "Solid"), LightstripConstants.Ranges.intake);
-    setColor(new LedState(0, 255, 0, "Solid"), LightstripConstants.Ranges.drivetrain);
-    setColor(new LedState(0, 0, 255, "Solid"), LightstripConstants.Ranges.superstructure);
-    setColor(new LedState(0, 255, 255, "Solid"), LightstripConstants.Ranges.shooter);
   }
 
   @Override
   public void periodic() {
-    if (isDefault) {
-      // System.out.println("Default Lightstrip: " + isDefault);
+    /*if (isDefault) {
+      System.out.println("Default Lightstrip: " + isDefault);
       return;
-    }
-
-    candle.clearAnimation(0);
+    }*/
 
     update(defaultColor, timer, LightstripConstants.Ranges.full);
 
@@ -87,53 +75,48 @@ public class Lightstrip extends SubsystemBase {
   public void setDefault(boolean defaultState) {
     isDefault = defaultState;
 
-    if (isDefault) {
+    /*if (isDefault) {
       candle.animate(rainbowAnim, 0);
-    }
+    }*/
   }
 
   private void update(LedState state, Timer timer, Range range) {
     SmartDashboard.putNumber("Timer", timer.get() % 1 - 0.50 * state.getRed());
+
+    AddressableLEDBuffer buffer = new AddressableLEDBuffer(LightstripConstants.ledCount);
+
     if (state.getEffect() == "Solid") {
-      candle.setLEDs(
-          state.getRed(),
-          state.getGreen(),
-          state.getBlue(),
-          0,
-          range.getStart(),
-          range.getEnd() - range.getStart() + 1);
+      for (int i = range.getStart(); i < range.getEnd(); i++) {
+        buffer.setRGB(i, state.getRed(), state.getGreen(), state.getBlue());
+      }
     } else if (state.getEffect() == "Blink") {
       if ((timer.get() % 2) < 1) {
-        candle.setLEDs(
-            state.getRed(),
-            state.getGreen(),
-            state.getBlue(),
-            0,
-            range.getStart(),
-            range.getEnd() - range.getStart() + 1);
+        for (int i = range.getStart(); i < range.getEnd(); i++) {
+          buffer.setRGB(i, state.getRed(), state.getGreen(), state.getBlue());
+        }
       } else if ((timer.get() % 2) >= 1) {
-        candle.setLEDs(0, 0, 0);
+        for (int i = range.getStart(); i < range.getEnd(); i++) {
+          buffer.setRGB(i, 0, 0, 0);
+        }
       }
     } else if (state.getEffect() == "Fast Blink") {
       if ((timer.get() % 0.5) < 0.25) {
-        candle.setLEDs(
-            state.getRed(),
-            state.getGreen(),
-            state.getBlue(),
-            0,
-            range.getStart(),
-            range.getEnd() - range.getStart() + 1);
+        for (int i = range.getStart(); i < range.getEnd(); i++) {
+          buffer.setRGB(i, state.getRed(), state.getGreen(), state.getBlue());
+        }
       } else if ((timer.get() % 0.5) >= 0.25) {
-        candle.setLEDs(0, 0, 0);
+        for (int i = range.getStart(); i < range.getEnd(); i++) {
+          buffer.setRGB(i, 0, 0, 0);
+        }
       }
     } else if (state.getEffect() == "Fade") {
-      candle.setLEDs(
-          (int) (state.getRed() / ((timer.get() % 0.5) * 2)),
-          (int) (state.getGreen() / ((timer.get() % 0.5) * 2)),
-          (int) (state.getBlue() / ((timer.get() % 0.5) * 2)),
-          0,
-          range.getStart(),
-          range.getEnd() - range.getStart() + 1);
+      for (int i = range.getStart(); i < range.getEnd(); i++) {
+        buffer.setRGB(
+            i,
+            (int) (state.getRed() * Math.abs((timer.get() % 2) - 1)),
+            (int) (state.getGreen() * Math.abs((timer.get() % 2) - 1)),
+            (int) (state.getBlue() * Math.abs((timer.get() % 2) - 1)));
+      }
     } else if (state.getEffect() == "Signal") {
       int chain = 0;
 
@@ -163,13 +146,11 @@ public class Lightstrip extends SubsystemBase {
           ratio = 0;
         }
 
-        candle.setLEDs(
-            (int) (state.getRed() * chain / 6),
-            (int) (state.getGreen() * chain / 6),
-            (int) (state.getBlue() * chain / 6),
-            0,
-            range.getStart() + i,
-            1);
+        buffer.setRGB(
+            (int) (state.getRed() * (ratio / 6)),
+            (int) (state.getGreen() * (ratio / 6)),
+            (int) (state.getBlue() * (ratio / 6)),
+            range.getStart() + i);
 
         chain++;
 
@@ -206,13 +187,11 @@ public class Lightstrip extends SubsystemBase {
           ratio = chain - 5;
         }
 
-        candle.setLEDs(
+        buffer.setRGB(
             (int) (state.getRed() * chain / 6),
             (int) (state.getGreen() * chain / 6),
             (int) (state.getBlue() * chain / 6),
-            0,
-            range.getStart() + i,
-            1);
+            range.getStart() + i);
 
         chain++;
 
@@ -221,6 +200,7 @@ public class Lightstrip extends SubsystemBase {
         }
       }
     }
+    leds.setData(buffer);
   }
 
   public void toggleOnColor(LedState state, Range range) {

@@ -164,10 +164,10 @@ public class Drive extends SubsystemBase {
     m_fieldRelVel = new FieldRelativeSpeed(getChassisSpeed(), getRotation());
     m_fieldRelAccel = new FieldRelativeAccel(m_fieldRelVel, m_lastFieldRelVel, 0.020);
     m_lastFieldRelVel = m_fieldRelVel;
-    calcVirtualGoal();
-    Logger.recordOutput("Shooting/VirtualGoal", virtGoal);
-    Logger.recordOutput("Swerve/velx", m_fieldRelVel.vx);
-    Logger.recordOutput("Swerve/vely", m_fieldRelVel.vy);
+    // calcVirtualGoal();
+    // Logger.recordOutput("Shooting/VirtualGoal", virtGoal);
+    // Logger.recordOutput("Swerve/velx", m_fieldRelVel.vx);
+    // Logger.recordOutput("Swerve/vely", m_fieldRelVel.vy);
   }
 
   private ChassisSpeeds getChassisSpeed() {
@@ -195,6 +195,10 @@ public class Drive extends SubsystemBase {
     // Log setpoint states
     Logger.recordOutput("SwerveStates/Setpoints", setpointStates);
     Logger.recordOutput("SwerveStates/SetpointsOptimized", optimizedSetpointStates);
+
+    // SmartDashboard.putNumber("odometryx", getPose().getX());
+    // SmartDashboard.putNumber("odometryy", getPose().getY());
+    // SmartDashboard.putNumber("odometryR", getPose().getRotation().getDegrees());
   }
 
   /** Stops the drive. */

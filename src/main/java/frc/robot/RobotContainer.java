@@ -23,6 +23,8 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import frc.robot.Constants.LightstripConstants;
+import frc.robot.Constants.PivotConstants;
 import frc.robot.commands.DriveCommands;
 import frc.robot.commands.FeedForwardCharacterization;
 import frc.robot.commands.FlywheelCommands;
@@ -49,6 +51,7 @@ import frc.robot.subsystems.intake.IntakeIOTalonFX;
 import frc.robot.subsystems.pivot.Pivot;
 import frc.robot.subsystems.pivot.PivotIOSim;
 import frc.robot.subsystems.pivot.PivotIOTalonFX;
+import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 import org.littletonrobotics.junction.networktables.LoggedDashboardNumber;
 import org.photonvision.PhotonCamera;
@@ -185,11 +188,17 @@ public class RobotContainer {
     SmartDashboard.putNumber("Indexer Volt Wanted 1", 0.0);
 
     SmartDashboard.putNumber("Shooter Volt Wanted", 0.0);
-    SmartDashboard.putNumber("Pivot Angle Wanted", -0.95);
+    SmartDashboard.putNumber("Pivot Angle Wanted", -1.0);
     SmartDashboard.putNumber("Pivot Angle Wanted 1", 0.8);
 
     SmartDashboard.putNumber("Shooter RPM Wanted", 3500);
     SmartDashboard.putNumber("Indexer Position Back", 1.0);
+
+    Logger.recordOutput("Intake/intakingPiece", false);
+
+    Logger.recordOutput("Indexer/outtaking", false);
+    Logger.recordOutput("Pivot/aiming", false);
+    Logger.recordOutput("Pivot/I'm super evil", false);
 
     // Set up auto routines
     NamedCommands.registerCommand(
@@ -203,6 +212,11 @@ public class RobotContainer {
 
     NamedCommands.registerCommand(
         "intake handoff", IntakeCommands.intakeHandoff(intake, indexer, pivot));
+
+    NamedCommands.registerCommand("Pivot Rev", FlywheelCommands.prepSubwoofer(flywheel, pivot));
+
+    NamedCommands.registerCommand(
+        "Shoot", FlywheelCommands.shoot(pivot, flywheel, indexer, intake));
 
     autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
 
@@ -236,13 +250,13 @@ public class RobotContainer {
             drive,
             () -> -controller.getLeftY(),
             () -> -controller.getLeftX(),
-            () -> -controller.getRawAxis(2),
+            () -> -controller.getRightX(),
             () -> controller.getLeftTriggerAxis(),
             () -> controller.getRightTriggerAxis()));
-    controller.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
+    // controller.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
     // flywheel.setDefaultCommand(FlywheelCommands.autoShoot(flywheel, drive));
-
-    controller.leftBumper().onTrue(DriveCommands.autoAlignAmp(drive));
+    // controller.x().onTrue(IntakeCommands.spit(intake));
+    // controller.leftBumper().onTrue(DriveCommands.autoAlignAmp(drive));
 
     // intake.setDefaultCommand(
     //     Commands.runOnce(
@@ -351,9 +365,25 @@ public class RobotContainer {
     //             .andThen(IntakeCommands.transferPiece(intake, indexer)));
 
     operator
-        .a()
+        .b()
         .onTrue(
             IntakeCommands.intakeHandoff(intake, indexer, pivot).unless(() -> indexer.hasPiece()));
+
+    operator
+        .y()
+        .onTrue(
+            Commands.runOnce(
+                () -> {
+                  lightstrip.tempColor(
+                      LightstripConstants.successSignal, LightstripConstants.Ranges.full);
+                },
+                lightstrip));
+
+    // operator.x().onTrue(IntakeCommands.homeIntake(intake));
+
+    operator.povDown().onTrue(IntakeCommands.spit(intake));
+
+    operator.y().onTrue(IntakeCommands.deepen(intake));
 
     // operator.a().onTrue(Commands.run(() -> intake.setPosition(IntakeConstants.handoff), intake));
 
@@ -366,7 +396,13 @@ public class RobotContainer {
     //             () -> flywheel.runVelocity(SmartDashboard.getNumber("Shooter RPM Wanted",
     // 3500))));
 
-    pivot.setDefaultCommand(Commands.run(() -> pivot.setPosition(-1.3), pivot));
+    pivot.setDefaultCommand(
+        Commands.run(
+            () -> {
+              pivot.setPosition(-1.5);
+              Logger.recordOutput("Pivot/I'm super evil", true);
+            },
+            pivot));
     flywheel.setDefaultCommand(Commands.run(() -> flywheel.runVelocity(0.0), flywheel));
     // controller`
     //     .x()
@@ -387,8 +423,8 @@ public class RobotContainer {
         .whileTrue(
             Commands.run(
                 () -> {
-                  pivot.setPosition(SmartDashboard.getNumber("Pivot Angle Wanted", 0));
-                  flywheel.runVelocity(3000);
+                  pivot.setPosition(PivotConstants.handoff);
+                  flywheel.runVelocity(4500);
                 },
                 pivot,
                 flywheel));
@@ -401,7 +437,7 @@ public class RobotContainer {
                 .andThen(FlywheelCommands.outtakeAmp(indexer, flywheel, pivot)));
 
     // controller.x().onTrue(IntakeCommands.bringOutPiece(indexer));
-    operator.leftBumper().onTrue(FlywheelCommands.shoot(indexer, intake));
+    operator.leftBumper().onTrue(FlywheelCommands.outtake(indexer, intake));
     // operator.rightBumper().onTrue(FlywheelCommands.outtakeAmp(indexer, flywheel, pivot));
 
     // operator.rightBumper().onTrue(IntakeCommands.transferPiece(intake, indexer, pivot));

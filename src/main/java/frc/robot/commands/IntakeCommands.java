@@ -49,7 +49,8 @@ public class IntakeCommands {
             () -> {
               intake.resetPosition();
               intake.stop();
-            });
+            },
+            intake);
   }
 
   public static Command intakePiece(Intake intake) {
@@ -63,30 +64,45 @@ public class IntakeCommands {
   }
 
   public static Command gotPiece(Intake intake) {
+
     return Commands.run(
             () -> {
               intake.setPosition(IntakeConstants.dropDown);
               intake.runWheel();
               Logger.recordOutput("Intake/intakingPiece", true);
-            })
-        .until(() -> intake.hasPiece() && intake.atPosition(IntakeConstants.dropDown));
+            },
+            intake)
+        // .withTimeout(3.0)
+        .until(() -> (intake.hasPiece() && intake.atPosition(IntakeConstants.dropDown)))
+        .andThen(() -> Logger.recordOutput("Intake/intakingPiece", false));
   }
 
   public static Command passPieceIntake(Intake intake, Pivot pivot, Indexer indexer) {
     return Commands.run(
             () -> {
               intake.setPosition(IntakeConstants.handoff);
-              intake.holdPiece();
-              pivot.setPosition(PivotConstants.handoff);
-              Logger.recordOutput("Intake/intakingPiece", false);
+              intake.runWheel();
+              // pivot.setPosition(PivotConstants.handoff);
+              Logger.recordOutput("Intake/intaking", true);
             },
             intake,
-            pivot,
+            // pivot,
             indexer)
         .until(
             () ->
-                intake.atPosition(IntakeConstants.handoff)
-                    && pivot.atPosition(PivotConstants.handoff));
+                // (pivot.atPosition(PivotConstants.handoff)
+                intake.atPosition(IntakeConstants.handoff))
+        .andThen(() -> intake.holdPiece());
+    // .withTimeout(5.0);
+  }
+
+  public static Command pivotHandoff(Pivot pivot) {
+    return Commands.run(
+            () -> {
+              pivot.setPosition(PivotConstants.handoff);
+            },
+            pivot)
+        .until(() -> (pivot.atPosition(PivotConstants.handoff)));
     // .withTimeout(5.0);
   }
 
@@ -94,7 +110,7 @@ public class IntakeCommands {
     return Commands.run(
             () -> {
               intake.outtakeWheel();
-              indexer.runVolts(IndexerConstants.indexVolts);
+              indexer.runVolts(IndexerConstants.outtakeVolts);
             },
             intake,
             indexer,
@@ -105,7 +121,9 @@ public class IntakeCommands {
             () -> {
               indexer.runVolts(IndexerConstants.holdVolts);
               intake.stopWheels();
-            });
+            },
+            indexer,
+            intake);
   }
 
   public static Command bringOutPiece(Indexer indexer) {
@@ -115,21 +133,21 @@ public class IntakeCommands {
             },
             indexer)
         .withTimeout(0.15)
-        .andThen(() -> indexer.stop());
+        .andThen(() -> indexer.stop(), indexer);
   }
 
   public static Command intakeHandoff(Intake intake, Indexer indexer, Pivot pivot) {
     // return intakePiece(intake)
     //     .andThen(gotPiece(intake))
     //     .andThen(passPieceIntake(intake, pivot, indexer));
-
+    // return gotPiece(intake);
     return gotPiece(intake).andThen(passPieceIntake(intake, pivot, indexer));
     // .andThen(transferPiece(intake, indexer, pivot))
     // .andThen(bringOutPiece(indexer));
   }
 
   public static Command ampPrep(Intake intake, Indexer indexer, Pivot pivot) {
-    return passPieceIntake(intake, pivot, indexer).andThen(transferPiece(intake, indexer, pivot));
+    return pivotHandoff(pivot).andThen(transferPiece(intake, indexer, pivot));
     // .andThen(
     //     Commands.run(
     //         () -> {
@@ -137,5 +155,43 @@ public class IntakeCommands {
     //               LightstripConstants.intake, LightstripConstants.Ranges.full);
     //         },
     //         lightstrip));
+  }
+
+  public static Command deepen(Intake intake) {
+    return Commands.run(
+            () -> {
+              intake.runWheel();
+            },
+            intake)
+        .withTimeout(1.0)
+        .andThen(
+            () -> {
+              intake.holdPiece();
+            },
+            intake);
+  }
+
+  public static Command spitpt2(Intake intake) {
+    return Commands.run(
+            () -> {
+              intake.outtakeWheel();
+              intake.setPosition(IntakeConstants.handoff);
+            },
+            intake)
+        .until(() -> intake.atPosition(IntakeConstants.handoff))
+        .andThen(() -> intake.stopWheels(), intake);
+  }
+
+  public static Command spitpt1(Intake intake) {
+    return Commands.run(
+            () -> {
+              intake.setPosition(IntakeConstants.dropDown);
+            },
+            intake)
+        .until(() -> intake.atPosition(IntakeConstants.dropDown));
+  }
+
+  public static Command spit(Intake intake) {
+    return spitpt1(intake).andThen(spitpt2(intake));
   }
 }

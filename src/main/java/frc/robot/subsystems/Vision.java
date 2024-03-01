@@ -53,7 +53,6 @@ public class Vision extends SubsystemBase {
     this.photonCamera2 = photonCamera2;
     this.swerveSubsystem = swerveSubsystem;
 
-    Logger.recordOutput("Odometry/camera 1 name", photonCamera1.getName());
     AprilTagFieldLayout layout;
 
     try {
@@ -122,7 +121,7 @@ public class Vision extends SubsystemBase {
         Transform3d camToTarget1 = target1.getBestCameraToTarget();
         Pose3d camPose1 = targetPose1.transformBy(camToTarget1.inverse());
 
-        var visionMeasurement1 = camPose1.transformBy(VisionConstants.CAMERA_TO_ROBOT);
+        var visionMeasurement1 = camPose1.transformBy(VisionConstants.CAMERA_TO_ROBOT1);
         poseEstimator.addVisionMeasurement(visionMeasurement1.toPose2d(), resultTimestamp1);
         SmartDashboard.putNumber("Vision1X", visionMeasurement1.toPose2d().getX());
         SmartDashboard.putNumber("Vision1Y", visionMeasurement1.toPose2d().getY());
@@ -152,7 +151,7 @@ public class Vision extends SubsystemBase {
         Transform3d camToTarget2 = target2.getBestCameraToTarget();
         Pose3d camPose2 = targetPose2.transformBy(camToTarget2.inverse());
 
-        var visionMeasurement2 = camPose2.transformBy(VisionConstants.CAMERA_TO_ROBOT);
+        var visionMeasurement2 = camPose2.transformBy(VisionConstants.CAMERA_TO_ROBOT2);
         poseEstimator.addVisionMeasurement(visionMeasurement2.toPose2d(), resultTimestamp2);
         SmartDashboard.putNumber("Vision2X", visionMeasurement2.toPose2d().getX());
         SmartDashboard.putNumber("Vision2Y", visionMeasurement2.toPose2d().getY());
@@ -164,7 +163,12 @@ public class Vision extends SubsystemBase {
     // Update pose estimator with drivetrain sensors
     poseEstimator.update(swerveSubsystem.getRotation(), swerveSubsystem.getModulePositions());
 
+    SmartDashboard.putNumber("estimatedX", getCurrentPose().getX());
+    SmartDashboard.putNumber("estimatedY", getCurrentPose().getY());
+    SmartDashboard.putNumber("estimatedR", getCurrentPose().getRotation().getDegrees());
+
     field2d.setRobotPose(getCurrentPose());
+    Logger.recordOutput("Odometry/Estimated Pose", getCurrentPose());
   }
 
   public Pose2d getCurrentPose() {

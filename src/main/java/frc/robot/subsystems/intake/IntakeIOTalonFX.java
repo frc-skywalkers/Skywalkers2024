@@ -21,7 +21,7 @@ import edu.wpi.first.math.util.Units;
 import frc.robot.Constants.IntakeConstants;
 
 public class IntakeIOTalonFX implements IntakeIO {
-  private static final double GEAR_RATIO = 40.0;
+  private static final double GEAR_RATIO = 5.0 * 4.0 * 32.0 / 18.0;
   private double goalPos = 0.00;
   private double goalVel = 0.0;
 
@@ -66,7 +66,7 @@ public class IntakeIOTalonFX implements IntakeIO {
     pidConfigs.kP = 3.0;
     pidConfigs.kI = 0.0;
     pidConfigs.kD = 0.03;
-    pidConfigs.kV = 4.80;
+    pidConfigs.kV = 4.80 * 16.0 / 18.0;
     pidConfigs.kA = 0.2;
 
     MotionMagicConfigs mm_configs = leaderConfig.MotionMagic;

@@ -33,9 +33,10 @@ import edu.wpi.first.math.util.Units;
 import frc.robot.Constants.PivotConstants;
 
 public class PivotIOTalonFX implements PivotIO {
-  private static final double GEAR_RATIO = 200.00;
+  private static final double GEAR_RATIO = 125.00;
 
-  private final TalonFX leader = new TalonFX(23);
+  private final TalonFX leader = new TalonFX(62);
+  // private final TalonFX follower = new TalonFX(61);
   private final CANcoder cancoder = new CANcoder(16);
 
   private final StatusSignal<Double> leaderPosition = leader.getPosition();
@@ -54,7 +55,7 @@ public class PivotIOTalonFX implements PivotIO {
   private final PositionVoltage m_voltagePosition =
       new PositionVoltage(0, 0, false, 0, 0, false, false, false);
 
-  private final double absEncoderOffset = -0.024658;
+  private final double absEncoderOffset = 0.262939;
 
   private double goalPos = 0.00;
 
@@ -71,13 +72,13 @@ public class PivotIOTalonFX implements PivotIO {
     Slot0Configs pidConfigs = config.Slot0;
 
     pidConfigs.GravityType = GravityTypeValue.Arm_Cosine;
-    pidConfigs.kS = 0.13;
-    pidConfigs.kG = 0.16;
-    pidConfigs.kP = 15.0;
+    pidConfigs.kS = 0.14;
+    pidConfigs.kG = 0.25; // 0.2
+    pidConfigs.kP = 10.0;
     pidConfigs.kI = 0.0;
-    pidConfigs.kD = 0.15;
-    pidConfigs.kV = 24.0;
-    pidConfigs.kA = 1.0;
+    pidConfigs.kD = 0.20;
+    pidConfigs.kV = 15.00;
+    pidConfigs.kA = 0.09;
 
     MotionMagicConfigs mm_configs = config.MotionMagic;
 
@@ -99,6 +100,17 @@ public class PivotIOTalonFX implements PivotIO {
     if (!status.isOK()) {
       System.out.println("Real Error, Could not configure device. Error: " + status.toString());
     }
+
+    // for (int i = 0; i < 5; ++i) {
+    //   status = follower.getConfigurator().apply(config);
+    //   if (status.isOK()) break;
+    // }
+    // if (!status.isOK()) {
+    //   System.out.println("Real Error, Could not configure device. Error: " + status.toString());
+    // }
+
+    // follower.setInverted(true);
+    // follower.setControl(new Follower(62, true));
 
     // FeedbackConfigs f_configs = config.Feedback;
 
@@ -138,12 +150,16 @@ public class PivotIOTalonFX implements PivotIO {
     inputs.appliedVolts = leaderAppliedVolts.getValueAsDouble();
     inputs.currentAmps = new double[] {leaderCurrent.getValueAsDouble()};
     inputs.goalPos = goalPos;
-    inputs.absPos = Units.rotationsToRadians(absEncoderPos.getValueAsDouble() - absEncoderOffset);
+    inputs.absPos = Units.rotationsToRadians(absEncoderPos.getValueAsDouble());
     inputs.goalVel = goalVel;
     // Logger.recordOutput("Pivot/PID/Output", leaderOutput.getValueAsDouble());
     // Logger.recordOutput("Pivot/PID/Error", leaderPIDError.getValueAsDouble());
     // Logger.recordOutput("Pivot/PID/Ref", leaderPIDRef.getValueAsDouble());
   }
+
+  // private double getAbsolutePosition() {
+  // return abs
+  // }
 
   @Override
   public void setVoltage(double volts) {
