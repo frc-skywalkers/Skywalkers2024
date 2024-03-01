@@ -77,7 +77,7 @@
     },
     {
       "name": "Aim Piece",
-      "waypointRelativePos": 1.45,
+      "waypointRelativePos": 0.7,
       "command": {
         "type": "sequential",
         "data": {
@@ -86,23 +86,6 @@
               "type": "named",
               "data": {
                 "name": "Pivot Rev"
-              }
-            }
-          ]
-        }
-      }
-    },
-    {
-      "name": "Shoot",
-      "waypointRelativePos": 1.75,
-      "command": {
-        "type": "sequential",
-        "data": {
-          "commands": [
-            {
-              "type": "named",
-              "data": {
-                "name": "Shoot"
               }
             }
           ]

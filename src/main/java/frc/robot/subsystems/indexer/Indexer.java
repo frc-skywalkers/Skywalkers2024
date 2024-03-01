@@ -48,6 +48,10 @@ public class Indexer extends SubsystemBase {
     io.setVoltage(volts);
   }
 
+  public void holdVolt() {
+    io.setVoltage(1.0);
+  }
+
   /** Run closed loop at the specified velocity. */
   public void runVelocity(double velocityRPM) {
     var velocityRadPerSec = Units.rotationsPerMinuteToRadiansPerSecond(velocityRPM);

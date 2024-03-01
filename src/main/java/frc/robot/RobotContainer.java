@@ -23,7 +23,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import frc.robot.Constants.LightstripConstants;
 import frc.robot.Constants.PivotConstants;
 import frc.robot.commands.DriveCommands;
 import frc.robot.commands.FeedForwardCharacterization;
@@ -369,15 +368,15 @@ public class RobotContainer {
         .onTrue(
             IntakeCommands.intakeHandoff(intake, indexer, pivot).unless(() -> indexer.hasPiece()));
 
-    operator
-        .y()
-        .onTrue(
-            Commands.runOnce(
-                () -> {
-                  lightstrip.tempColor(
-                      LightstripConstants.successSignal, LightstripConstants.Ranges.full);
-                },
-                lightstrip));
+    // operator
+    //     .y()
+    //     .onTrue(
+    //         Commands.runOnce(
+    //             () -> {
+    //               lightstrip.tempColor(
+    //                   LightstripConstants.successSignal, LightstripConstants.Ranges.full);
+    //             },
+    //             lightstrip));
 
     // operator.x().onTrue(IntakeCommands.homeIntake(intake));
 
@@ -424,7 +423,9 @@ public class RobotContainer {
             Commands.run(
                 () -> {
                   pivot.setPosition(PivotConstants.handoff);
-                  flywheel.runVelocity(4500);
+                  flywheel.runVelocity(3500);
+                  //   pivot.setPosition(SmartDashboard.getNumber("Pivot Angle Wanted", -1.0));
+                  //   flywheel.runVelocity(SmartDashboard.getNumber("Shooter RPM Wanted", 0.0));
                 },
                 pivot,
                 flywheel));
