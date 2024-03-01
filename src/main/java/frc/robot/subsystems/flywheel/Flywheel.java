@@ -44,7 +44,7 @@ public class Flywheel extends SubsystemBase {
         io.configurePID(1.0, 0.0, 0.0);
         break;
       case SIM:
-        ffModel = new SimpleMotorFeedforward(0.0, 0.03);
+        ffModel = new SimpleMotorFeedforward(0.0, 0.02);
         io.configurePID(0.5, 0.0, 0.0);
         break;
       default:
@@ -84,7 +84,8 @@ public class Flywheel extends SubsystemBase {
   }
 
   public boolean atDesiredRPM(double requestRPM) {
-    return Math.abs(getVelocityRPM() - requestRPM) < ShooterConstants.tolerance;
+    boolean ret = (Math.abs(getVelocityRPM() - requestRPM) < ShooterConstants.tolerance);
+    return ret;
   }
 
   /** Returns the current velocity in RPM. */

@@ -81,12 +81,12 @@ public class IntakeCommands {
     return Commands.run(
             () -> {
               intake.setPosition(IntakeConstants.handoff);
-              intake.runWheel();
+              // intake.runWheelHalf();
+              intake.holdPiece();
               // pivot.setPosition(PivotConstants.handoff);
               Logger.recordOutput("Intake/intaking", true);
             },
             intake,
-            // pivot,
             indexer)
         .until(
             () ->
@@ -113,10 +113,9 @@ public class IntakeCommands {
               indexer.runVolts(IndexerConstants.outtakeVolts);
             },
             intake,
-            indexer,
-            pivot)
-        .until(() -> indexer.hasPiece())
-        .withTimeout(1.5)
+            indexer)
+        // .until(() -> indexer.hasPiece())
+        .withTimeout(2.0)
         .andThen(
             () -> {
               indexer.runVolts(IndexerConstants.holdVolts);
@@ -129,11 +128,11 @@ public class IntakeCommands {
   public static Command bringOutPiece(Indexer indexer) {
     return Commands.run(
             () -> {
-              indexer.runVolts(-0.2);
+              indexer.runVolts(-0.15);
             },
             indexer)
-        .withTimeout(0.15)
-        .andThen(() -> indexer.stop(), indexer);
+        .withTimeout(0.10)
+        .andThen(() -> indexer.runVolts(IndexerConstants.holdVolts), indexer);
   }
 
   public static Command intakeHandoff(Intake intake, Indexer indexer, Pivot pivot) {
@@ -142,6 +141,7 @@ public class IntakeCommands {
     //     .andThen(passPieceIntake(intake, pivot, indexer));
     // return gotPiece(intake);
     return gotPiece(intake).andThen(passPieceIntake(intake, pivot, indexer));
+    // .andThen(pivotHandoff(pivot))
     // .andThen(transferPiece(intake, indexer, pivot))
     // .andThen(bringOutPiece(indexer));
   }

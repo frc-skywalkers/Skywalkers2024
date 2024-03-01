@@ -98,7 +98,7 @@ public class FlywheelCommands {
 
   public static Command waiting(Pivot pivot, Flywheel flywheel) {
     return Commands.waitUntil(
-        () -> pivot.atPosition(PivotConstants.handoff) && flywheel.atDesiredRPM(5500));
+        () -> pivot.atPosition(PivotConstants.handoff) && flywheel.atDesiredRPM(4000));
   }
 
   public static Command outtake(Indexer indexer, Intake intake) {
@@ -153,7 +153,7 @@ public class FlywheelCommands {
             () -> {
               Logger.recordOutput("Pivot/aiming", true);
               pivot.setPosition(PivotConstants.handoff);
-              flywheel.runVelocity(4500);
+              flywheel.runVelocity(4000);
             },
             flywheel,
             pivot)

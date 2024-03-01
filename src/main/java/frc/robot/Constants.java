@@ -36,7 +36,7 @@ import frc.robot.lightstrip.TempLedState;
  * constants are needed, to reduce verbosity.
  */
 public final class Constants {
-  public static final Mode currentMode = Mode.REAL;
+  public static final Mode currentMode = Mode.SIM;
 
   public static enum Mode {
     /** Running on a real robot. */
@@ -61,9 +61,9 @@ public final class Constants {
 
     // public static InterpolatingDoubleTreeMap pivotAngleMap = new InterpolatingDoubleTreeMap({});
 
-    public static final double mm_cruisevel = 0.4;
-    public static final double mm_accel = 0.8;
-    public static final double mm_jerk = 1.6;
+    public static final double mm_cruisevel = 0.4 * 2.0;
+    public static final double mm_accel = 0.8 * 2.0;
+    public static final double mm_jerk = 1.6 * 2.0;
 
     public static final double handoff = -1.000;
 
@@ -79,7 +79,7 @@ public final class Constants {
     public static final double holdVolts = -0.25;
     public static final double outtakeVolts = 4.0;
 
-    public static final double tolerance = 0.15;
+    public static final double tolerance = 0.09;
 
     public static final double tofTolerance = 30.00;
 
@@ -91,7 +91,7 @@ public final class Constants {
   public static final class IndexerConstants {
     public static final double indexVolts = 6.0;
     public static final double outtakeVolts = 7.0;
-    public static final double holdVolts = 0.0;
+    public static final double holdVolts = 0.1;
   }
 
   public static final class FieldConstants {

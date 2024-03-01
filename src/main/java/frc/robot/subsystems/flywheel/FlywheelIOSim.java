@@ -19,12 +19,14 @@ import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.simulation.FlywheelSim;
 
 public class FlywheelIOSim implements FlywheelIO {
-  private FlywheelSim sim = new FlywheelSim(DCMotor.getFalcon500(1), 1.5, 0.004);
+  private FlywheelSim sim = new FlywheelSim(DCMotor.getFalcon500(1), 1, 0.004);
   private PIDController pid = new PIDController(0.0, 0.0, 0.0);
 
   private boolean closedLoop = false;
   private double ffVolts = 0.0;
   private double appliedVolts = 0.0;
+
+  private double goalVelRadPerSec = 0.0;
 
   @Override
   public void updateInputs(FlywheelIOInputs inputs) {
@@ -40,6 +42,7 @@ public class FlywheelIOSim implements FlywheelIO {
     inputs.velocityRadPerSec = sim.getAngularVelocityRadPerSec();
     inputs.appliedVolts = appliedVolts;
     inputs.currentAmps = new double[] {sim.getCurrentDrawAmps()};
+    inputs.goalRadPerSec = goalVelRadPerSec;
   }
 
   @Override
@@ -54,6 +57,7 @@ public class FlywheelIOSim implements FlywheelIO {
     closedLoop = true;
     pid.setSetpoint(velocityRadPerSec);
     this.ffVolts = ffVolts;
+    this.goalVelRadPerSec = velocityRadPerSec;
   }
 
   @Override

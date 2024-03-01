@@ -33,13 +33,13 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Sub1Close1Sub1"
+            "pathName": "1B1"
           }
         },
         {
-          "type": "path",
+          "type": "named",
           "data": {
-            "pathName": "Sub1Close2Sub2"
+            "name": "Shoot Sequence"
           }
         }
       ]
