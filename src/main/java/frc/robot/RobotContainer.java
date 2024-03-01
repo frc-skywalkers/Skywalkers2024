@@ -253,9 +253,9 @@ public class RobotContainer {
             () -> -controller.getRightX(),
             () -> controller.getLeftTriggerAxis(),
             () -> controller.getRightTriggerAxis()));
-    controller.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
+    // controller.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
     // flywheel.setDefaultCommand(FlywheelCommands.autoShoot(flywheel, drive));
-
+    // controller.x().onTrue(IntakeCommands.spit(intake));
     // controller.leftBumper().onTrue(DriveCommands.autoAlignAmp(drive));
 
     // intake.setDefaultCommand(
@@ -379,7 +379,11 @@ public class RobotContainer {
                 },
                 lightstrip));
 
-    // operator.x().onTrue(IntakeCommands.outtake(intake));
+    // operator.x().onTrue(IntakeCommands.homeIntake(intake));
+
+    operator.povDown().onTrue(IntakeCommands.spit(intake));
+
+    operator.y().onTrue(IntakeCommands.deepen(intake));
 
     // operator.a().onTrue(Commands.run(() -> intake.setPosition(IntakeConstants.handoff), intake));
 
@@ -420,7 +424,7 @@ public class RobotContainer {
             Commands.run(
                 () -> {
                   pivot.setPosition(PivotConstants.handoff);
-                  flywheel.runVelocity(3000);
+                  flywheel.runVelocity(4500);
                 },
                 pivot,
                 flywheel));

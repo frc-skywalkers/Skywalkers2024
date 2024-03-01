@@ -3,41 +3,41 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 0.8390142428433007,
-        "y": 6.634303944533816
+        "x": 0.84,
+        "y": 6.63
       },
       "prevControl": null,
       "nextControl": {
-        "x": 1.6777826418621842,
-        "y": 6.655562776867805
+        "x": 1.8145808050875363,
+        "y": 7.020421170471971
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 2.353607863822579,
-        "y": 6.878047850712341
+        "x": 2.5983952106793105,
+        "y": 5.757077912303973
       },
       "prevControl": {
-        "x": 1.763903956716823,
-        "y": 6.863120865426504
+        "x": 2.189949458602621,
+        "y": 5.985707767711831
       },
       "nextControl": {
-        "x": 2.45673173465883,
-        "y": 6.8806581920786485
+        "x": 3.0068409627559998,
+        "y": 5.5284480568961145
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 0.8390142428433007,
-        "y": 6.634303944533816
+        "x": 0.84,
+        "y": 6.63
       },
       "prevControl": {
-        "x": 1.1748502412176114,
-        "y": 6.710438592165929
+        "x": 1.607750931335198,
+        "y": 6.723055320369901
       },
       "nextControl": null,
       "isLocked": false,
@@ -46,21 +46,16 @@
   ],
   "rotationTargets": [
     {
-      "waypointRelativePos": 1,
-      "rotationDegrees": 180.0,
+      "waypointRelativePos": 0.5,
+      "rotationDegrees": 120.0,
       "rotateFast": false
-    },
-    {
-      "waypointRelativePos": 2.0,
-      "rotationDegrees": -120.0,
-      "rotateFast": true
     }
   ],
   "constraintZones": [],
   "eventMarkers": [
     {
-      "name": "Drop Down Piece",
-      "waypointRelativePos": 0.05,
+      "name": "Drop Down",
+      "waypointRelativePos": 0,
       "command": {
         "type": "sequential",
         "data": {
@@ -76,8 +71,8 @@
       }
     },
     {
-      "name": "Aim Piece",
-      "waypointRelativePos": 1.45,
+      "name": "Pivot Rev",
+      "waypointRelativePos": 0.8,
       "command": {
         "type": "sequential",
         "data": {
@@ -94,7 +89,7 @@
     },
     {
       "name": "Shoot",
-      "waypointRelativePos": 1.75,
+      "waypointRelativePos": 1.8,
       "command": {
         "type": "sequential",
         "data": {
@@ -125,7 +120,7 @@
   "folder": null,
   "previewStartingState": {
     "rotation": -120.0,
-    "velocity": 0.0
+    "velocity": 0
   },
   "useDefaultConstraints": false
 }

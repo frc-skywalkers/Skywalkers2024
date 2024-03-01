@@ -29,6 +29,12 @@
               }
             ]
           }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Sub1Close1Sub1"
+          }
         }
       ]
     }

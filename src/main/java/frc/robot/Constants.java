@@ -65,13 +65,13 @@ public final class Constants {
     public static final double mm_accel = 0.8;
     public static final double mm_jerk = 1.6;
 
-    public static final double handoff = -1.1;
+    public static final double handoff = -1.000;
 
-    public static final double tolerance = 0.025;
+    public static final double tolerance = 0.075;
   }
 
   public static final class IntakeConstants {
-    public static final double dropDown = 3.0;
+    public static final double dropDown = 3.35;
     public static final double home = Math.PI / 2;
     public static final double handoff = 0.0;
 

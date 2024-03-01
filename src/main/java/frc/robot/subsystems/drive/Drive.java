@@ -165,9 +165,9 @@ public class Drive extends SubsystemBase {
     m_fieldRelAccel = new FieldRelativeAccel(m_fieldRelVel, m_lastFieldRelVel, 0.020);
     m_lastFieldRelVel = m_fieldRelVel;
     // calcVirtualGoal();
-    Logger.recordOutput("Shooting/VirtualGoal", virtGoal);
-    Logger.recordOutput("Swerve/velx", m_fieldRelVel.vx);
-    Logger.recordOutput("Swerve/vely", m_fieldRelVel.vy);
+    // Logger.recordOutput("Shooting/VirtualGoal", virtGoal);
+    // Logger.recordOutput("Swerve/velx", m_fieldRelVel.vx);
+    // Logger.recordOutput("Swerve/vely", m_fieldRelVel.vy);
   }
 
   private ChassisSpeeds getChassisSpeed() {

@@ -98,7 +98,7 @@ public class FlywheelCommands {
 
   public static Command waiting(Pivot pivot, Flywheel flywheel) {
     return Commands.waitUntil(
-        () -> pivot.atPosition(PivotConstants.handoff) && flywheel.atDesiredRPM(3000));
+        () -> pivot.atPosition(PivotConstants.handoff) && flywheel.atDesiredRPM(5500));
   }
 
   public static Command outtake(Indexer indexer, Intake intake) {
@@ -115,11 +115,14 @@ public class FlywheelCommands {
               indexer.stop();
               intake.stopWheels();
               Logger.recordOutput("Indexer/outtaking", false);
-            });
+            },
+            indexer,
+            intake);
   }
 
   public static Command shoot(Pivot pivot, Flywheel flywheel, Indexer indexer, Intake intake) {
     return waiting(pivot, flywheel).andThen(outtake(indexer, intake));
+    // return outtake(indexer, intake);
   }
 
   public static Command aimAmp(Pivot pivot) {
@@ -142,7 +145,7 @@ public class FlywheelCommands {
             flywheel,
             pivot)
         .withTimeout(1.0)
-        .andThen(() -> indexer.stop());
+        .andThen(() -> indexer.stop(), indexer);
   }
 
   public static Command prepSubwoofer(Flywheel flywheel, Pivot pivot) {
@@ -150,7 +153,7 @@ public class FlywheelCommands {
             () -> {
               Logger.recordOutput("Pivot/aiming", true);
               pivot.setPosition(PivotConstants.handoff);
-              flywheel.runVelocity(3000);
+              flywheel.runVelocity(4500);
             },
             flywheel,
             pivot)
