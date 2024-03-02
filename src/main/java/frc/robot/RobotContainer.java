@@ -55,7 +55,6 @@ import frc.robot.subsystems.pivot.PivotIOTalonFX;
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 import org.littletonrobotics.junction.networktables.LoggedDashboardNumber;
-import org.photonvision.PhotonCamera;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -124,7 +123,7 @@ public class RobotContainer {
                 new ModuleIOTalonFX(1),
                 new ModuleIOTalonFX(2),
                 new ModuleIOTalonFX(3));
-        vision = new Vision(new PhotonCamera("arducam1"), new PhotonCamera("arducam2"), drive);
+        vision = new Vision(null, null, drive);
         flywheel = new Flywheel(new FlywheelIOTalonFX());
         pivot = new Pivot(new PivotIOTalonFX());
         intake = new Intake(new IntakeIOTalonFX());
@@ -254,7 +253,7 @@ public class RobotContainer {
    * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
   private void configureButtonBindings() {
-    if (false) {
+    if (!Constants.isRed) { // Alliance.Blue
       drive.setDefaultCommand(
           DriveCommands.joystickDrive(
               drive,
@@ -408,6 +407,8 @@ public class RobotContainer {
     operator.x().onTrue(IntakeCommands.spit(intake));
 
     operator.y().onTrue(IntakeCommands.deepen(intake));
+
+    // operator.a().onTrue(IntakeCommands.runWheelVolts(intake));
 
     // operator.a().onTrue(Commands.run(() -> intake.setPosition(IntakeConstants.handoff), intake));
 

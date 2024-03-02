@@ -81,8 +81,8 @@ public class IntakeCommands {
     return Commands.run(
             () -> {
               intake.setPosition(IntakeConstants.handoff);
-              // intake.runWheelHalf();
-              intake.holdPiece();
+              intake.runWheelHalf();
+              // intake.holdPiece();
               // pivot.setPosition(PivotConstants.handoff);
               Logger.recordOutput("Intake/intaking", true);
             },

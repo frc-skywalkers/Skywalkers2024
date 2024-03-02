@@ -92,6 +92,10 @@ public class Vision extends SubsystemBase {
     if (Constants.currentMode == Mode.SIM) {
       return;
     }
+    if (Constants.currentMode == Mode.REAL) {
+      return;
+    }
+    // return;
     // This method will be called once per scheduler run
 
     photonCamera1.getPipelineIndex();
