@@ -21,7 +21,7 @@ import edu.wpi.first.math.util.Units;
 import frc.robot.Constants.IntakeConstants;
 
 public class IntakeIOTalonFX implements IntakeIO {
-  private static final double GEAR_RATIO = 5.0 * 4.0 * 32.0 / 18.0;
+  private static final double GEAR_RATIO = 5.0 * 4.0 * 36.0 / 16.0;
   private double goalPos = 0.00;
   private double goalVel = 0.0;
 
@@ -49,7 +49,7 @@ public class IntakeIOTalonFX implements IntakeIO {
 
   public IntakeIOTalonFX() {
     var leaderConfig = new TalonFXConfiguration();
-    leaderConfig.CurrentLimits.StatorCurrentLimit = 30.0;
+    leaderConfig.CurrentLimits.StatorCurrentLimit = 50.0;
     leaderConfig.CurrentLimits.StatorCurrentLimitEnable = true;
     leaderConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
 
@@ -62,12 +62,12 @@ public class IntakeIOTalonFX implements IntakeIO {
 
     pidConfigs.GravityType = GravityTypeValue.Arm_Cosine;
     pidConfigs.kS = 0.075;
-    pidConfigs.kG = 0.2;
-    pidConfigs.kP = 3.0;
+    pidConfigs.kG = 0.3;
+    pidConfigs.kP = 6.0;
     pidConfigs.kI = 0.0;
-    pidConfigs.kD = 0.03;
-    pidConfigs.kV = 4.80 * 16.0 / 18.0;
-    pidConfigs.kA = 0.2;
+    pidConfigs.kD = 0.06;
+    pidConfigs.kV = 12.00 / (100.0000 / GEAR_RATIO);
+    pidConfigs.kA = 0.03;
 
     MotionMagicConfigs mm_configs = leaderConfig.MotionMagic;
     mm_configs.MotionMagicCruiseVelocity = IntakeConstants.mm_cruisevel;

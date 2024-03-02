@@ -36,7 +36,7 @@ import frc.robot.lightstrip.TempLedState;
  * constants are needed, to reduce verbosity.
  */
 public final class Constants {
-  public static final Mode currentMode = Mode.SIM;
+  public static final Mode currentMode = Mode.REAL;
 
   public static enum Mode {
     /** Running on a real robot. */
@@ -65,13 +65,13 @@ public final class Constants {
     public static final double mm_accel = 0.8 * 2.0;
     public static final double mm_jerk = 1.6 * 2.0;
 
-    public static final double handoff = -1.000;
+    public static final double handoff = -0.98;
 
     public static final double tolerance = 0.075;
   }
 
   public static final class IntakeConstants {
-    public static final double dropDown = 3.35;
+    public static final double dropDown = 2.7;
     public static final double home = Math.PI / 2;
     public static final double handoff = 0.0;
 
@@ -79,13 +79,13 @@ public final class Constants {
     public static final double holdVolts = -0.25;
     public static final double outtakeVolts = 4.0;
 
-    public static final double tolerance = 0.09;
+    public static final double tolerance = 0.1;
 
     public static final double tofTolerance = 30.00;
 
-    public static final double mm_cruisevel = 0.4 * 2.5;
-    public static final double mm_accel = 0.8 * 2.5 * 1.5;
-    public static final double mm_jerk = 1.6 * 2.5 * 1.5;
+    public static final double mm_cruisevel = 0.4 * 4.0;
+    public static final double mm_accel = mm_cruisevel * 2.5;
+    public static final double mm_jerk = mm_accel * 3.0;
   }
 
   public static final class IndexerConstants {
@@ -135,15 +135,25 @@ public final class Constants {
 
   public static final class VisionConstants {
 
-    // Fix these constants
-    public static final Transform3d CAMERA_TO_ROBOT1 =
-        new Transform3d(
-            new Translation3d(-0.205, 0 - 0.249, -0.229),
-            new Rotation3d(0.0, degreesToRadians(-30), degreesToRadians(-60.0)));
     public static final Transform3d CAMERA_TO_ROBOT2 =
         new Transform3d(
-            new Translation3d(-0.205, -0.249, -0.229),
-            new Rotation3d(0.0, degreesToRadians(30.0), degreesToRadians(60.0)));
+            new Translation3d(-0.300, 0 - 0.301, -0.234),
+            new Rotation3d(0.0, degreesToRadians(-30), degreesToRadians(-15.0)));
+    public static final Transform3d CAMERA_TO_ROBOT1 =
+        new Transform3d(
+            new Translation3d(-0.300, -0.301, -0.234),
+            new Rotation3d(0.0, degreesToRadians(30.0), degreesToRadians(15.0)));
+
+    /*
+    public static final Transform3d CAMERA_TO_ROBOT2 =
+      new Transform3d(
+          new Translation3d(-0.205, -0.249, -0.229),
+          new Rotation3d(0.0, degreesToRadians(-30), degreesToRadians(-60.0)));
+    public static final Transform3d CAMERA_TO_ROBOT2 =
+      new Transform3d(
+          new Translation3d(-0.205, -0.249, -0.229),
+          new Rotation3d(0.0, degreesToRadians(30.0), degreesToRadians(60.0)));
+     */
   }
 
   public static final class LightstripConstants {
@@ -158,7 +168,7 @@ public final class Constants {
       public static Range full = new Range(0, ledCount);
     }
 
-    public static LedState defaultState = new LedState(255, 0, 0, "Fade");
+    public static LedState defaultState = new LedState(50, 0, 0, "Fade");
     public static TempLedState successSignal = new TempLedState(0, 255, 0, "Solid", 2);
     public static TempLedState intake = new TempLedState(255, 255, 0, "Solid", 10);
   }

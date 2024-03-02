@@ -3,41 +3,41 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 0.8390142428433007,
-        "y": 6.634303944533816
+        "x": 0.6956009699056437,
+        "y": 4.418138340906312
       },
       "prevControl": null,
       "nextControl": {
-        "x": 3.7112584549243173,
-        "y": 7.446741620335093
+        "x": 1.5343693689245266,
+        "y": 4.439397173240302
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 8.092994172099456,
-        "y": 7.4538083613204265
+        "x": 2.4865150424745295,
+        "y": 4.118366000620891
       },
       "prevControl": {
-        "x": 7.5032902649937,
-        "y": 7.4388813760345895
+        "x": 2.061560433306052,
+        "y": 4.122225985192712
       },
       "nextControl": {
-        "x": 8.196118042935714,
-        "y": 7.456418702686734
+        "x": 3.0424253011570612,
+        "y": 4.113316508332691
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 0.8390142428433007,
-        "y": 6.634303944533816
+        "x": 0.6956009699056437,
+        "y": 4.418138340906312
       },
       "prevControl": {
-        "x": 1.1748502412176114,
-        "y": 6.710438592165929
+        "x": 1.031436968279957,
+        "y": 4.494272988538421
       },
       "nextControl": null,
       "isLocked": false,
@@ -46,17 +46,24 @@
   ],
   "rotationTargets": [
     {
-      "waypointRelativePos": 0.8,
+      "waypointRelativePos": 1,
       "rotationDegrees": 180.0,
       "rotateFast": false
-    },
-    {
-      "waypointRelativePos": 2.0,
-      "rotationDegrees": -120.0,
-      "rotateFast": true
     }
   ],
-  "constraintZones": [],
+  "constraintZones": [
+    {
+      "name": "New Constraints Zone",
+      "minWaypointRelativePos": 0,
+      "maxWaypointRelativePos": 0.95,
+      "constraints": {
+        "maxVelocity": 1.0,
+        "maxAcceleration": 2.0,
+        "maxAngularVelocity": 540.0,
+        "maxAngularAcceleration": 720.0
+      }
+    }
+  ],
   "eventMarkers": [
     {
       "name": "Drop Down Piece",
@@ -95,19 +102,19 @@
   ],
   "globalConstraints": {
     "maxVelocity": 3.0,
-    "maxAcceleration": 3.0,
+    "maxAcceleration": 4.0,
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": -120.0,
+    "rotation": 120.0,
     "rotateFast": false
   },
   "reversed": false,
   "folder": null,
   "previewStartingState": {
-    "rotation": -120.0,
+    "rotation": 120.0,
     "velocity": 0.0
   },
   "useDefaultConstraints": false

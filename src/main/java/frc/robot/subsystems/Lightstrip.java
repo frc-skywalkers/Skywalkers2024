@@ -26,6 +26,7 @@ public class Lightstrip extends SubsystemBase {
   private List<TempLedState> tempColor = new ArrayList<TempLedState>();
   private List<Range> tempRange = new ArrayList<Range>();
   private List<Double> tempStart = new ArrayList<Double>();
+  private AddressableLEDBuffer buffer;
 
   private boolean isDefault = false;
 
@@ -47,29 +48,30 @@ public class Lightstrip extends SubsystemBase {
       return;
     }*/
 
+    buffer = new AddressableLEDBuffer(LightstripConstants.ledCount);
+
     update(defaultColor, timer, LightstripConstants.Ranges.full);
 
     for (int i = 0; i < currentColor.size(); i++) {
       update(currentColor.get(i), timer, currentRange.get(i));
     }
 
-    List<TempLedState> states = new ArrayList<TempLedState>();
-    List<Range> ranges = new ArrayList<Range>();
-    List<Double> starts = new ArrayList<Double>();
-
-    for (int i = 0; i < tempColor.size(); i++) {
+    for (int i = 0; i < tempColor.size(); ) {
       update(tempColor.get(i), timer, tempRange.get(i));
 
-      if (tempStart.get(i) <= timer.get() + tempColor.get(i).getSeconds()) {
-        states.add(tempColor.get(i));
-        ranges.add(tempRange.get(i));
-        starts.add(tempStart.get(i));
+      System.out.println(
+          timer.get() + " " + tempStart.get(i) + " " + tempColor.get(i).getSeconds());
+
+      if (timer.get() - tempStart.get(i) > tempColor.get(i).getSeconds()) {
+        tempStart.remove(i);
+        tempColor.remove(i);
+        tempRange.remove(i);
+      } else {
+        i++;
       }
     }
 
-    tempColor = states;
-    tempRange = ranges;
-    tempStart = starts;
+    leds.setData(buffer);
   }
 
   public void setDefault(boolean defaultState) {
@@ -82,8 +84,6 @@ public class Lightstrip extends SubsystemBase {
 
   private void update(LedState state, Timer timer, Range range) {
     SmartDashboard.putNumber("Timer", timer.get() % 1 - 0.50 * state.getRed());
-
-    AddressableLEDBuffer buffer = new AddressableLEDBuffer(LightstripConstants.ledCount);
 
     if (state.getEffect() == "Solid") {
       for (int i = range.getStart(); i < range.getEnd(); i++) {
@@ -200,7 +200,6 @@ public class Lightstrip extends SubsystemBase {
         }
       }
     }
-    leds.setData(buffer);
   }
 
   public void toggleOnColor(LedState state, Range range) {

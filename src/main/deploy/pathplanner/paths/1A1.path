@@ -16,16 +16,16 @@
     },
     {
       "anchor": {
-        "x": 2.353607863822579,
-        "y": 6.878047850712341
+        "x": 2.4020704569236355,
+        "y": 6.975526580681862
       },
       "prevControl": {
-        "x": 1.763903956716823,
-        "y": 6.863120865426504
+        "x": 1.8123665498178796,
+        "y": 6.960599595396025
       },
       "nextControl": {
-        "x": 2.45673173465883,
-        "y": 6.8806581920786485
+        "x": 2.5051943277598867,
+        "y": 6.9781369220481695
       },
       "isLocked": false,
       "linkedName": null
@@ -56,7 +56,19 @@
       "rotateFast": true
     }
   ],
-  "constraintZones": [],
+  "constraintZones": [
+    {
+      "name": "New Constraints Zone",
+      "minWaypointRelativePos": 0,
+      "maxWaypointRelativePos": 0.95,
+      "constraints": {
+        "maxVelocity": 1.0,
+        "maxAcceleration": 2.0,
+        "maxAngularVelocity": 540.0,
+        "maxAngularAcceleration": 720.0
+      }
+    }
+  ],
   "eventMarkers": [
     {
       "name": "Drop Down Piece",
@@ -94,8 +106,8 @@
     }
   ],
   "globalConstraints": {
-    "maxVelocity": 3.0,
-    "maxAcceleration": 3.0,
+    "maxVelocity": 2.5,
+    "maxAcceleration": 2.5,
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0
   },

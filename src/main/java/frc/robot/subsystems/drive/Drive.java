@@ -18,7 +18,10 @@ import com.pathplanner.lib.pathfinding.Pathfinding;
 import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
 import com.pathplanner.lib.util.PathPlannerLogging;
 import com.pathplanner.lib.util.ReplanningConfig;
+import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.Vector;
 import edu.wpi.first.math.controller.ProfiledPIDController;
+import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -27,10 +30,12 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.FieldConstants;
 import frc.robot.Constants.ShooterConstants;
@@ -64,6 +69,16 @@ public class Drive extends SubsystemBase {
   private FieldRelativeSpeed m_lastFieldRelVel = new FieldRelativeSpeed();
   private FieldRelativeAccel m_fieldRelAccel = new FieldRelativeAccel();
 
+  private static final Vector<N3> stateStdDevs =
+      VecBuilder.fill(0.05, 0.05, Units.degreesToRadians(5));
+  private static final Vector<N3> visionMeasurementStdDevs =
+      VecBuilder.fill(0.5, 0.5, Units.degreesToRadians(10));
+  public final SwerveDrivePoseEstimator poseEstimator;
+  private final Field2d field2d = new Field2d();
+
+  public boolean ampAligned = false;
+  public boolean subwooferAligned = false;
+
   ProfiledPIDController headingController =
       new ProfiledPIDController(
           3.0, 0.0, 0.05, new Constraints(ALIGN_MAX_ANGULAR_SPEED, ALIGN_MAX_ANGULAR_SPEED / 2));
@@ -93,9 +108,7 @@ public class Drive extends SubsystemBase {
         this::runVelocity,
         new HolonomicPathFollowerConfig(
             MAX_LINEAR_SPEED, DRIVE_BASE_RADIUS, new ReplanningConfig()),
-        () ->
-            DriverStation.getAlliance().isPresent()
-                && DriverStation.getAlliance().get() == Alliance.Red,
+        () -> true, // Alliance.Red
         this);
     Pathfinding.setPathfinder(new LocalADStarAK());
     PathPlannerLogging.setLogActivePathCallback(
@@ -108,6 +121,15 @@ public class Drive extends SubsystemBase {
           Logger.recordOutput("Odometry/TrajectorySetpoint", targetPose);
         });
     headingController.enableContinuousInput(-Math.PI, Math.PI);
+
+    poseEstimator =
+        new SwerveDrivePoseEstimator(
+            this.kinematics,
+            this.getRotation(),
+            this.getModulePositions(),
+            new Pose2d(),
+            stateStdDevs,
+            visionMeasurementStdDevs);
   }
 
   public void periodic() {
@@ -168,6 +190,23 @@ public class Drive extends SubsystemBase {
     // Logger.recordOutput("Shooting/VirtualGoal", virtGoal);
     // Logger.recordOutput("Swerve/velx", m_fieldRelVel.vx);
     // Logger.recordOutput("Swerve/vely", m_fieldRelVel.vy);
+
+    poseEstimator.update(this.getRotation(), this.getModulePositions());
+
+    SmartDashboard.putNumber("estimatedX", getCurrentPose().getX());
+    SmartDashboard.putNumber("estimatedY", getCurrentPose().getY());
+    SmartDashboard.putNumber("estimatedR", getCurrentPose().getRotation().getDegrees());
+
+    field2d.setRobotPose(getCurrentPose());
+    Logger.recordOutput("Odometry/Estimated Pose", getCurrentPose());
+  }
+
+  public Pose2d getCurrentPose() {
+    return poseEstimator.getEstimatedPosition();
+  }
+
+  public void setCurrentPose(Pose2d pose) {
+    poseEstimator.resetPosition(this.getRotation(), this.getModulePositions(), pose);
   }
 
   private ChassisSpeeds getChassisSpeed() {
@@ -303,7 +342,8 @@ public class Drive extends SubsystemBase {
   /** Returns the current odometry pose. */
   @AutoLogOutput(key = "Odometry/Robot")
   public Pose2d getPose() {
-    return pose;
+    return pose; // wo vision
+    // return getCurrentPose(); // vision measurement
   }
 
   /** Returns the current odometry rotation. */

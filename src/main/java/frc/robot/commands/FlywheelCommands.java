@@ -20,6 +20,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.Constants.FieldConstants;
 import frc.robot.Constants.IndexerConstants;
+import frc.robot.Constants.IntakeConstants;
 import frc.robot.Constants.PivotConstants;
 import frc.robot.Constants.ShooterConstants;
 import frc.robot.subsystems.drive.Drive;
@@ -96,9 +97,12 @@ public class FlywheelCommands {
         pivot);
   }
 
-  public static Command waiting(Pivot pivot, Flywheel flywheel) {
+  public static Command waiting(Pivot pivot, Flywheel flywheel, Intake intake) {
     return Commands.waitUntil(
-        () -> pivot.atPosition(PivotConstants.handoff) && flywheel.atDesiredRPM(4000));
+        () ->
+            pivot.atPosition(PivotConstants.handoff)
+                && flywheel.atDesiredRPM(5000)
+                && intake.atPosition(IntakeConstants.handoff));
   }
 
   public static Command outtake(Indexer indexer, Intake intake) {
@@ -109,7 +113,7 @@ public class FlywheelCommands {
               Logger.recordOutput("Indexer/outtaking", true);
             },
             indexer)
-        .withTimeout(2.0)
+        .withTimeout(0.5)
         .andThen(
             () -> {
               indexer.stop();
@@ -121,17 +125,17 @@ public class FlywheelCommands {
   }
 
   public static Command shoot(Pivot pivot, Flywheel flywheel, Indexer indexer, Intake intake) {
-    return waiting(pivot, flywheel).andThen(outtake(indexer, intake));
+    return waiting(pivot, flywheel, intake).andThen(outtake(indexer, intake));
     // return outtake(indexer, intake);
   }
 
   public static Command aimAmp(Pivot pivot) {
     return Commands.run(
             () -> {
-              pivot.setPosition(0.6);
+              pivot.setPosition(0.8);
             },
             pivot)
-        .until(() -> pivot.atPosition(0.6));
+        .until(() -> pivot.atPosition(0.8));
   }
 
   public static Command outtakeAmp(Indexer indexer, Flywheel flywheel, Pivot pivot) {
@@ -139,7 +143,7 @@ public class FlywheelCommands {
             () -> {
               indexer.runVolts(IndexerConstants.outtakeVolts);
               flywheel.runVelocity(1000);
-              pivot.setPosition(0.6);
+              pivot.setPosition(0.8);
             },
             indexer,
             flywheel,
@@ -153,7 +157,7 @@ public class FlywheelCommands {
             () -> {
               Logger.recordOutput("Pivot/aiming", true);
               pivot.setPosition(PivotConstants.handoff);
-              flywheel.runVelocity(4000);
+              flywheel.runVelocity(5000);
             },
             flywheel,
             pivot)

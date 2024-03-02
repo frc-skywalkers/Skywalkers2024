@@ -115,7 +115,7 @@ public class IntakeCommands {
             intake,
             indexer)
         // .until(() -> indexer.hasPiece())
-        .withTimeout(2.0)
+        .withTimeout(1.0)
         .andThen(
             () -> {
               indexer.runVolts(IndexerConstants.holdVolts);
@@ -163,7 +163,7 @@ public class IntakeCommands {
               intake.runWheel();
             },
             intake)
-        .withTimeout(1.0)
+        .withTimeout(1.5)
         .andThen(
             () -> {
               intake.holdPiece();

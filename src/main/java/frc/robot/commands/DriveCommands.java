@@ -23,6 +23,7 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Constants.FieldConstants;
 import frc.robot.subsystems.drive.Drive;
 import java.util.function.DoubleSupplier;
@@ -85,7 +86,7 @@ public class DriveCommands {
         drive);
   }
 
-  public static Command autoAlignAmp(Drive drive) {
+  public static Command autoAlignAmp(Drive drive, CommandXboxController joystick) {
     ProfiledPIDController headingController =
         new ProfiledPIDController(
             3.0,
@@ -122,6 +123,6 @@ public class DriveCommands {
                       drive.getRotation()));
             },
             drive)
-        .until(() -> drive.atGoal(goal));
+        .until(() -> joystick.rightBumper().getAsBoolean());
   }
 }

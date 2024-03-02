@@ -2,10 +2,10 @@
   "version": 1.0,
   "startingPose": {
     "position": {
-      "x": 0.7,
-      "y": 4.42
+      "x": 0.84,
+      "y": 6.63
     },
-    "rotation": 120.0
+    "rotation": -120.0
   },
   "command": {
     "type": "sequential",
@@ -33,7 +33,31 @@
         {
           "type": "path",
           "data": {
-            "pathName": "1B1"
+            "pathName": "1A1"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Shoot Sequence"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "1D1"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Shoot Sequence"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "1E1"
           }
         },
         {

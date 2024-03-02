@@ -33,7 +33,19 @@
         {
           "type": "path",
           "data": {
-            "pathName": "1B1"
+            "pathName": "3C3"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Shoot Sequence"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "3H3"
           }
         },
         {
