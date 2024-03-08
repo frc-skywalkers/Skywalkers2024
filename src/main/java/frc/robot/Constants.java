@@ -64,10 +64,10 @@ public final class Constants {
     // public static InterpolatingDoubleTreeMap pivotAngleMap = new InterpolatingDoubleTreeMap({});
 
     public static final double mm_cruisevel = 0.4 * 2.0;
-    public static final double mm_accel = 0.8 * 2.0;
-    public static final double mm_jerk = 1.6 * 2.0;
+    public static final double mm_accel = mm_cruisevel * 3.0;
+    public static final double mm_jerk = mm_accel * 4.0;
 
-    public static final double handoff = -0.98;
+    public static final double handoff = -0.96;
 
     public static final double tolerance = 0.075;
   }
@@ -86,8 +86,8 @@ public final class Constants {
     public static final double tofTolerance = 30.00;
 
     public static final double mm_cruisevel = 0.4 * 4.0;
-    public static final double mm_accel = mm_cruisevel * 2.5;
-    public static final double mm_jerk = mm_accel * 3.0;
+    public static final double mm_accel = mm_cruisevel * 4.0;
+    public static final double mm_jerk = mm_accel * 4.0;
   }
 
   public static final class IndexerConstants {
@@ -171,7 +171,7 @@ public final class Constants {
     }
 
     public static LedState defaultState = new LedState(50, 0, 0, "Fade");
-    public static TempLedState successSignal = new TempLedState(0, 255, 0, "Solid", 2);
+    public static TempLedState successSignal = new TempLedState(68, 17, 99, "Solid", 2);
     public static TempLedState intake = new TempLedState(255, 255, 0, "Solid", 10);
   }
 }

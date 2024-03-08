@@ -62,7 +62,7 @@ public class DriveCommands {
           //   double omega = 0;
           // Square values
           linearMagnitude = linearMagnitude * linearMagnitude;
-          omega = Math.copySign(omega * omega, omega) * drive.getMaxAngularSpeedRadPerSec();
+          omega = Math.copySign(omega * omega, omega) * drive.getMaxAngularSpeedRadPerSec(); //
           if (autoAlign.getAsDouble() > 0.5) {
             // omega = drive.getAlignOutput(drive.get)
             omega = drive.getAlignOutput();

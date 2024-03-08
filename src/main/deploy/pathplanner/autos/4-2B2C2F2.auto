@@ -1,0 +1,74 @@
+{
+  "version": 1.0,
+  "startingPose": {
+    "position": {
+      "x": 1.35,
+      "y": 5.52
+    },
+    "rotation": 180.0
+  },
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "race",
+          "data": {
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "Shoot"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "Pivot Rev"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "2B2"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Shoot Sequence"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "2A2"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Shoot Sequence"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "2F2"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Shoot Sequence"
+          }
+        }
+      ]
+    }
+  },
+  "folder": null,
+  "choreoAuto": false
+}

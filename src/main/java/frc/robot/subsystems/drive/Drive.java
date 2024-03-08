@@ -198,7 +198,7 @@ public class Drive extends SubsystemBase {
     SmartDashboard.putNumber("estimatedY", getCurrentPose().getY());
     SmartDashboard.putNumber("estimatedR", getCurrentPose().getRotation().getDegrees());
 
-    field2d.setRobotPose(getCurrentPose());
+    // field2d.setRobotPose(getCurrentPose());
     Logger.recordOutput("Odometry/Estimated Pose", getCurrentPose());
   }
 

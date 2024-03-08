@@ -59,6 +59,12 @@
           "data": {
             "pathName": "2A2"
           }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Shoot Sequence"
+          }
         }
       ]
     }

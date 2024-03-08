@@ -123,6 +123,7 @@ public class RobotContainer {
                 new ModuleIOTalonFX(1),
                 new ModuleIOTalonFX(2),
                 new ModuleIOTalonFX(3));
+        // vision = new Vision("arducam1", "arducam2", drive);
         vision = new Vision(null, null, drive);
         flywheel = new Flywheel(new FlywheelIOTalonFX());
         pivot = new Pivot(new PivotIOTalonFX());
@@ -191,7 +192,7 @@ public class RobotContainer {
     SmartDashboard.putNumber("Pivot Angle Wanted", -1.0);
     SmartDashboard.putNumber("Pivot Angle Wanted 1", 0.8);
 
-    SmartDashboard.putNumber("Shooter RPM Wanted", 3500);
+    SmartDashboard.putNumber("Shooter RPM Wanted", 4500);
     SmartDashboard.putNumber("Indexer Position Back", 1.0);
 
     Logger.recordOutput("Intake/intakingPiece", false);
@@ -211,7 +212,7 @@ public class RobotContainer {
     // drive, pivot));
 
     NamedCommands.registerCommand(
-        "intake handoff", IntakeCommands.intakeHandoff(intake, indexer, pivot));
+        "intake handoff", IntakeCommands.intakeHandoff(intake, indexer, pivot, lightstrip));
 
     NamedCommands.registerCommand("Pivot Rev", FlywheelCommands.prepSubwoofer(flywheel, pivot));
 
@@ -223,6 +224,8 @@ public class RobotContainer {
         Commands.race(
             FlywheelCommands.prepSubwoofer(flywheel, pivot),
             FlywheelCommands.shoot(pivot, flywheel, indexer, intake)));
+
+    NamedCommands.registerCommand("Lower", Commands.race(FlywheelCommands.lower(pivot)));
 
     Logger.recordOutput("Alliance", DriverStation.getAlliance().isPresent());
 
@@ -390,7 +393,8 @@ public class RobotContainer {
     operator
         .b()
         .onTrue(
-            IntakeCommands.intakeHandoff(intake, indexer, pivot).unless(() -> indexer.hasPiece()));
+            IntakeCommands.intakeHandoff(intake, indexer, pivot, lightstrip)
+                .unless(() -> indexer.hasPiece()));
 
     operator
         .povDown()
@@ -408,7 +412,7 @@ public class RobotContainer {
 
     operator.y().onTrue(IntakeCommands.deepen(intake));
 
-    // operator.a().onTrue(IntakeCommands.runWheelVolts(intake));
+    operator.a().onTrue(IntakeCommands.runWheelVolts(intake));
 
     // operator.a().onTrue(Commands.run(() -> intake.setPosition(IntakeConstants.handoff), intake));
 
@@ -478,7 +482,7 @@ public class RobotContainer {
             Commands.run(
                 () -> {
                   pivot.setPosition(PivotConstants.handoff);
-                  flywheel.runVelocity(3500);
+                  flywheel.runVelocity(4500);
                   //   pivot.setPosition(SmartDashboard.getNumber("Pivot Angle Wanted", -1.0));
                   //   flywheel.runVelocity(SmartDashboard.getNumber("Shooter RPM Wanted", 0.0));
                 },

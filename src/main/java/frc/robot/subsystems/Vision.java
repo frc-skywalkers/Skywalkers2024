@@ -10,7 +10,6 @@ import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Transform3d;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
@@ -20,11 +19,9 @@ import frc.robot.Constants;
 import frc.robot.Constants.*;
 import frc.robot.subsystems.drive.Drive;
 import java.io.IOException;
-import java.util.List;
 import java.util.Optional;
 import org.littletonrobotics.junction.Logger;
 import org.photonvision.PhotonCamera;
-import org.photonvision.targeting.PhotonTrackedTarget;
 
 public class Vision extends SubsystemBase {
 
@@ -110,7 +107,6 @@ public class Vision extends SubsystemBase {
     Logger.recordOutput("Odometry/resultTimestamp1", resultTimestamp1);
     Logger.recordOutput("Odometry/hasTargets", pipelineResult2.hasTargets());
 
-    /*
     if (resultTimestamp1 != previousPipelineTimestamp && pipelineResult1.hasTargets()) {
 
       previousPipelineTimestamp = resultTimestamp1;
@@ -129,107 +125,124 @@ public class Vision extends SubsystemBase {
         Transform3d camToTarget1 = target1.getBestCameraToTarget();
         Pose3d camPose1 = targetPose1.transformBy(camToTarget1.inverse());
 
-        var visionMeasurement1 = camPose1.transformBy(VisionConstants.CAMERA_TO_ROBOT1);
-        poseEstimator.addVisionMeasurement(visionMeasurement1.toPose2d(), resultTimestamp1);
-        SmartDashboard.putNumber("Vision1X", visionMeasurement1.toPose2d().getX());
-        SmartDashboard.putNumber("Vision1Y", visionMeasurement1.toPose2d().getY());
-        SmartDashboard.putNumber(
-            "Vision1Rotation", visionMeasurement1.toPose2d().getRotation().getDegrees());
+        // Pose3d visionMeasurement1 = camPose1.transformBy(VisionConstants.CAMERA_TO_ROBOT1);
+        Pose3d visionMeasurement1 = camPose1.transformBy(VisionConstants.CAMERA_TO_ROBOT1);
+
+        Pose2d Measurement12d =
+            new Pose2d(
+                visionMeasurement1.getX(),
+                visionMeasurement1.getY(),
+                swerveSubsystem.getRotation());
+
+        // swerveSubsystem.poseEstimator.addVisionMeasurement(visionMeasurement1.toPose2d(),
+        // resultTimestamp1);
+        swerveSubsystem.poseEstimator.addVisionMeasurement(Measurement12d, resultTimestamp1);
+        SmartDashboard.putNumber("Vision1X", Measurement12d.getX());
+        SmartDashboard.putNumber("Vision1Y", Measurement12d.getY());
+        SmartDashboard.putNumber("Vision1Rotation", Measurement12d.getRotation().getDegrees());
       }
     }
-    */
 
-    if (resultTimestamp1 != previousPipelineTimestamp && pipelineResult1.hasTargets()) {
-
-      previousPipelineTimestamp = resultTimestamp1;
-      List<PhotonTrackedTarget> targets1 = pipelineResult1.getTargets();
-      SmartDashboard.putNumber("targetnum1", targets1.size());
-
-      for (int i = 0; i < targets1.size(); i++) {
-        var currenttarget1 = targets1.get(i);
-        var fiducialId1 = currenttarget1.getFiducialId();
-
-        Optional<Pose3d> tagPose1 =
-            aprilTagFieldLayout == null
-                ? Optional.empty()
-                : aprilTagFieldLayout.getTagPose(fiducialId1);
-
-        if (currenttarget1.getPoseAmbiguity() <= .2 && fiducialId1 >= 0 && tagPose1.isPresent()) {
-          var targetPose1 = tagPose1.get();
-          Transform3d camToTarget1 = currenttarget1.getBestCameraToTarget();
-          Pose3d camPose1 = targetPose1.transformBy(camToTarget1.inverse());
-
-          var visionMeasurement1 =
-              camPose1.transformBy(VisionConstants.CAMERA_TO_ROBOT1).toPose2d();
-          Pose2d measurement1 =
-              new Pose2d(
-                  new Translation2d(visionMeasurement1.getX(), visionMeasurement1.getY()),
-                  swerveSubsystem.getRotation());
-
-          swerveSubsystem.poseEstimator.addVisionMeasurement(measurement1, resultTimestamp1);
-        }
-      }
-    }
     if (resultTimestamp2 != previousPipelineTimestamp && pipelineResult2.hasTargets()) {
 
       previousPipelineTimestamp = resultTimestamp2;
-      List<PhotonTrackedTarget> targets2 = pipelineResult2.getTargets();
-      SmartDashboard.putNumber("targetnum2", targets2.size());
+      var target2 = pipelineResult2.getBestTarget();
+      var fiducialId2 = target2.getFiducialId();
 
-      for (int i = 0; i < targets2.size(); i++) {
-        var currenttarget2 = targets2.get(i);
-        var fiducialId2 = currenttarget2.getFiducialId();
+      // Get the tag pose from field layout - consider that the layout will be null if it failed to
+      // load
+      Optional<Pose3d> tagPose2 =
+          aprilTagFieldLayout == null
+              ? Optional.empty()
+              : aprilTagFieldLayout.getTagPose(fiducialId2);
 
-        Optional<Pose3d> tagPose2 =
-            aprilTagFieldLayout == null
-                ? Optional.empty()
-                : aprilTagFieldLayout.getTagPose(fiducialId2);
+      if (target2.getPoseAmbiguity() <= .2 && fiducialId2 >= 0 && tagPose2.isPresent()) {
+        var targetPose2 = tagPose2.get();
+        Transform3d camToTarget2 = target2.getBestCameraToTarget();
+        Pose3d camPose2 = targetPose2.transformBy(camToTarget2.inverse());
 
-        if (currenttarget2.getPoseAmbiguity() <= .2 && fiducialId2 >= 0 && tagPose2.isPresent()) {
-          var targetPose2 = tagPose2.get();
-          Transform3d camToTarget2 = currenttarget2.getBestCameraToTarget();
-          Pose3d camPose2 = targetPose2.transformBy(camToTarget2.inverse());
+        // Pose3d visionMeasurement2 = camPose2.transformBy(VisionConstants.CAMERA_TO_ROBOT2);
+        Pose3d visionMeasurement2 = camPose2.transformBy(VisionConstants.CAMERA_TO_ROBOT2);
 
-          var visionMeasurement2 =
-              camPose2.transformBy(VisionConstants.CAMERA_TO_ROBOT1).toPose2d();
-          Pose2d measurement2 =
-              new Pose2d(
-                  new Translation2d(visionMeasurement2.getX(), visionMeasurement2.getY()),
-                  swerveSubsystem.getRotation());
+        Pose2d Measurement22d =
+            new Pose2d(
+                visionMeasurement2.getX(),
+                visionMeasurement2.getY(),
+                swerveSubsystem.getRotation());
 
-          swerveSubsystem.poseEstimator.addVisionMeasurement(measurement2, resultTimestamp2);
-        }
+        // swerveSubsystem.poseEstimator.addVisionMeasurement(visionMeasurement1.toPose2d(),
+        // resultTimestamp1);
+        swerveSubsystem.poseEstimator.addVisionMeasurement(Measurement22d, resultTimestamp2);
+        SmartDashboard.putNumber("Vision2X", Measurement22d.getX());
+        SmartDashboard.putNumber("Vision2Y", Measurement22d.getY());
+        SmartDashboard.putNumber("Vision2Rotation", Measurement22d.getRotation().getDegrees());
       }
-
-      /*
-      if (resultTimestamp2 != previousPipelineTimestamp && pipelineResult2.hasTargets()) {
-        var target2 = pipelineResult2.getBestTarget();
-        var fiducialId2 = target2.getFiducialId();
-
-        // Get the tag pose from field layout - consider that the layout will be null if it failed to
-        // load
-        Optional<Pose3d> tagPose2 =
-            aprilTagFieldLayout == null
-                ? Optional.empty()
-                : aprilTagFieldLayout.getTagPose(fiducialId2);
-        Logger.recordOutput("Odometry/pose ambiguity", target2.getPoseAmbiguity());
-        Logger.recordOutput("Odometry/tag present", tagPose2.isPresent());
-        Logger.recordOutput("Odometry/id", fiducialId2);
-
-        if (target2.getPoseAmbiguity() <= .2 && fiducialId2 >= 0 && tagPose2.isPresent()) {
-          var targetPose2 = tagPose2.get();
-          Transform3d camToTarget2 = target2.getBestCameraToTarget();
-          Pose3d camPose2 = targetPose2.transformBy(camToTarget2.inverse());
-
-          var visionMeasurement2 = camPose2.transformBy(VisionConstants.CAMERA_TO_ROBOT2);
-          poseEstimator.addVisionMeasurement(visionMeasurement2.toPose2d(), resultTimestamp2);
-          SmartDashboard.putNumber("Vision2X", visionMeasurement2.toPose2d().getX());
-          SmartDashboard.putNumber("Vision2Y", visionMeasurement2.toPose2d().getY());
-          SmartDashboard.putNumber(
-              "Vision2Rotation", visionMeasurement2.toPose2d().getRotation().getDegrees());
-        }
-        */
     }
+
+    // if (resultTimestamp1 != previousPipelineTimestamp && pipelineResult1.hasTargets()) {
+
+    //   previousPipelineTimestamp = resultTimestamp1;
+    //   List<PhotonTrackedTarget> targets1 = pipelineResult1.getTargets();
+    //   SmartDashboard.putNumber("targetnum1", targets1.size());
+
+    //   for (int i = 0; i < targets1.size(); i++) {
+    //     var currenttarget1 = targets1.get(i);
+    //     var fiducialId1 = currenttarget1.getFiducialId();
+
+    //     Optional<Pose3d> tagPose1 =
+    //         aprilTagFieldLayout == null
+    //             ? Optional.empty()
+    //             : aprilTagFieldLayout.getTagPose(fiducialId1);
+
+    //     if (currenttarget1.getPoseAmbiguity() <= .2 && fiducialId1 >= 0 && tagPose1.isPresent())
+    // {
+    //       var targetPose1 = tagPose1.get();
+    //       Transform3d camToTarget1 = currenttarget1.getBestCameraToTarget();
+    //       Pose3d camPose1 = targetPose1.transformBy(camToTarget1.inverse());
+
+    //       var visionMeasurement1 =
+    //           camPose1.transformBy(VisionConstants.CAMERA_TO_ROBOT1).toPose2d();
+    //       Pose2d measurement1 =
+    //           new Pose2d(
+    //               new Translation2d(visionMeasurement1.getX(), visionMeasurement1.getY()),
+    //               swerveSubsystem.getRotation());
+
+    //       swerveSubsystem.poseEstimator.addVisionMeasurement(measurement1, resultTimestamp1);
+    //     }
+    //   }
+    // }
+
+    // if (resultTimestamp2 != previousPipelineTimestamp && pipelineResult2.hasTargets()) {
+
+    //   previousPipelineTimestamp = resultTimestamp2;
+    //   List<PhotonTrackedTarget> targets2 = pipelineResult2.getTargets();
+    //   SmartDashboard.putNumber("targetnum2", targets2.size());
+
+    //   for (int i = 0; i < targets2.size(); i++) {
+    //     var currenttarget2 = targets2.get(i);
+    //     var fiducialId2 = currenttarget2.getFiducialId();
+
+    //     Optional<Pose3d> tagPose2 =
+    //         aprilTagFieldLayout == null
+    //             ? Optional.empty()
+    //             : aprilTagFieldLayout.getTagPose(fiducialId2);
+
+    //     if (currenttarget2.getPoseAmbiguity() <= .2 && fiducialId2 >= 0 && tagPose2.isPresent())
+    // {
+    //       var targetPose2 = tagPose2.get();
+    //       Transform3d camToTarget2 = currenttarget2.getBestCameraToTarget();
+    //       Pose3d camPose2 = targetPose2.transformBy(camToTarget2.inverse());
+
+    //       var visionMeasurement2 =
+    //           camPose2.transformBy(VisionConstants.CAMERA_TO_ROBOT1).toPose2d();
+    //       Pose2d measurement2 =
+    //           new Pose2d(
+    //               new Translation2d(visionMeasurement2.getX(), visionMeasurement2.getY()),
+    //               swerveSubsystem.getRotation());
+
+    //       swerveSubsystem.poseEstimator.addVisionMeasurement(measurement2, resultTimestamp2);
+    //     }
+    //   }
 
     // Update pose estimator with drivetrain sensors
     /*

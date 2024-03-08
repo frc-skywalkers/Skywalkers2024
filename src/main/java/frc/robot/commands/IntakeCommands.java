@@ -17,7 +17,9 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.Constants.IndexerConstants;
 import frc.robot.Constants.IntakeConstants;
+import frc.robot.Constants.LightstripConstants;
 import frc.robot.Constants.PivotConstants;
+import frc.robot.subsystems.Lightstrip;
 import frc.robot.subsystems.indexer.Indexer;
 import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.pivot.Pivot;
@@ -32,10 +34,16 @@ public class IntakeCommands {
    */
   public static Command runWheelVolts(Intake intake) {
     return Commands.run(
-        () -> {
-          intake.runWheelVolts(3.0);
-        },
-        intake);
+            () -> {
+              intake.runWheelVolts(-7.0);
+            },
+            intake)
+        .withTimeout(3.0)
+        .andThen(
+            () -> {
+              intake.stopWheels();
+            },
+            intake);
   }
 
   public static Command homeIntake(Intake intake) {
@@ -63,7 +71,7 @@ public class IntakeCommands {
         .withTimeout(0.25);
   }
 
-  public static Command gotPiece(Intake intake) {
+  public static Command gotPiece(Intake intake, Lightstrip lightstrip) {
 
     return Commands.run(
             () -> {
@@ -74,6 +82,12 @@ public class IntakeCommands {
             intake)
         // .withTimeout(3.0)
         .until(() -> (intake.hasPiece() && intake.atPosition(IntakeConstants.dropDown)))
+        .andThen(
+            Commands.runOnce(
+                () ->
+                    lightstrip.tempColor(
+                        LightstripConstants.successSignal, LightstripConstants.Ranges.full),
+                lightstrip))
         .andThen(() -> Logger.recordOutput("Intake/intakingPiece", false));
   }
 
@@ -115,7 +129,7 @@ public class IntakeCommands {
             intake,
             indexer)
         // .until(() -> indexer.hasPiece())
-        .withTimeout(1.0)
+        .withTimeout(0.75)
         .andThen(
             () -> {
               indexer.runVolts(IndexerConstants.holdVolts);
@@ -135,12 +149,13 @@ public class IntakeCommands {
         .andThen(() -> indexer.runVolts(IndexerConstants.holdVolts), indexer);
   }
 
-  public static Command intakeHandoff(Intake intake, Indexer indexer, Pivot pivot) {
+  public static Command intakeHandoff(
+      Intake intake, Indexer indexer, Pivot pivot, Lightstrip lightstrip) {
     // return intakePiece(intake)
     //     .andThen(gotPiece(intake))
     //     .andThen(passPieceIntake(intake, pivot, indexer));
     // return gotPiece(intake);
-    return gotPiece(intake).andThen(passPieceIntake(intake, pivot, indexer));
+    return gotPiece(intake, lightstrip).andThen(passPieceIntake(intake, pivot, indexer));
     // .andThen(pivotHandoff(pivot))
     // .andThen(transferPiece(intake, indexer, pivot))
     // .andThen(bringOutPiece(indexer));
@@ -186,6 +201,7 @@ public class IntakeCommands {
     return Commands.run(
             () -> {
               intake.setPosition(IntakeConstants.dropDown);
+              intake.runWheelVolts(1.0);
             },
             intake)
         .until(() -> intake.atPosition(IntakeConstants.dropDown));
