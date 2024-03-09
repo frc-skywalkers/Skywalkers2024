@@ -27,7 +27,7 @@ import edu.wpi.first.wpilibj.DigitalInput;
 public class IndexerIOTalonFX implements IndexerIO {
   private static final double GEAR_RATIO = 1.5;
 
-  private final TalonFX leader = new TalonFX(22);
+  private final TalonFX leader = new TalonFX(20);
 
   private final StatusSignal<Double> leaderPosition = leader.getPosition();
   private final StatusSignal<Double> leaderVelocity = leader.getVelocity();

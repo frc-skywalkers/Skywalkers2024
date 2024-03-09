@@ -25,7 +25,6 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Constants.LightstripConstants;
-import frc.robot.Constants.PivotConstants;
 import frc.robot.commands.DriveCommands;
 import frc.robot.commands.FeedForwardCharacterization;
 import frc.robot.commands.FlywheelCommands;
@@ -276,6 +275,13 @@ public class RobotContainer {
               () -> controller.getRightTriggerAxis()));
     }
 
+    indexer.setDefaultCommand(
+        Commands.runOnce(
+            () -> {
+              indexer.stop();
+            },
+            indexer));
+
     // controller.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
     // flywheel.setDefaultCommand(FlywheelCommands.autoShoot(flywheel, drive));
     // controller.x().onTrue(IntakeCommands.spit(intake));
@@ -390,11 +396,11 @@ public class RobotContainer {
     //             .andThen(IntakeCommands.passPieceIntake(intake, pivot, indexer))
     //             .andThen(IntakeCommands.transferPiece(intake, indexer)));
 
-    operator
-        .b()
-        .onTrue(
-            IntakeCommands.intakeHandoff(intake, indexer, pivot, lightstrip)
-                .unless(() -> indexer.hasPiece()));
+    // operator
+    //     .b()
+    //     .onTrue(
+    //         IntakeCommands.intakeHandoff(intake, indexer, pivot, lightstrip)
+    //             .unless(() -> indexer.hasPiece()));
 
     operator
         .povDown()
@@ -408,11 +414,45 @@ public class RobotContainer {
 
     // operator.x().onTrue(IntakeCommands.homeIntake(intake));
 
-    operator.x().onTrue(IntakeCommands.spit(intake));
+    // operator.x().onTrue(IntakeCommands.spit(intake));
 
-    operator.y().onTrue(IntakeCommands.deepen(intake));
+    // operator.y().onTrue(IntakeCommands.deepen(intake));
 
-    operator.a().onTrue(IntakeCommands.runWheelVolts(intake));
+    // operator.a().onTrue(IntakeCommands.runWheelVolts(intake));
+
+    operator
+        .leftBumper()
+        .whileTrue(
+            Commands.run(
+                () -> {
+                  indexer.runVolts(1.00);
+                },
+                indexer));
+    operator
+        .rightBumper()
+        .whileTrue(
+            Commands.run(
+                () -> {
+                  indexer.runVolts(-1.00);
+                },
+                indexer));
+
+    operator
+        .a()
+        .onTrue(
+            Commands.run(
+                () -> {
+                  flywheel.runVelocity(0);
+                },
+                flywheel));
+    operator
+        .b()
+        .onTrue(
+            Commands.run(
+                () -> {
+                  flywheel.runVelocity(SmartDashboard.getNumber("Shooter RPM Wanted", 0));
+                },
+                flywheel));
 
     // operator.a().onTrue(Commands.run(() -> intake.setPosition(IntakeConstants.handoff), intake));
 
@@ -425,14 +465,14 @@ public class RobotContainer {
     //             () -> flywheel.runVelocity(SmartDashboard.getNumber("Shooter RPM Wanted",
     // 3500))));
 
-    pivot.setDefaultCommand(
-        Commands.run(
-            () -> {
-              pivot.setPosition(-1.5);
-              Logger.recordOutput("Pivot/I'm super evil", true);
-            },
-            pivot));
-    flywheel.setDefaultCommand(Commands.run(() -> flywheel.runVelocity(0.0), flywheel));
+    // pivot.setDefaultCommand(
+    //     Commands.run(
+    //         () -> {
+    //           pivot.setPosition(-1.5);
+    //           Logger.recordOutput("Pivot/I'm super evil", true);
+    //         },
+    //         pivot));
+    // flywheel.setDefaultCommand(Commands.run(() -> flywheel.runVelocity(0.0), flywheel));
 
     // operator
     //     .povDown()
@@ -476,28 +516,28 @@ public class RobotContainer {
     //         Commands.runOnce(
     //             () -> pivot.setPosition(SmartDashboard.getNumber("Pivot Angle Wanted", 0.45))));
 
-    operator
-        .leftTrigger()
-        .whileTrue(
-            Commands.run(
-                () -> {
-                  pivot.setPosition(PivotConstants.handoff);
-                  flywheel.runVelocity(4500);
-                  //   pivot.setPosition(SmartDashboard.getNumber("Pivot Angle Wanted", -1.0));
-                  //   flywheel.runVelocity(SmartDashboard.getNumber("Shooter RPM Wanted", 0.0));
-                },
-                pivot,
-                flywheel));
+    // operator
+    //     .leftTrigger()
+    //     .whileTrue(
+    //         Commands.run(
+    //             () -> {
+    //               pivot.setPosition(PivotConstants.handoff);
+    //               flywheel.runVelocity(4500);
+    //               //   pivot.setPosition(SmartDashboard.getNumber("Pivot Angle Wanted", -1.0));
+    //               //   flywheel.runVelocity(SmartDashboard.getNumber("Shooter RPM Wanted", 0.0));
+    //             },
+    //             pivot,
+    //             flywheel));
 
-    operator
-        .rightBumper()
-        .onTrue(
-            IntakeCommands.ampPrep(intake, indexer, pivot)
-                .andThen(FlywheelCommands.aimAmp(pivot))
-                .andThen(FlywheelCommands.outtakeAmp(indexer, flywheel, pivot)));
+    // operator
+    //     .rightBumper()
+    //     .onTrue(
+    //         IntakeCommands.ampPrep(intake, indexer, pivot)
+    //             .andThen(FlywheelCommands.aimAmp(pivot))
+    //             .andThen(FlywheelCommands.outtakeAmp(indexer, flywheel, pivot)));
 
     // controller.x().onTrue(IntakeCommands.bringOutPiece(indexer));
-    operator.leftBumper().onTrue(FlywheelCommands.outtake(indexer, intake));
+    // operator.leftBumper().onTrue(FlywheelCommands.outtake(indexer, intake));
     // operator.rightBumper().onTrue(FlywheelCommands.outtakeAmp(indexer, flywheel, pivot));
 
     // operator.rightBumper().onTrue(IntakeCommands.transferPiece(intake, indexer, pivot));

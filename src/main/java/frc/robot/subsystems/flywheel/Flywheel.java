@@ -96,7 +96,7 @@ public class Flywheel extends SubsystemBase {
 
   /** Returns the current velocity in radians per second. */
   public double getCharacterizationVelocity() {
-    return inputs.velocityRadPerSec;
+    return inputs.followerVelocityRadPerSec;
   }
 
   public double getAppliedVolts() {
