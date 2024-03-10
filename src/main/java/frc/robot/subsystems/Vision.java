@@ -5,266 +5,89 @@
 package frc.robot.subsystems;
 
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
-import edu.wpi.first.apriltag.AprilTagFieldLayout.OriginPosition;
-import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
-import edu.wpi.first.math.geometry.Transform3d;
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.Filesystem;
+import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants;
-import frc.robot.Constants.*;
-import frc.robot.subsystems.drive.Drive;
+import frc.robot.Constants.VisionConstants;
+import frc.robot.Constants.VisionConstants.CameraInformation;
+import frc.robot.Constants.VisionConstants.CameraResult;
+import frc.robot.Robot;
 import java.io.IOException;
-import java.util.Optional;
+import java.util.ArrayList;
 import org.littletonrobotics.junction.Logger;
-import org.photonvision.PhotonCamera;
+import org.photonvision.simulation.VisionSystemSim;
 
-public class Vision extends SubsystemBase {
+public class Vision {
 
-  private final PhotonCamera photonCamera1;
-  private final PhotonCamera photonCamera2;
-  private final Drive swerveSubsystem;
-  private final AprilTagFieldLayout aprilTagFieldLayout;
+  private Camera arducam1;
+  private Camera arducam2;
 
-  // Standard Deviations for (Module) States and Visioon measurements' trust
-  // [x, y, theta], with units in meters and radians
+  private VisionSystemSim visionSim;
 
-  /*
-  private static final Vector<N3> stateStdDevs =
-      VecBuilder.fill(0.05, 0.05, Units.degreesToRadians(0.1)); // 5
-  private static final Vector<N3> visionMeasurementStdDevs =
-      VecBuilder.fill(0.5, 0.5, Units.degreesToRadians(1000000)); // 10
-  public final SwerveDrivePoseEstimator poseEstimator;
-  */
-  private final Field2d field2d = new Field2d();
+  public Vision(CameraInformation arducam1info, CameraInformation arducam2info) {
 
-  private double previousPipelineTimestamp = 0;
+    arducam1 = new Camera(arducam1info.name, arducam1info.cameraPose);
+    arducam2 = new Camera(arducam2info.name, arducam2info.cameraPose);
 
-  /** Creates a new Vision. */
-  public Vision(PhotonCamera photonCamera1, PhotonCamera photonCamera2, Drive swerveSubsystem) {
-
-    this.photonCamera1 = photonCamera1;
-    this.photonCamera2 = photonCamera2;
-    this.swerveSubsystem = swerveSubsystem;
-
-    AprilTagFieldLayout layout;
-
-    try {
-      layout = AprilTagFieldLayout.loadFromResource(AprilTagFields.k2024Crescendo.m_resourceFile);
-      var alliance = DriverStation.getAlliance();
-      Logger.recordOutput("Odometry/Alliance", alliance.isPresent());
-      if (alliance.isPresent()) {
-        layout.setOrigin(
-            alliance.get() == Alliance.Blue
-                ? OriginPosition.kBlueAllianceWallRightSide
-                : OriginPosition.kRedAllianceWallRightSide);
-      } else {
-        layout.setOrigin(OriginPosition.kBlueAllianceWallRightSide);
-        Logger.recordOutput("Odometry/bad things have happened", true);
+    if (RobotBase.isSimulation()) {
+      visionSim = new VisionSystemSim("main");
+      try {
+        visionSim.addAprilTags(
+            new AprilTagFieldLayout(Filesystem.getDeployDirectory() + "/fields/BlueTags.json"));
+      } catch (IOException e) {
       }
-    } catch (IOException e) {
-      DriverStation.reportError("Failed to load AprilTagFieldLayout", e.getStackTrace());
-      layout = null;
-    }
-    this.aprilTagFieldLayout = layout;
 
-    /*
-    poseEstimator =
-        new SwerveDrivePoseEstimator(
-            swerveSubsystem.kinematics,
-            swerveSubsystem.getRotation(),
-            swerveSubsystem.getModulePositions(),
-            new Pose2d(),
-            stateStdDevs,
-            visionMeasurementStdDevs);
-    */
+      visionSim.addCamera(
+          arducam1.getCameraSim(), VisionConstants.CAMERA_TO_ROBOT1.inverse()); // camera pose
+      visionSim.addCamera(arducam2.getCameraSim(), VisionConstants.CAMERA_TO_ROBOT2.inverse());
+    }
   }
 
-  @Override
-  public void periodic() {
-    if (Constants.currentMode == Mode.SIM) {
-      return;
-    }
-    if (Constants.currentMode == Mode.REAL) {
-      return;
-    }
-    // return;
-    // This method will be called once per scheduler run
-
-    photonCamera1.getPipelineIndex();
-
-    // Update pose estimator with the best visible target
-    var pipelineResult1 = photonCamera1.getLatestResult();
-    var pipelineResult2 = photonCamera2.getLatestResult();
-
-    var resultTimestamp1 = pipelineResult1.getTimestampSeconds();
-    var resultTimestamp2 = pipelineResult2.getTimestampSeconds();
-
-    Logger.recordOutput("Odometry/resultTimestamp1", resultTimestamp1);
-    Logger.recordOutput("Odometry/hasTargets", pipelineResult2.hasTargets());
-
-    if (resultTimestamp1 != previousPipelineTimestamp && pipelineResult1.hasTargets()) {
-
-      previousPipelineTimestamp = resultTimestamp1;
-      var target1 = pipelineResult1.getBestTarget();
-      var fiducialId1 = target1.getFiducialId();
-
-      // Get the tag pose from field layout - consider that the layout will be null if it failed to
-      // load
-      Optional<Pose3d> tagPose1 =
-          aprilTagFieldLayout == null
-              ? Optional.empty()
-              : aprilTagFieldLayout.getTagPose(fiducialId1);
-
-      if (target1.getPoseAmbiguity() <= .2 && fiducialId1 >= 0 && tagPose1.isPresent()) {
-        var targetPose1 = tagPose1.get();
-        Transform3d camToTarget1 = target1.getBestCameraToTarget();
-        Pose3d camPose1 = targetPose1.transformBy(camToTarget1.inverse());
-
-        // Pose3d visionMeasurement1 = camPose1.transformBy(VisionConstants.CAMERA_TO_ROBOT1);
-        Pose3d visionMeasurement1 = camPose1.transformBy(VisionConstants.CAMERA_TO_ROBOT1);
-
-        Pose2d Measurement12d =
-            new Pose2d(
-                visionMeasurement1.getX(),
-                visionMeasurement1.getY(),
-                swerveSubsystem.getRotation());
-
-        // swerveSubsystem.poseEstimator.addVisionMeasurement(visionMeasurement1.toPose2d(),
-        // resultTimestamp1);
-        swerveSubsystem.poseEstimator.addVisionMeasurement(Measurement12d, resultTimestamp1);
-        SmartDashboard.putNumber("Vision1X", Measurement12d.getX());
-        SmartDashboard.putNumber("Vision1Y", Measurement12d.getY());
-        SmartDashboard.putNumber("Vision1Rotation", Measurement12d.getRotation().getDegrees());
-      }
-    }
-
-    if (resultTimestamp2 != previousPipelineTimestamp && pipelineResult2.hasTargets()) {
-
-      previousPipelineTimestamp = resultTimestamp2;
-      var target2 = pipelineResult2.getBestTarget();
-      var fiducialId2 = target2.getFiducialId();
-
-      // Get the tag pose from field layout - consider that the layout will be null if it failed to
-      // load
-      Optional<Pose3d> tagPose2 =
-          aprilTagFieldLayout == null
-              ? Optional.empty()
-              : aprilTagFieldLayout.getTagPose(fiducialId2);
-
-      if (target2.getPoseAmbiguity() <= .2 && fiducialId2 >= 0 && tagPose2.isPresent()) {
-        var targetPose2 = tagPose2.get();
-        Transform3d camToTarget2 = target2.getBestCameraToTarget();
-        Pose3d camPose2 = targetPose2.transformBy(camToTarget2.inverse());
-
-        // Pose3d visionMeasurement2 = camPose2.transformBy(VisionConstants.CAMERA_TO_ROBOT2);
-        Pose3d visionMeasurement2 = camPose2.transformBy(VisionConstants.CAMERA_TO_ROBOT2);
-
-        Pose2d Measurement22d =
-            new Pose2d(
-                visionMeasurement2.getX(),
-                visionMeasurement2.getY(),
-                swerveSubsystem.getRotation());
-
-        // swerveSubsystem.poseEstimator.addVisionMeasurement(visionMeasurement1.toPose2d(),
-        // resultTimestamp1);
-        swerveSubsystem.poseEstimator.addVisionMeasurement(Measurement22d, resultTimestamp2);
-        SmartDashboard.putNumber("Vision2X", Measurement22d.getX());
-        SmartDashboard.putNumber("Vision2Y", Measurement22d.getY());
-        SmartDashboard.putNumber("Vision2Rotation", Measurement22d.getRotation().getDegrees());
-      }
-    }
-
-    // if (resultTimestamp1 != previousPipelineTimestamp && pipelineResult1.hasTargets()) {
-
-    //   previousPipelineTimestamp = resultTimestamp1;
-    //   List<PhotonTrackedTarget> targets1 = pipelineResult1.getTargets();
-    //   SmartDashboard.putNumber("targetnum1", targets1.size());
-
-    //   for (int i = 0; i < targets1.size(); i++) {
-    //     var currenttarget1 = targets1.get(i);
-    //     var fiducialId1 = currenttarget1.getFiducialId();
-
-    //     Optional<Pose3d> tagPose1 =
-    //         aprilTagFieldLayout == null
-    //             ? Optional.empty()
-    //             : aprilTagFieldLayout.getTagPose(fiducialId1);
-
-    //     if (currenttarget1.getPoseAmbiguity() <= .2 && fiducialId1 >= 0 && tagPose1.isPresent())
-    // {
-    //       var targetPose1 = tagPose1.get();
-    //       Transform3d camToTarget1 = currenttarget1.getBestCameraToTarget();
-    //       Pose3d camPose1 = targetPose1.transformBy(camToTarget1.inverse());
-
-    //       var visionMeasurement1 =
-    //           camPose1.transformBy(VisionConstants.CAMERA_TO_ROBOT1).toPose2d();
-    //       Pose2d measurement1 =
-    //           new Pose2d(
-    //               new Translation2d(visionMeasurement1.getX(), visionMeasurement1.getY()),
-    //               swerveSubsystem.getRotation());
-
-    //       swerveSubsystem.poseEstimator.addVisionMeasurement(measurement1, resultTimestamp1);
-    //     }
-    //   }
-    // }
-
-    // if (resultTimestamp2 != previousPipelineTimestamp && pipelineResult2.hasTargets()) {
-
-    //   previousPipelineTimestamp = resultTimestamp2;
-    //   List<PhotonTrackedTarget> targets2 = pipelineResult2.getTargets();
-    //   SmartDashboard.putNumber("targetnum2", targets2.size());
-
-    //   for (int i = 0; i < targets2.size(); i++) {
-    //     var currenttarget2 = targets2.get(i);
-    //     var fiducialId2 = currenttarget2.getFiducialId();
-
-    //     Optional<Pose3d> tagPose2 =
-    //         aprilTagFieldLayout == null
-    //             ? Optional.empty()
-    //             : aprilTagFieldLayout.getTagPose(fiducialId2);
-
-    //     if (currenttarget2.getPoseAmbiguity() <= .2 && fiducialId2 >= 0 && tagPose2.isPresent())
-    // {
-    //       var targetPose2 = tagPose2.get();
-    //       Transform3d camToTarget2 = currenttarget2.getBestCameraToTarget();
-    //       Pose3d camPose2 = targetPose2.transformBy(camToTarget2.inverse());
-
-    //       var visionMeasurement2 =
-    //           camPose2.transformBy(VisionConstants.CAMERA_TO_ROBOT1).toPose2d();
-    //       Pose2d measurement2 =
-    //           new Pose2d(
-    //               new Translation2d(visionMeasurement2.getX(), visionMeasurement2.getY()),
-    //               swerveSubsystem.getRotation());
-
-    //       swerveSubsystem.poseEstimator.addVisionMeasurement(measurement2, resultTimestamp2);
-    //     }
-    //   }
-
-    // Update pose estimator with drivetrain sensors
-    /*
-    poseEstimator.update(swerveSubsystem.getRotation(), swerveSubsystem.getModulePositions());
-
-    SmartDashboard.putNumber("estimatedX", getCurrentPose().getX());
-    SmartDashboard.putNumber("estimatedY", getCurrentPose().getY());
-    SmartDashboard.putNumber("estimatedR", getCurrentPose().getRotation().getDegrees());
-
-    field2d.setRobotPose(getCurrentPose());
-    Logger.recordOutput("Odometry/Estimated Pose", getCurrentPose());
-    */
+  public CameraResult getCam1Result() {
+    return arducam1.getCameraResult();
   }
 
-  /*
-  public Pose2d getCurrentPose() {
-    return poseEstimator.getEstimatedPosition();
+  public CameraResult getCam2Result() {
+    return arducam2.getCameraResult();
   }
 
-  public void setCurrentPose(Pose2d pose) {
-    poseEstimator.resetPosition(
-        swerveSubsystem.getRotation(), swerveSubsystem.getModulePositions(), pose);
+  public void simulationPeriodic(Pose2d robotSimPose) {
+    visionSim.update(robotSimPose);
   }
-  */
+
+  public void setFieldTags(Alliance alliance) throws IOException {
+
+    String resource =
+        (alliance == Alliance.Blue) ? "/fields/BlueTags.json" : "/fields/RedTags.json";
+
+    AprilTagFieldLayout field = new AprilTagFieldLayout(Filesystem.getDeployDirectory() + resource);
+
+    if (RobotBase.isSimulation()) {
+      visionSim.clearAprilTags();
+      visionSim.addAprilTags(field);
+    }
+
+    arducam1.setAprilTagField(field);
+    arducam2.setAprilTagField(field);
+
+    ArrayList<Pose3d> tagPoses = new ArrayList<Pose3d>();
+
+    for (int i = 0; i < field.getTags().size(); i++) {
+      tagPoses.add(field.getTags().get(i).pose);
+    }
+
+    Logger.recordOutput("Vision/Tag Poses", tagPoses.toArray(new Pose3d[tagPoses.size()]));
+  }
+
+  public void resetSimPose(Pose2d pose) {
+    if (Robot.isSimulation()) visionSim.resetRobotPose(pose);
+  }
+
+  public Field2d getSimDebugField() {
+    if (!Robot.isSimulation()) return null;
+    return visionSim.getDebugField();
+  }
 }

@@ -15,12 +15,16 @@ package frc.robot;
 
 import static edu.wpi.first.math.util.Units.degreesToRadians;
 
+import edu.wpi.first.math.Matrix;
+import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.math.numbers.N1;
+import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import frc.robot.lightstrip.LedState;
@@ -147,6 +151,35 @@ public final class Constants {
             new Translation3d(-0.300, -0.301, -0.234),
             new Rotation3d(0.0, degreesToRadians(30.0), degreesToRadians(15.0)));
 
+    public static final Matrix<N3, N1> kSingleTagStdDevs = VecBuilder.fill(0.4, 0.4, 0.4);
+    public static final Matrix<N3, N1> kMultiTagStdDevs = VecBuilder.fill(0.2, 0.2, 0.2);
+
+    public static final class CameraInformation {
+      public final String name;
+      public final Transform3d cameraPose;
+
+      public CameraInformation(String name, Transform3d cameraPose) {
+        this.name = name;
+        this.cameraPose = cameraPose;
+      }
+    }
+
+    public static final CameraInformation kArducam1Info =
+        new CameraInformation("arducam1", CAMERA_TO_ROBOT1.inverse());
+    public static final CameraInformation kArducam2Info =
+        new CameraInformation("arducam2", CAMERA_TO_ROBOT2.inverse());
+
+    public static final class CameraResult {
+      public final Pose2d estimatedPose;
+      public final Matrix<N3, N1> stdDevs;
+      public final double timestamp;
+
+      public CameraResult(Pose2d estPose, Matrix<N3, N1> stdDevs, double timestamp) {
+        this.estimatedPose = estPose;
+        this.stdDevs = stdDevs;
+        this.timestamp = timestamp;
+      }
+    }
     /*
     public static final Transform3d CAMERA_TO_ROBOT2 =
       new Transform3d(

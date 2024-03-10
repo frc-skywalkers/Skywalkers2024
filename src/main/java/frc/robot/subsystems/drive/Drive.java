@@ -18,8 +18,7 @@ import com.pathplanner.lib.pathfinding.Pathfinding;
 import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
 import com.pathplanner.lib.util.PathPlannerLogging;
 import com.pathplanner.lib.util.ReplanningConfig;
-import edu.wpi.first.math.VecBuilder;
-import edu.wpi.first.math.Vector;
+import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -30,6 +29,7 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.math.util.Units;
@@ -39,7 +39,10 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Constants.FieldConstants;
+import frc.robot.Constants.Mode;
 import frc.robot.Constants.ShooterConstants;
+import frc.robot.Constants.VisionConstants;
+import frc.robot.subsystems.Vision;
 import frc.robot.util.FieldRelativeAccel;
 import frc.robot.util.FieldRelativeSpeed;
 import frc.robot.util.LocalADStarAK;
@@ -70,12 +73,10 @@ public class Drive extends SubsystemBase {
   private FieldRelativeSpeed m_lastFieldRelVel = new FieldRelativeSpeed();
   private FieldRelativeAccel m_fieldRelAccel = new FieldRelativeAccel();
 
-  private static final Vector<N3> stateStdDevs =
-      VecBuilder.fill(0.05, 0.05, Units.degreesToRadians(5));
-  private static final Vector<N3> visionMeasurementStdDevs =
-      VecBuilder.fill(0.5, 0.5, Units.degreesToRadians(10));
   public final SwerveDrivePoseEstimator poseEstimator;
   private final Field2d field2d = new Field2d();
+
+  Vision vision = new Vision(VisionConstants.kArducam1Info, VisionConstants.kArducam2Info);
 
   public boolean ampAligned = false;
   public boolean subwooferAligned = false;
@@ -125,12 +126,7 @@ public class Drive extends SubsystemBase {
 
     poseEstimator =
         new SwerveDrivePoseEstimator(
-            this.kinematics,
-            this.getRotation(),
-            this.getModulePositions(),
-            new Pose2d(),
-            stateStdDevs,
-            visionMeasurementStdDevs);
+            this.kinematics, this.getRotation(), this.getModulePositions(), new Pose2d());
   }
 
   public void periodic() {
@@ -198,12 +194,40 @@ public class Drive extends SubsystemBase {
     SmartDashboard.putNumber("estimatedY", getCurrentPose().getY());
     SmartDashboard.putNumber("estimatedR", getCurrentPose().getRotation().getDegrees());
 
-    // field2d.setRobotPose(getCurrentPose());
+    field2d.setRobotPose(getCurrentPose());
     Logger.recordOutput("Odometry/Estimated Pose", getCurrentPose());
+
+    var cam1Result = vision.getCam1Result();
+    var cam2Result = vision.getCam2Result();
+
+    if (cam1Result.timestamp != 0.0) {
+      Logger.recordOutput("Vision/1GlobalEstimate", cam1Result.estimatedPose);
+      if (Constants.currentMode == Mode.REAL) {
+        this.poseEstimator.addVisionMeasurement(
+            cam1Result.estimatedPose, cam1Result.timestamp, cam1Result.stdDevs);
+      }
+    }
+
+    if (cam2Result.timestamp != 0.0) {
+      Logger.recordOutput("Vision/2GlobalEstimate", cam2Result.estimatedPose);
+      if (Constants.currentMode == Mode.REAL) {
+        this.poseEstimator.addVisionMeasurement(
+            cam2Result.estimatedPose, cam2Result.timestamp, cam2Result.stdDevs);
+      }
+    }
+
+    if (Constants.currentMode == Mode.SIM) {
+      vision.simulationPeriodic(getCurrentPose());
+    }
   }
 
   public Pose2d getCurrentPose() {
     return poseEstimator.getEstimatedPosition();
+  }
+
+  public void addVisionMeasurement(
+      Pose2d visionMeasurement, double timestampSeconds, Matrix<N3, N1> stdDevs) {
+    poseEstimator.addVisionMeasurement(visionMeasurement, timestampSeconds, stdDevs);
   }
 
   public void setCurrentPose(Pose2d pose) {
@@ -356,7 +380,13 @@ public class Drive extends SubsystemBase {
 
   /** Resets the current odometry pose. */
   public void setPose(Pose2d pose) {
-    this.pose = pose;
+    this.pose = pose; // wo vision
+    if (Constants.currentMode == Mode.REAL) { // with vision
+      poseEstimator.resetPosition(
+          this.pose.getRotation(), getModulePositions(), pose); // gyro inputs
+    } else {
+      poseEstimator.resetPosition(pose.getRotation(), getModulePositions(), pose);
+    }
   }
 
   /** Returns the maximum linear speed in meters per sec. */

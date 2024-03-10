@@ -36,8 +36,8 @@ import frc.robot.Constants.PivotConstants;
 public class PivotIOTalonFX implements PivotIO {
   private static final double GEAR_RATIO = 125.00 * 34.00 / 22.0;
 
-  private final TalonFX leader = new TalonFX(62);
-  private final TalonFX follower = new TalonFX(61);
+  private final TalonFX leader = new TalonFX(61);
+  private final TalonFX follower = new TalonFX(62);
   private final CANcoder cancoder = new CANcoder(16);
 
   private final StatusSignal<Double> leaderPosition = leader.getPosition();
@@ -61,7 +61,7 @@ public class PivotIOTalonFX implements PivotIO {
   private final PositionVoltage m_voltagePosition =
       new PositionVoltage(0, 0, false, 0, 0, false, false, false);
 
-  private final double absEncoderOffset = 0.262939;
+  private final double absEncoderOffset = 0.286621;
 
   private double goalPos = 0.00;
 

@@ -27,8 +27,8 @@ public class IntakeIOTalonFX implements IntakeIO {
   private double goalVel = 0.0;
 
   private final TalonFX leader = new TalonFX(55);
-  private final TalonFX wheel = new TalonFX(54);
-  private final TalonFX follower = new TalonFX(1);
+  private final TalonFX wheel = new TalonFX(18);
+  private final TalonFX follower = new TalonFX(54);
   private final ProfiledPIDController pidd =
       new ProfiledPIDController(
           0.0, 0.0, 0.0, new TrapezoidProfile.Constraints(2 * Math.PI, 1.75 * Math.PI));
