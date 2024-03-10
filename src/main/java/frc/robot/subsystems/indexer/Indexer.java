@@ -80,4 +80,8 @@ public class Indexer extends SubsystemBase {
   public boolean hasPiece() {
     return inputs.hasPiece;
   }
+
+  public boolean superHasPiece() {
+    return inputs.superHasPiece;
+  }
 }

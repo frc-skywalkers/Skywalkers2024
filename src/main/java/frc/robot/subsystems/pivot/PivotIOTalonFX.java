@@ -20,6 +20,7 @@ import com.ctre.phoenix6.configs.FeedbackConfigs;
 import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.controls.VoltageOut;
@@ -33,10 +34,10 @@ import edu.wpi.first.math.util.Units;
 import frc.robot.Constants.PivotConstants;
 
 public class PivotIOTalonFX implements PivotIO {
-  private static final double GEAR_RATIO = 125.00;
+  private static final double GEAR_RATIO = 125.00 * 34.00 / 22.0;
 
   private final TalonFX leader = new TalonFX(62);
-  // private final TalonFX follower = new TalonFX(61);
+  private final TalonFX follower = new TalonFX(61);
   private final CANcoder cancoder = new CANcoder(16);
 
   private final StatusSignal<Double> leaderPosition = leader.getPosition();
@@ -46,6 +47,11 @@ public class PivotIOTalonFX implements PivotIO {
   private final StatusSignal<Double> leaderOutput = leader.getClosedLoopOutput();
   private final StatusSignal<Double> leaderPIDError = leader.getClosedLoopError();
   private final StatusSignal<Double> leaderPIDRef = leader.getClosedLoopReference();
+
+  private final StatusSignal<Double> followerPosition = follower.getPosition();
+  private final StatusSignal<Double> followerVelocity = follower.getVelocity();
+  private final StatusSignal<Double> followerAppliedVolts = follower.getMotorVoltage();
+  private final StatusSignal<Double> followerCurrent = follower.getStatorCurrent();
 
   private final StatusSignal<Double> absEncoderPos = cancoder.getAbsolutePosition();
 
@@ -65,20 +71,20 @@ public class PivotIOTalonFX implements PivotIO {
 
   public PivotIOTalonFX() {
     var config = new TalonFXConfiguration();
-    config.CurrentLimits.StatorCurrentLimit = 40.0;
+    config.CurrentLimits.StatorCurrentLimit = 45.0;
     config.CurrentLimits.StatorCurrentLimitEnable = true;
     config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
 
     Slot0Configs pidConfigs = config.Slot0;
 
     pidConfigs.GravityType = GravityTypeValue.Arm_Cosine;
-    pidConfigs.kS = 0.14;
-    pidConfigs.kG = 0.25; // 0.2
+    pidConfigs.kS = 0.1;
+    pidConfigs.kG = 0.14; // 0.2
     pidConfigs.kP = 10.0;
     pidConfigs.kI = 0.0;
     pidConfigs.kD = 0.20;
-    pidConfigs.kV = 15.00;
-    pidConfigs.kA = 0.09;
+    pidConfigs.kV = 0.12 * GEAR_RATIO;
+    pidConfigs.kA = 0.25;
 
     MotionMagicConfigs mm_configs = config.MotionMagic;
 
@@ -101,16 +107,16 @@ public class PivotIOTalonFX implements PivotIO {
       System.out.println("Real Error, Could not configure device. Error: " + status.toString());
     }
 
-    // for (int i = 0; i < 5; ++i) {
-    //   status = follower.getConfigurator().apply(config);
-    //   if (status.isOK()) break;
-    // }
-    // if (!status.isOK()) {
-    //   System.out.println("Real Error, Could not configure device. Error: " + status.toString());
-    // }
+    for (int i = 0; i < 5; ++i) {
+      status = follower.getConfigurator().apply(config);
+      if (status.isOK()) break;
+    }
+    if (!status.isOK()) {
+      System.out.println("Real Error, Could not configure device. Error: " + status.toString());
+    }
 
     // follower.setInverted(true);
-    // follower.setControl(new Follower(62, true));
+    follower.setControl(new Follower(leader.getDeviceID(), true));
 
     // FeedbackConfigs f_configs = config.Feedback;
 
@@ -130,7 +136,11 @@ public class PivotIOTalonFX implements PivotIO {
         leaderPIDRef);
     leader.optimizeBusUtilization();
 
+    BaseStatusSignal.setUpdateFrequencyForAll(
+        250.0, followerPosition, followerVelocity, followerAppliedVolts, followerCurrent);
+
     leader.setPosition(absEncoderPos.getValueAsDouble() - absEncoderOffset);
+    follower.setPosition(absEncoderPos.getValueAsDouble() - absEncoderOffset);
     pid.reset(absEncoderPos.getValueAsDouble() - absEncoderOffset);
   }
 

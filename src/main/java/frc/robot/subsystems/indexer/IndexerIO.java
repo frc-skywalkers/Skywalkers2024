@@ -27,6 +27,7 @@ public interface IndexerIO {
     public double tofSD = 0.0;
     public boolean tofStatus = false;
     public boolean bb_sensor = false;
+    public boolean superHasPiece = false;
   }
 
   /** Updates the set of loggable inputs. */

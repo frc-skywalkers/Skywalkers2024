@@ -142,13 +142,13 @@ public class FlywheelCommands {
     return Commands.run(
             () -> {
               indexer.runVolts(IndexerConstants.outtakeVolts);
-              flywheel.runVelocity(1500);
-              pivot.setPosition(0.9);
+              flywheel.runVelocity(1000);
+              pivot.setPosition(0.8);
             },
             indexer,
             flywheel,
             pivot)
-        .withTimeout(1.1)
+        .withTimeout(1.0)
         .andThen(() -> indexer.stop(), indexer);
   }
 
@@ -165,14 +165,6 @@ public class FlywheelCommands {
             () -> {
               Logger.recordOutput("Pivot/aiming", false);
             });
-  }
-
-  public static Command lower(Pivot pivot) {
-    return Commands.run(
-        () -> {
-          pivot.setPosition(-1.5);
-        },
-        pivot);
   }
 
   // public static Command subwooferShot(Flywheel flywheel, Pivot pivot, Indexer indexer, Intake

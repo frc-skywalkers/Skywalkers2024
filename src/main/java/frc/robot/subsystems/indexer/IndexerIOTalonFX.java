@@ -35,7 +35,8 @@ public class IndexerIOTalonFX implements IndexerIO {
   private final StatusSignal<Double> leaderCurrent = leader.getStatorCurrent();
   // private final StatusSignal<Double> leaderA = leader.getLimitSw
 
-  private final DigitalInput bb_sensor = new DigitalInput(9);
+  private final DigitalInput index_sensor = new DigitalInput(9);
+  private final DigitalInput shoot_sensor = new DigitalInput(8);
 
   // private final TimeOfFlight tofSensor = new TimeOfFlight(15);
 
@@ -64,6 +65,7 @@ public class IndexerIOTalonFX implements IndexerIO {
     inputs.appliedVolts = leaderAppliedVolts.getValueAsDouble();
     inputs.currentAmps = new double[] {leaderCurrent.getValueAsDouble()};
     inputs.hasPiece = hasPiece();
+    inputs.superHasPiece = superHasPiece();
     // inputs.tofDistance = tofSensor.getRange();
     // inputs.tofSD = tofSensor.getRangeSigma();
   }
@@ -103,6 +105,10 @@ public class IndexerIOTalonFX implements IndexerIO {
   }
 
   private boolean hasPiece() {
-    return !bb_sensor.get();
+    return !index_sensor.get() || !shoot_sensor.get();
+  }
+
+  private boolean superHasPiece() {
+    return !shoot_sensor.get();
   }
 }

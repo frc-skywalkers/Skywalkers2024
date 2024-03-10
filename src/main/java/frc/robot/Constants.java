@@ -63,9 +63,9 @@ public final class Constants {
 
     // public static InterpolatingDoubleTreeMap pivotAngleMap = new InterpolatingDoubleTreeMap({});
 
-    public static final double mm_cruisevel = 0.4 * 2.0;
-    public static final double mm_accel = mm_cruisevel * 3.0;
-    public static final double mm_jerk = mm_accel * 4.0;
+    public static final double mm_cruisevel = 0.4;
+    public static final double mm_accel = mm_cruisevel * 10.0;
+    public static final double mm_jerk = mm_accel * 10.0;
 
     public static final double handoff = -0.96;
 
@@ -85,7 +85,7 @@ public final class Constants {
 
     public static final double tofTolerance = 30.00;
 
-    public static final double mm_cruisevel = 0.4 * 4.0;
+    public static final double mm_cruisevel = 2.0;
     public static final double mm_accel = mm_cruisevel * 4.0;
     public static final double mm_jerk = mm_accel * 4.0;
   }
@@ -94,6 +94,7 @@ public final class Constants {
     public static final double indexVolts = 6.0;
     public static final double outtakeVolts = 7.0;
     public static final double holdVolts = 0.1;
+    public static final double slowVolts = 2.5;
   }
 
   public static final class FieldConstants {

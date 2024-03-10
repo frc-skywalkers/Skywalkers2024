@@ -7,6 +7,7 @@ import com.ctre.phoenix6.configs.FeedbackConfigs;
 import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
@@ -21,12 +22,13 @@ import edu.wpi.first.math.util.Units;
 import frc.robot.Constants.IntakeConstants;
 
 public class IntakeIOTalonFX implements IntakeIO {
-  private static final double GEAR_RATIO = 5.0 * 4.0 * 36.0 / 16.0;
+  private static final double GEAR_RATIO = 3.0 * 4.0 * 2.0;
   private double goalPos = 0.00;
   private double goalVel = 0.0;
 
   private final TalonFX leader = new TalonFX(55);
   private final TalonFX wheel = new TalonFX(54);
+  private final TalonFX follower = new TalonFX(1);
   private final ProfiledPIDController pidd =
       new ProfiledPIDController(
           0.0, 0.0, 0.0, new TrapezoidProfile.Constraints(2 * Math.PI, 1.75 * Math.PI));
@@ -36,6 +38,11 @@ public class IntakeIOTalonFX implements IntakeIO {
   private final StatusSignal<Double> leaderAppliedVolts = leader.getMotorVoltage();
   private final StatusSignal<Double> leaderCurrent = leader.getTorqueCurrent();
   private final StatusSignal<Double> leaderGoal = leader.getClosedLoopReference();
+
+  private final StatusSignal<Double> followerPosition = follower.getPosition();
+  private final StatusSignal<Double> followerVelocity = follower.getVelocity();
+  private final StatusSignal<Double> followerAppliedVolts = follower.getMotorVoltage();
+  private final StatusSignal<Double> followerCurrent = follower.getTorqueCurrent();
 
   private final StatusSignal<Double> wheelVelocity = wheel.getVelocity();
   private final StatusSignal<Double> wheelAppliedVolts = wheel.getMotorVoltage();
@@ -89,6 +96,15 @@ public class IntakeIOTalonFX implements IntakeIO {
 
     status = StatusCode.StatusCodeNotInitialized;
     for (int i = 0; i < 5; ++i) {
+      status = follower.getConfigurator().apply(leaderConfig);
+      if (status.isOK()) break;
+    }
+    if (!status.isOK()) {
+      System.out.println("Real Error, Could not configure device. Error: " + status.toString());
+    }
+
+    status = StatusCode.StatusCodeNotInitialized;
+    for (int i = 0; i < 5; ++i) {
       status = wheel.getConfigurator().apply(wheelConfig);
       if (status.isOK()) break;
     }
@@ -109,6 +125,8 @@ public class IntakeIOTalonFX implements IntakeIO {
     tofSensor.setRangeOfInterest(7, 7, 9, 9);
 
     leader.setPosition(0.0);
+    follower.setPosition(0);
+    follower.setControl(new Follower(leader.getDeviceID(), true));
   }
 
   @Override
