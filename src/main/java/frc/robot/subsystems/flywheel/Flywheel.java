@@ -17,6 +17,7 @@ import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+import frc.robot.Constants.FieldConstants;
 import frc.robot.Constants.ShooterConstants;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
@@ -51,6 +52,19 @@ public class Flywheel extends SubsystemBase {
         ffModel = new SimpleMotorFeedforward(0.0, 0.0);
         break;
     }
+    updateTable();
+  }
+
+  public void updateTable() {
+    ShooterConstants.RPMAngleMap.put(FieldConstants.robotSubwooferSpeakerDistance + 0.0, 4500.0);
+    ShooterConstants.RPMAngleMap.put(FieldConstants.robotSubwooferSpeakerDistance + 25.0, 4500.0);
+    ShooterConstants.RPMAngleMap.put(FieldConstants.robotSubwooferSpeakerDistance + 13.5, 4500.0);
+    ShooterConstants.RPMAngleMap.put(FieldConstants.robotSubwooferSpeakerDistance + 34.0, 4750.0);
+    ShooterConstants.RPMAngleMap.put(FieldConstants.robotSubwooferSpeakerDistance + 43.0, 4750.0);
+    ShooterConstants.RPMAngleMap.put(FieldConstants.robotSubwooferSpeakerDistance + 50.0, 5000.0);
+    ShooterConstants.RPMAngleMap.put(FieldConstants.robotSubwooferSpeakerDistance + 84.75, 6250.0);
+    ShooterConstants.RPMAngleMap.put(FieldConstants.robotSubwooferSpeakerDistance + 68.0, 6500.0);
+    ShooterConstants.RPMAngleMap.put(FieldConstants.robotSubwooferSpeakerDistance + 101.0, 8250.0);
   }
 
   @Override

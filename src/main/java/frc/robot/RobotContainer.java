@@ -25,6 +25,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Constants.LightstripConstants;
+import frc.robot.commands.DriveCommands;
 import frc.robot.commands.FeedForwardCharacterization;
 import frc.robot.commands.FlywheelCommands;
 import frc.robot.commands.IntakeCommands;
@@ -247,31 +248,31 @@ public class RobotContainer {
    * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
   private void configureButtonBindings() {
-    // if (false) {
-    //   drive.setDefaultCommand(
-    //       DriveCommands.joystickDrive(
-    //           drive,
-    //           () -> -controller.getLeftY(),
-    //           () -> -controller.getLeftX(),
-    //           () -> -controller.getRightX(),
-    //           () -> controller.getLeftTriggerAxis(),
-    //           () -> controller.getRightTriggerAxis()));
-    // } else {
-    //   drive.setDefaultCommand(
-    //       DriveCommands.joystickDrive(
-    //           drive,
-    //           () -> controller.getLeftY(),
-    //           () -> controller.getLeftX(),
-    //           () -> -controller.getRightX(), // rotation not flipped
-    //           () -> controller.getLeftTriggerAxis(),
-    //           () -> controller.getRightTriggerAxis()));
-    // }
+    if (!Constants.isRed) {
+      drive.setDefaultCommand(
+          DriveCommands.joystickDrive(
+              drive,
+              () -> -controller.getLeftY(),
+              () -> -controller.getLeftX(),
+              () -> -controller.getRightX(),
+              () -> controller.getLeftTriggerAxis(),
+              () -> controller.getRightTriggerAxis()));
+    } else {
+      drive.setDefaultCommand(
+          DriveCommands.joystickDrive(
+              drive,
+              () -> controller.getLeftY(),
+              () -> controller.getLeftX(),
+              () -> -controller.getRightX(), // rotation not flipped
+              () -> controller.getLeftTriggerAxis(),
+              () -> controller.getRightTriggerAxis()));
+    }
 
     // controller.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
     // flywheel.setDefaultCommand(FlywheelCommands.autoShoot(flywheel, drive));
     // controller.x().onTrue(IntakeCommands.spit(intake));
 
-    // controller.leftBumper().onTrue(DriveCommands.autoAlignAmp(drive, controller));
+    controller.leftBumper().onTrue(DriveCommands.autoAlignAmp(drive, controller));
 
     // intake.setDefaultCommand(
     //     Commands.runOnce(
@@ -383,11 +384,11 @@ public class RobotContainer {
     //             .andThen(IntakeCommands.passPieceIntake(intake, pivot, indexer))
     //             .andThen(IntakeCommands.transferPiece(intake, indexer)));
 
-    operator
-        .b()
-        .onTrue(
-            IntakeCommands.intakeHandoff(intake, indexer, pivot, lightstrip)
-                .unless(() -> indexer.hasPiece()));
+    // operator
+    //     .b()
+    //     .onTrue(
+    //         IntakeCommands.intakeHandoff(intake, indexer, pivot, lightstrip)
+    //             .unless(() -> indexer.hasPiece()));
 
     operator
         .povDown()
@@ -401,11 +402,9 @@ public class RobotContainer {
 
     // operator.x().onTrue(IntakeCommands.homeIntake(intake));
 
-    operator.x().onTrue(IntakeCommands.spit(intake));
+    // operator.x().onTrue(IntakeCommands.spit(intake));
 
-    operator.y().onTrue(IntakeCommands.deepen(intake));
-
-    operator.a().onTrue(IntakeCommands.indexSequence(intake, indexer, pivot));
+    // operator.a().onTrue(IntakeCommands.indexSequence(intake, indexer, pivot));
 
     // operator.a().onTrue(Commands.run(() -> intake.setPosition(IntakeConstants.handoff), intake));
 
@@ -436,6 +435,8 @@ public class RobotContainer {
                 },
                 indexer));
 
+    // operator.x().onTrue()
+
     operator
         .rightBumper()
         .whileTrue(
@@ -446,21 +447,30 @@ public class RobotContainer {
                 indexer));
 
     // operator
-    //     .povDown()
+    //     .x()
     //     .whileTrue(
     //         Commands.run(
     //             () -> {
-    //               intake.runVolts(2.0);
+    //               intake.runWheelVolts(10.0);
     //             },
     //             intake));
-    // operator
-    //     .povUp()
-    //     .whileTrue(
-    //         Commands.run(
-    //             () -> {
-    //               intake.runVolts(-2.0);
-    //             },
-    //             intake));
+
+    operator
+        .povDown()
+        .whileTrue(
+            Commands.run(
+                () -> {
+                  intake.runWheelVolts(10.0);
+                },
+                intake));
+    operator
+        .povUp()
+        .whileTrue(
+            Commands.run(
+                () -> {
+                  intake.runWheelVolts(-10.0);
+                },
+                intake));
 
     // operator
     //     .povLeft()
@@ -487,18 +497,24 @@ public class RobotContainer {
     //         Commands.runOnce(
     //             () -> pivot.setPosition(SmartDashboard.getNumber("Pivot Angle Wanted", 0.45))));
 
+    // operator
+    //     .leftTrigger()
+    //     .whileTrue(
+    //         Commands.run(
+    //             () -> {
+    //               pivot.setPosition(SmartDashboard.getNumber("Pivot Angle Wanted", 0.0));
+    //               flywheel.runVelocity(SmartDashboard.getNumber("Shooter RPM Wanted", 0.0));
+    //               //   pivot.setPosition(SmartDashboard.getNumber("Pivot Angle Wanted", -1.0));
+    //               //   flywheel.runVelocity(SmartDashboard.getNumber("Shooter RPM Wanted", 0.0));
+    //             },
+    //             pivot,
+    //             flywheel));
+
     operator
         .leftTrigger()
         .whileTrue(
-            Commands.run(
-                () -> {
-                  pivot.setPosition(SmartDashboard.getNumber("Pivot Angle Wanted", 0.0));
-                  flywheel.runVelocity(SmartDashboard.getNumber("Shooter RPM Wanted", 0.0));
-                  //   pivot.setPosition(SmartDashboard.getNumber("Pivot Angle Wanted", -1.0));
-                  //   flywheel.runVelocity(SmartDashboard.getNumber("Shooter RPM Wanted", 0.0));
-                },
-                pivot,
-                flywheel));
+            FlywheelCommands.autoPivotAim(pivot, drive)
+                .alongWith(FlywheelCommands.autoShoot(flywheel, drive)));
 
     operator
         .rightTrigger()
@@ -510,12 +526,14 @@ public class RobotContainer {
                 pivot));
 
     // operator
-    //     .rightBumper()
+    //     .x()
     //     .onTrue(
-    //         IntakeCommands.ampPrep(intake, indexer, pivot)
-    //             .andThen(FlywheelCommands.aimAmp(pivot))
+    //         // IntakeCommands.indexSequence(intake, indexer, pivot)
+    //         FlywheelCommands.aimAmp(pivot, flywheel)
     //             .andThen(FlywheelCommands.outtakeAmp(indexer, flywheel, pivot)));
 
+    operator.x().onTrue(IntakeCommands.intakeHandoff(intake, indexer, pivot, lightstrip));
+    operator.a().onTrue(IntakeCommands.indexSequence(intake, indexer, pivot));
     // controller.x().onTrue(IntakeCommands.bringOutPiece(indexer));
     // operator.leftBumper().onTrue(FlywheelCommands.outtake(indexer, intake));
     // operator.rightBumper().onTrue(FlywheelCommands.outtakeAmp(indexer, flywheel, pivot));

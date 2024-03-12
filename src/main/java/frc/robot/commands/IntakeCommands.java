@@ -143,7 +143,7 @@ public class IntakeCommands {
   public static Command transferPiecept2(Intake intake, Indexer indexer, Pivot pivot) {
     return Commands.run(
             () -> {
-              intake.outtakeWheel();
+              // intake.outtakeWheel();
               indexer.runVolts(IndexerConstants.slowVolts);
               pivot.setPosition(PivotConstants.handoff);
             },
@@ -181,7 +181,9 @@ public class IntakeCommands {
   }
 
   public static Command indexSequence(Intake intake, Indexer indexer, Pivot pivot) {
-    return transferPiece(intake, indexer, pivot).andThen(transferPiecept2(intake, indexer, pivot));
+    return pivotHandoff(pivot)
+        .andThen(transferPiece(intake, indexer, pivot))
+        .andThen(transferPiecept2(intake, indexer, pivot));
   }
 
   public static Command ampPrep(Intake intake, Indexer indexer, Pivot pivot) {

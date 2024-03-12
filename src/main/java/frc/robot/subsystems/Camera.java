@@ -5,25 +5,22 @@ import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
-import edu.wpi.first.wpilibj.RobotBase;
 import frc.robot.Constants.VisionConstants;
 import frc.robot.Constants.VisionConstants.CameraResult;
 import java.util.Optional;
+import org.littletonrobotics.junction.Logger;
 import org.photonvision.EstimatedRobotPose;
 import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonPoseEstimator;
 import org.photonvision.PhotonPoseEstimator.PoseStrategy;
-import org.photonvision.simulation.PhotonCameraSim;
-import org.photonvision.simulation.SimCameraProperties;
 
 public class Camera {
 
   private PhotonCamera camera;
-  private PhotonCameraSim cameraSim;
+  // private PhotonCameraSim cameraSim;
   private PhotonPoseEstimator poseEstimator;
 
   private double lastEstTimestamp = 0;
@@ -31,14 +28,16 @@ public class Camera {
   public Camera(String name, Transform3d cameraTransform) {
     camera = new PhotonCamera(name);
 
+    /*
     var cameraProp = new SimCameraProperties();
-    cameraProp.setCalibration(1280, 800, Rotation2d.fromDegrees(90));
+    cameraProp.setCalibration(1280, 800, Rotation2d.fromDegrees(70));
     cameraProp.setCalibError(0.1, 0.10);
     cameraProp.setFPS(15);
     cameraProp.setAvgLatencyMs(50);
     cameraProp.setLatencyStdDevMs(15);
 
     cameraSim = new PhotonCameraSim(camera, cameraProp);
+    */
 
     // try {
     poseEstimator =
@@ -53,11 +52,13 @@ public class Camera {
     // }
     poseEstimator.setMultiTagFallbackStrategy(PoseStrategy.LOWEST_AMBIGUITY);
 
+    /*
     if (RobotBase.isSimulation()) {
       cameraSim.enableDrawWireframe(true);
     } else {
       cameraSim.enableDrawWireframe(false);
     }
+    */
   }
 
   /**
@@ -114,13 +115,17 @@ public class Camera {
     try {
       var estimate = getEstimatedGlobalPose().get();
       var estPose = estimate.estimatedPose.toPose2d();
+      Logger.recordOutput("camresult", estPose.getX());
+      Logger.recordOutput("camresultSTDDEV", getEstimationStdDevs(estPose).max());
       return new CameraResult(estPose, getEstimationStdDevs(estPose), estimate.timestampSeconds);
     } catch (Exception e) {
       return new CameraResult(new Pose2d(), VecBuilder.fill(0, 0, 0), 0);
     }
   }
 
+  /*
   public PhotonCameraSim getCameraSim() {
     return cameraSim;
   }
+  */
 }

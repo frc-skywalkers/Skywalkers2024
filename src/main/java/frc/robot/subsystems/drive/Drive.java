@@ -123,6 +123,7 @@ public class Drive extends SubsystemBase {
           Logger.recordOutput("Odometry/TrajectorySetpoint", targetPose);
         });
     headingController.enableContinuousInput(-Math.PI, Math.PI);
+    resetHeadingController();
 
     poseEstimator =
         new SwerveDrivePoseEstimator(
@@ -210,19 +211,25 @@ public class Drive extends SubsystemBase {
 
     if (cam2Result.timestamp != 0.0) {
       Logger.recordOutput("Vision/2GlobalEstimate", cam2Result.estimatedPose);
+
       if (Constants.currentMode == Mode.REAL) {
         this.poseEstimator.addVisionMeasurement(
             cam2Result.estimatedPose, cam2Result.timestamp, cam2Result.stdDevs);
       }
     }
 
+    /*
     if (Constants.currentMode == Mode.SIM) {
       vision.simulationPeriodic(getCurrentPose());
     }
+    */
   }
 
   public Pose2d getCurrentPose() {
-    return poseEstimator.getEstimatedPosition();
+    Translation2d ret = poseEstimator.getEstimatedPosition().getTranslation();
+    Rotation2d ang = getRotation();
+    return new Pose2d(ret, ang);
+    // return poseEstimator.getEstimatedPosition();
   }
 
   public void addVisionMeasurement(
@@ -369,8 +376,8 @@ public class Drive extends SubsystemBase {
   /** Returns the current odometry pose. */
   @AutoLogOutput(key = "Odometry/Robot")
   public Pose2d getPose() {
-    return pose; // wo vision
-    // return getCurrentPose(); // vision measurement
+    // return pose; // wo vision
+    return getCurrentPose(); // vision measurement
   }
 
   /** Returns the current odometry rotation. */
@@ -380,7 +387,7 @@ public class Drive extends SubsystemBase {
 
   /** Resets the current odometry pose. */
   public void setPose(Pose2d pose) {
-    this.pose = pose; // wo vision
+    // this.pose = pose; // wo vision
     if (Constants.currentMode == Mode.REAL) { // with vision
       poseEstimator.resetPosition(
           this.pose.getRotation(), getModulePositions(), pose); // gyro inputs

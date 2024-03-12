@@ -16,6 +16,8 @@ package frc.robot.commands;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.Constants.FieldConstants;
@@ -41,14 +43,14 @@ public class FlywheelCommands {
 
   public static double calcShootRPM(Translation2d curPose, Translation2d goalPose) {
     double shootDistance = curPose.getDistance(goalPose);
-    double shootRPM =
-        ShooterConstants.RPMEquation[0] * shootDistance + ShooterConstants.RPMEquation[1];
+    double shootRPM = ShooterConstants.RPMAngleMap.get(shootDistance);
 
     return shootRPM;
   }
 
   public static double calcShootTime(Translation2d curPose, Translation2d goalPose) {
     double shootDistance = curPose.getDistance(goalPose);
+    shootDistance = Units.metersToInches(shootDistance);
     double shotTime =
         ShooterConstants.timeEquation[0] * shootDistance + ShooterConstants.timeEquation[1];
     return shotTime;
@@ -56,7 +58,9 @@ public class FlywheelCommands {
 
   public static double calcPivotPos(Translation2d curPose, Translation2d goalPose) {
     double shootDistance = curPose.getDistance(goalPose);
-    return PivotConstants.angleEquation[0] * shootDistance + PivotConstants.angleEquation[1];
+    shootDistance = Units.metersToInches(shootDistance);
+
+    return PivotConstants.pivotAngleMap.get(shootDistance);
   }
 
   public static Command autoShoot(Flywheel shooter, Drive drive) {
@@ -129,26 +133,27 @@ public class FlywheelCommands {
     // return outtake(indexer, intake);
   }
 
-  public static Command aimAmp(Pivot pivot) {
+  public static Command aimAmp(Pivot pivot, Flywheel flywheel) {
     return Commands.run(
             () -> {
-              pivot.setPosition(0.8);
+              pivot.setPosition(SmartDashboard.getNumber("Pivot Angle Wanted", 0));
+              flywheel.runVelocity(3500);
             },
             pivot)
-        .until(() -> pivot.atPosition(0.8));
+        .until(() -> pivot.atPosition(SmartDashboard.getNumber("Pivot Angle Wanted", 0)));
   }
 
   public static Command outtakeAmp(Indexer indexer, Flywheel flywheel, Pivot pivot) {
     return Commands.run(
             () -> {
-              indexer.runVolts(IndexerConstants.outtakeVolts);
-              flywheel.runVelocity(1000);
-              pivot.setPosition(0.8);
+              indexer.runVolts(-7.0);
+              flywheel.runVelocity(3500);
+              pivot.setPosition(SmartDashboard.getNumber("Pivot Angle Wanted", 0));
             },
             indexer,
             flywheel,
             pivot)
-        .withTimeout(1.0)
+        .until(() -> (!indexer.superHasPiece()))
         .andThen(() -> indexer.stop(), indexer);
   }
 

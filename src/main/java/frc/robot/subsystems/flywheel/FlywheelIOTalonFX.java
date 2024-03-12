@@ -147,7 +147,7 @@ public class FlywheelIOTalonFX implements FlywheelIO {
 
     leader.setControl(mm_vel.withVelocity(Units.radiansToRotations(velocityRadPerSec)).withSlot(0));
     follower.setControl(
-        mm_vel.withVelocity(Units.radiansToRotations(velocityRadPerSec * 0.70)).withSlot(0));
+        mm_vel.withVelocity(Units.radiansToRotations(velocityRadPerSec * 0.8)).withSlot(0));
     goalRadPerSec = velocityRadPerSec;
   }
 

@@ -16,6 +16,7 @@ package frc.robot.subsystems.pivot;
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusCode;
 import com.ctre.phoenix6.StatusSignal;
+import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.FeedbackConfigs;
 import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
@@ -32,6 +33,7 @@ import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
 import frc.robot.Constants.PivotConstants;
+import org.littletonrobotics.junction.Logger;
 
 public class PivotIOTalonFX implements PivotIO {
   private static final double GEAR_RATIO = 125.00 * 34.00 / 22.0;
@@ -61,13 +63,16 @@ public class PivotIOTalonFX implements PivotIO {
   private final PositionVoltage m_voltagePosition =
       new PositionVoltage(0, 0, false, 0, 0, false, false, false);
 
-  private final double absEncoderOffset = 0.286621;
+  private final double absEncoderOffset = 0.60831144;
 
   private double goalPos = 0.00;
 
   private double goalVel = 0.0;
 
   private final MotionMagicVoltage mm_volt = new MotionMagicVoltage(0);
+
+  private double outputOffset = 0.0;
+  private double initialAbs = 0.0;
 
   public PivotIOTalonFX() {
     var config = new TalonFXConfiguration();
@@ -115,6 +120,8 @@ public class PivotIOTalonFX implements PivotIO {
       System.out.println("Real Error, Could not configure device. Error: " + status.toString());
     }
 
+    cancoder.getConfigurator().apply(new CANcoderConfiguration());
+
     // follower.setInverted(true);
     follower.setControl(new Follower(leader.getDeviceID(), true));
 
@@ -141,6 +148,9 @@ public class PivotIOTalonFX implements PivotIO {
 
     leader.setPosition(absEncoderPos.getValueAsDouble() - absEncoderOffset);
     follower.setPosition(absEncoderPos.getValueAsDouble() - absEncoderOffset);
+
+    initialAbs = absEncoderPos.getValueAsDouble();
+    outputOffset = initialAbs - absEncoderOffset;
     pid.reset(absEncoderPos.getValueAsDouble() - absEncoderOffset);
   }
 
@@ -162,6 +172,8 @@ public class PivotIOTalonFX implements PivotIO {
     inputs.goalPos = goalPos;
     inputs.absPos = Units.rotationsToRadians(absEncoderPos.getValueAsDouble());
     inputs.goalVel = goalVel;
+    Logger.recordOutput("Pivot/outputOffset", outputOffset);
+    Logger.recordOutput("Pivot/initialAbs", initialAbs);
     // Logger.recordOutput("Pivot/PID/Output", leaderOutput.getValueAsDouble());
     // Logger.recordOutput("Pivot/PID/Error", leaderPIDError.getValueAsDouble());
     // Logger.recordOutput("Pivot/PID/Ref", leaderPIDRef.getValueAsDouble());

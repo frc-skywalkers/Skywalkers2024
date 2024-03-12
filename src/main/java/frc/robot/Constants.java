@@ -23,10 +23,9 @@ import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import frc.robot.lightstrip.LedState;
 import frc.robot.lightstrip.Range;
 import frc.robot.lightstrip.TempLedState;
@@ -60,28 +59,29 @@ public final class Constants {
     public static final double[] timeEquation = {0.05, 0.15}; // need to tune; [0] -> m, [1] -> b
     public static final double kAccelCompFactor = 0.000;
     public static final double tolerance = 70.0;
+    public static InterpolatingDoubleTreeMap RPMAngleMap = new InterpolatingDoubleTreeMap();
   }
 
   public static final class PivotConstants {
     public static final double[] angleEquation = {Math.PI / 27.00, -Math.PI * 1.000 / 3.000};
 
-    // public static InterpolatingDoubleTreeMap pivotAngleMap = new InterpolatingDoubleTreeMap({});
+    public static InterpolatingDoubleTreeMap pivotAngleMap = new InterpolatingDoubleTreeMap();
 
     public static final double mm_cruisevel = 0.4;
     public static final double mm_accel = mm_cruisevel * 10.0;
     public static final double mm_jerk = mm_accel * 10.0;
 
-    public static final double handoff = -0.96;
+    public static final double handoff = -1.1;
 
     public static final double tolerance = 0.075;
   }
 
   public static final class IntakeConstants {
-    public static final double dropDown = 2.7;
+    public static final double dropDown = 2.90;
     public static final double home = Math.PI / 2;
     public static final double handoff = 0.0;
 
-    public static final double intakeVolts = -7.0;
+    public static final double intakeVolts = -9.0;
     public static final double holdVolts = -0.25;
     public static final double outtakeVolts = 4.0;
 
@@ -95,15 +95,16 @@ public final class Constants {
   }
 
   public static final class IndexerConstants {
-    public static final double indexVolts = 6.0;
-    public static final double outtakeVolts = 7.0;
-    public static final double holdVolts = 0.1;
-    public static final double slowVolts = 2.5;
+    public static final double indexVolts = -6.0;
+    public static final double outtakeVolts = -5.0;
+    public static final double holdVolts = -0.2;
+    public static final double slowVolts = -1.5;
   }
 
   public static final class FieldConstants {
     public static final Translation2d BLUE_SPEAKER_POSE = new Translation2d(-0.086473, 5.757474);
     public static final Translation2d RED_SPEAKER_POSE = new Translation2d(16.389722, 5.757474);
+    public static final double robotSubwooferSpeakerDistance = 57.341456693; // in inches
 
     public static final Pose2d RED_AMP_POSE =
         new Pose2d(14.483249, 7.57, new Rotation2d(0.5 * Math.PI));
@@ -111,21 +112,25 @@ public final class Constants {
         new Pose2d(1.82, 7.57, new Rotation2d(1.5 * Math.PI));
 
     public static Translation2d getSpeaker() {
-      if (DriverStation.getAlliance().isPresent()) {
-        return DriverStation.getAlliance().get() == Alliance.Red
-            ? RED_SPEAKER_POSE
-            : BLUE_SPEAKER_POSE;
-      } else {
-        return BLUE_SPEAKER_POSE; // default to blue
-      }
+      // if (DriverStation.getAlliance().isPresent()) {
+      //   return DriverStation.getAlliance().get() == Alliance.Red
+      //       ? RED_SPEAKER_POSE
+      //       : BLUE_SPEAKER_POSE;
+      // } else {
+      //   return BLUE_SPEAKER_POSE; // default to blue
+      // }
+      if (isRed) return RED_SPEAKER_POSE;
+      else return BLUE_SPEAKER_POSE;
     }
 
     public static Pose2d getAmp() {
-      if (DriverStation.getAlliance().isPresent()) {
-        return DriverStation.getAlliance().get() == Alliance.Red ? RED_AMP_POSE : BLUE_AMP_POSE;
-      } else {
-        return BLUE_AMP_POSE;
-      }
+      // if (DriverStation.getAlliance().isPresent()) {
+      //   return DriverStation.getAlliance().get() == Alliance.Red ? RED_AMP_POSE : BLUE_AMP_POSE;
+      // } else {
+      //   return BLUE_AMP_POSE;
+      // }
+      if (isRed) return RED_AMP_POSE;
+      else return BLUE_AMP_POSE;
     }
   }
 
@@ -152,7 +157,7 @@ public final class Constants {
             new Rotation3d(0.0, degreesToRadians(30.0), degreesToRadians(15.0)));
 
     public static final Matrix<N3, N1> kSingleTagStdDevs = VecBuilder.fill(0.4, 0.4, 0.4);
-    public static final Matrix<N3, N1> kMultiTagStdDevs = VecBuilder.fill(0.2, 0.2, 0.2);
+    public static final Matrix<N3, N1> kMultiTagStdDevs = VecBuilder.fill(0.2, 0.2, 0.4);
 
     public static final class CameraInformation {
       public final String name;
