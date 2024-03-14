@@ -443,12 +443,8 @@ public class RobotContainer {
 
     operator
         .rightBumper()
-        .whileTrue(
-            Commands.run(
-                () -> {
-                  indexer.runVolts(3.00);
-                },
-                indexer));
+        .whileTrue(FlywheelCommands.shoot(pivot, flywheel, indexer));
+
 
     // operator.x().onTrue()
 
@@ -525,13 +521,23 @@ public class RobotContainer {
     //             pivot,
     //             flywheel));
 
+    // operator
+    //     .leftTrigger()
+    //     .whileTrue(
+    //         FlywheelCommands.autoPivotAim(pivot, drive)
+    //             .alongWith(FlywheelCommands.autoShoot(flywheel, drive)));
+
     operator
         .leftTrigger()
         .whileTrue(
-            FlywheelCommands.autoPivotAim(pivot, drive)
-                .alongWith(FlywheelCommands.autoShoot(flywheel, drive)));
+            Commands.run(() -> {pivot.setPosition(-1.05);}, pivot));
 
     operator
+        .rightTrigger()
+        .whileTrue(
+            Commands.run(() -> {flywheel.runVelocity(4500);}, flywheel));
+
+    /*operator
         .rightTrigger()
         .whileTrue(
             Commands.run(
@@ -541,6 +547,7 @@ public class RobotContainer {
                   flywheel.runVelocity(6500);
                 },
                 pivot));
+    */
 
     operator
         .x()
