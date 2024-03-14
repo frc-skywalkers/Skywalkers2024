@@ -77,7 +77,7 @@ public final class Constants {
   }
 
   public static final class IntakeConstants {
-    public static final double dropDown = 2.90;
+    public static final double dropDown = 2.875;
     public static final double home = Math.PI / 2;
     public static final double handoff = 0.0;
 
@@ -85,7 +85,7 @@ public final class Constants {
     public static final double holdVolts = -0.25;
     public static final double outtakeVolts = 4.0;
 
-    public static final double tolerance = 0.1;
+    public static final double tolerance = 0.105;
 
     public static final double tofTolerance = 30.00;
 

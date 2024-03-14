@@ -17,18 +17,15 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.Constants.FieldConstants;
 import frc.robot.Constants.IndexerConstants;
-import frc.robot.Constants.IntakeConstants;
 import frc.robot.Constants.PivotConstants;
 import frc.robot.Constants.ShooterConstants;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.flywheel.Flywheel;
 import frc.robot.subsystems.indexer.Indexer;
-import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.pivot.Pivot;
 import org.littletonrobotics.junction.Logger;
 
@@ -101,46 +98,39 @@ public class FlywheelCommands {
         pivot);
   }
 
-  public static Command waiting(Pivot pivot, Flywheel flywheel, Intake intake) {
-    return Commands.waitUntil(
-        () ->
-            pivot.atPosition(PivotConstants.handoff)
-                && flywheel.atDesiredRPM(5000)
-                && intake.atPosition(IntakeConstants.handoff));
+  public static Command waiting(Pivot pivot, Flywheel flywheel) {
+    return Commands.waitUntil(() -> pivot.atPosition() && flywheel.atDesiredRPM());
   }
 
-  public static Command outtake(Indexer indexer, Intake intake) {
+  public static Command outtake(Indexer indexer) {
     return Commands.run(
             () -> {
               indexer.runVolts(IndexerConstants.outtakeVolts);
-              intake.outtakeWheel();
               Logger.recordOutput("Indexer/outtaking", true);
             },
             indexer)
-        .withTimeout(0.75)
+        .until(() -> !indexer.hasPiece())
         .andThen(
             () -> {
               indexer.stop();
-              intake.stopWheels();
               Logger.recordOutput("Indexer/outtaking", false);
             },
-            indexer,
-            intake);
+            indexer);
   }
 
-  public static Command shoot(Pivot pivot, Flywheel flywheel, Indexer indexer, Intake intake) {
-    return waiting(pivot, flywheel, intake).andThen(outtake(indexer, intake));
+  public static Command shoot(Pivot pivot, Flywheel flywheel, Indexer indexer) {
+    return waiting(pivot, flywheel).andThen(outtake(indexer));
     // return outtake(indexer, intake);
   }
 
   public static Command aimAmp(Pivot pivot, Flywheel flywheel) {
     return Commands.run(
             () -> {
-              pivot.setPosition(SmartDashboard.getNumber("Pivot Angle Wanted", 0));
+              pivot.setPosition(0.25);
               flywheel.runVelocity(3500);
             },
             pivot)
-        .until(() -> pivot.atPosition(SmartDashboard.getNumber("Pivot Angle Wanted", 0)));
+        .until(() -> pivot.atPosition(0.25));
   }
 
   public static Command outtakeAmp(Indexer indexer, Flywheel flywheel, Pivot pivot) {
@@ -148,12 +138,12 @@ public class FlywheelCommands {
             () -> {
               indexer.runVolts(-7.0);
               flywheel.runVelocity(3500);
-              pivot.setPosition(SmartDashboard.getNumber("Pivot Angle Wanted", 0));
+              pivot.setPosition(0.25);
             },
             indexer,
             flywheel,
             pivot)
-        .until(() -> (!indexer.superHasPiece()))
+        .until(() -> (!indexer.hasPiece()))
         .andThen(() -> indexer.stop(), indexer);
   }
 
@@ -161,7 +151,7 @@ public class FlywheelCommands {
     return Commands.run(
             () -> {
               Logger.recordOutput("Pivot/aiming", true);
-              pivot.setPosition(PivotConstants.handoff);
+              pivot.setPosition(-1.05);
               flywheel.runVelocity(5000);
             },
             flywheel,

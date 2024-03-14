@@ -68,8 +68,8 @@ public class IntakeIOTalonFX implements IntakeIO {
     Slot0Configs pidConfigs = leaderConfig.Slot0;
 
     pidConfigs.GravityType = GravityTypeValue.Arm_Cosine;
-    pidConfigs.kS = 0.075;
-    pidConfigs.kG = 0.3;
+    pidConfigs.kS = 0.1;
+    pidConfigs.kG = 0.35;
     pidConfigs.kP = 6.0;
     pidConfigs.kI = 0.0;
     pidConfigs.kD = 0.06;

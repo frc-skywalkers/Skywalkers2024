@@ -84,7 +84,7 @@
     },
     {
       "name": "Aim Piece",
-      "waypointRelativePos": 0.7,
+      "waypointRelativePos": 1.55,
       "command": {
         "type": "sequential",
         "data": {
@@ -107,7 +107,7 @@
     "maxAngularAcceleration": 720.0
   },
   "goalEndState": {
-    "velocity": 0,
+    "velocity": 0.0,
     "rotation": 180.0,
     "rotateFast": false
   },

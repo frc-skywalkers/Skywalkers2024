@@ -4,8 +4,12 @@
 
 package frc.robot.subsystems;
 
+import edu.wpi.first.apriltag.AprilTagFieldLayout;
+import edu.wpi.first.apriltag.AprilTagFieldLayout.OriginPosition;
+import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.cscore.UsbCamera;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
@@ -13,14 +17,18 @@ import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 // import frc.robot.Dashboard.Limelight.Debugging;
+import java.io.IOException;
+import java.util.Optional;
 
 public class Limelight extends SubsystemBase {
 
   NetworkTable limelightTable = NetworkTableInstance.getDefault().getTable("limelight");
   int targetID;
   double[] cameratotarget = new double[6];
+  private AprilTagFieldLayout aprilTagFieldLayout;
 
   public Limelight() {
     // CameraServer.startAutomaticCapture(0);
@@ -30,13 +38,75 @@ public class Limelight extends SubsystemBase {
     UsbCamera LL3 = CameraServer.startAutomaticCapture(0);
     LL3.setBrightness(50); // idk
     LL3.setExposureManual(15);
+
+    AprilTagFieldLayout layout;
+
+    try {
+      layout = AprilTagFieldLayout.loadFromResource(AprilTagFields.k2024Crescendo.m_resourceFile);
+      var alliance = DriverStation.getAlliance();
+      if (true) {
+        layout.setOrigin(
+            false
+                ? OriginPosition.kBlueAllianceWallRightSide
+                : OriginPosition.kRedAllianceWallRightSide);
+      } else {
+        layout = null;
+      }
+    } catch (IOException e) {
+      DriverStation.reportError("Failed to load AprilTagFieldLayout", e.getStackTrace());
+      layout = null;
+    }
+    this.aprilTagFieldLayout = layout;
   }
+
+  public static class PoseEstimate {
+    public Pose2d pose;
+    public double timestampSeconds;
+    public double latency;
+    public int tagCount;
+    public double tagSpan;
+    public double avgTagDist;
+    public double avgTagArea;
+
+    public PoseEstimate(
+        Pose2d pose,
+        double timestampSeconds,
+        double latency,
+        int tagCount,
+        double tagSpan,
+        double avgTagDist,
+        double avgTagArea) {
+      this.pose = pose;
+      this.timestampSeconds = timestampSeconds;
+      this.latency = latency;
+      this.tagCount = tagCount;
+      this.tagSpan = tagSpan;
+      this.avgTagDist = avgTagDist;
+      this.avgTagArea = avgTagArea;
+    }
+  }
+  // get poseestimate
+
+  /*private static PoseEstimate getBotPoseEstimate(String limelightName, String entryName) {
+      var poseEntry = LimelightHelpers.getLimelightNTTableEntry(limelightName, entryName);
+      var poseArray = poseEntry.getDoubleArray(new double[0]);
+      var pose = toPose2D(poseArray);
+      double latency = extractBotPoseEntry(poseArray,6);
+      int tagCount = (int)extractBotPoseEntry(poseArray,7);
+      double tagSpan = extractBotPoseEntry(poseArray,8);
+      double tagDist = extractBotPoseEntry(poseArray,9);
+      double tagArea = extractBotPoseEntry(poseArray,10);
+      //getlastchange() in microseconds, ll latency in milliseconds
+      var timestamp = (poseEntry.getLastChange() / 1000000.0) - (latency/1000.0);
+      return new PoseEstimate(pose, timestamp,latency,tagCount,tagSpan,tagDist,tagArea);
+  }*/
 
   // fiducial markers pipeline
 
   public int getId() {
-    limelightTable.getEntry("pipeline").setNumber(0);
-    // targetID = limelightTable.getEntry("tid").getInteger(0);
+    limelightTable.getEntry("pipe line").setNumber(3);
+    targetID = 7;
+    // targetID = (int) limelightTable.getEntry("tid").getInteger(0);
     return (targetID);
   }
 
@@ -95,8 +165,15 @@ public class Limelight extends SubsystemBase {
   };
 
   public Pose3d campose() {
-    var targetPose = blueGameAprilTags[getId()];
-    return targetPose.transformBy(CamtoTarget().inverse()); // target to camera
+    Optional<Pose3d> targetPose =
+        (aprilTagFieldLayout.getTagPose(getId()).get() == null)
+            ? Optional.empty()
+            : aprilTagFieldLayout.getTagPose(getId());
+
+    // var targetPose = blueGameAprilTags[getId()];
+    var targetPose1 = targetPose.get();
+    return targetPose1.transformBy(CamtoTarget().inverse());
+    // return targetPose.transformBy(CamtoTarget().inverse()); // target to camera
   }
 
   public double getTY() { // left right, y controller

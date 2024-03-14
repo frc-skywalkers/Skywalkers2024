@@ -95,7 +95,7 @@ public class IntakeCommands {
     return Commands.run(
             () -> {
               intake.setPosition(IntakeConstants.handoff);
-              intake.runWheelHalf();
+              intake.runWheel();
               // intake.holdPiece();
               // pivot.setPosition(PivotConstants.handoff);
               Logger.recordOutput("Intake/intaking", true);
@@ -143,9 +143,17 @@ public class IntakeCommands {
   public static Command transferPiecept2(Intake intake, Indexer indexer, Pivot pivot) {
     return Commands.run(
             () -> {
-              // intake.outtakeWheel();
+              // intake.runWheelHalf();
               indexer.runVolts(IndexerConstants.slowVolts);
-              pivot.setPosition(PivotConstants.handoff);
+              // pivot.setPosition(PivotConstants.handoff);
+              // if (intake.tofHasPiece()) {
+              intake.outtakeWheel();
+              // } else {
+              // intake.runWheelHalf();
+              // }
+              pivot.setPosition(-1.4);
+              // intake.stopWheels();
+
             },
             indexer,
             intake,

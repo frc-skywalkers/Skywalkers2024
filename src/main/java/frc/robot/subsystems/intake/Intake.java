@@ -119,6 +119,11 @@ public class Intake extends SubsystemBase {
     // return false;
   }
 
+  public boolean tofHasPiece() {
+    if (Constants.currentMode == Mode.SIM) return true;
+    return inputs.tofDistance < 350.0;
+  }
+
   // public void resetPosition(double position) {
 
   // }

@@ -21,10 +21,10 @@ public class Vision {
 
   // private VisionSystemSim visionSim;
 
-  public Vision(CameraInformation arducam1info, CameraInformation arducam2info) {
+  public Vision(CameraInformation arducam1info) {
 
     arducam1 = new Camera(arducam1info.name, arducam1info.cameraPose);
-    arducam2 = new Camera(arducam2info.name, arducam2info.cameraPose);
+    // arducam2 = new Camera(arducam2info.name, arducam2info.cameraPose);
 
     /*
     if (RobotBase.isSimulation()) {
@@ -46,9 +46,9 @@ public class Vision {
     return arducam1.getCameraResult();
   }
 
-  public CameraResult getCam2Result() {
+  /*public CameraResult getCam2Result() {
     return arducam2.getCameraResult();
-  }
+  }*/
 
   /*
   public void simulationPeriodic(Pose2d robotSimPose) {
@@ -71,7 +71,7 @@ public class Vision {
     */
 
     arducam1.setAprilTagField(field);
-    arducam2.setAprilTagField(field);
+    // arducam2.setAprilTagField(field);
 
     ArrayList<Pose3d> tagPoses = new ArrayList<Pose3d>();
 
