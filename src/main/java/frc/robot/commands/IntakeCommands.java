@@ -57,6 +57,7 @@ public class IntakeCommands {
             () -> {
               intake.resetPosition();
               intake.stop();
+              intake.stopWheels();
             },
             intake);
   }
@@ -106,7 +107,12 @@ public class IntakeCommands {
             () ->
                 // (pivot.atPosition(PivotConstants.handoff)
                 intake.atPosition(IntakeConstants.handoff))
-        .andThen(() -> intake.holdPiece());
+        .andThen(
+            Commands.runOnce(
+                () -> {
+                  intake.holdPiece();
+                },
+                intake));
     // .withTimeout(5.0);
   }
 
@@ -124,7 +130,7 @@ public class IntakeCommands {
     return Commands.run(
             () -> {
               intake.outtakeWheel();
-              indexer.runVolts(IndexerConstants.outtakeVolts);
+              indexer.runVolts(-5.0);
               pivot.setPosition(PivotConstants.handoff);
             },
             intake,

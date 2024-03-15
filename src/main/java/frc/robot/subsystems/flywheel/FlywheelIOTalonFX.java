@@ -60,8 +60,8 @@ public class FlywheelIOTalonFX implements FlywheelIO {
     MotionMagicConfigs mm_configs = config.MotionMagic;
 
     mm_configs.MotionMagicCruiseVelocity = 200.0;
-    mm_configs.MotionMagicAcceleration = 450.0;
-    mm_configs.MotionMagicJerk = 900.0;
+    mm_configs.MotionMagicAcceleration = 600.0;
+    mm_configs.MotionMagicJerk = 1200.0;
 
     Slot0Configs slot0 = config.Slot0;
 

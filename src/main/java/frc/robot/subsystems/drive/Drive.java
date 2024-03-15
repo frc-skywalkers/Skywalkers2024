@@ -42,6 +42,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Constants.FieldConstants;
+import frc.robot.Constants.Mode;
 import frc.robot.Constants.ShooterConstants;
 import frc.robot.Constants.VisionConstants;
 import frc.robot.subsystems.Limelight;
@@ -78,9 +79,9 @@ public class Drive extends SubsystemBase {
   private FieldRelativeAccel m_fieldRelAccel = new FieldRelativeAccel();
 
   private static final Vector<N3> stateStdDevs =
-      VecBuilder.fill(0.39, 0.39, Units.degreesToRadians(80));
+      VecBuilder.fill(0.39, 0.39, Units.degreesToRadians(2));
   private static final Vector<N3> visionStdDevs =
-      VecBuilder.fill(0.02, 0.02, Units.degreesToRadians(2));
+      VecBuilder.fill(0.02, 0.02, Units.degreesToRadians(60));
 
   public final SwerveDrivePoseEstimator poseEstimator;
   private final Field2d field2d = new Field2d();
@@ -219,7 +220,7 @@ public class Drive extends SubsystemBase {
     Logger.recordOutput("Odometry/Estimated Pose", getCurrentPose());
 
     var cam1Result = vision.getCam1Result();
-    /*
+
     Logger.recordOutput("Vision/cam2x", cam1Result.estimatedPose.getX());
     Logger.recordOutput("Vision/cam2y", cam1Result.estimatedPose.getY());
 
@@ -229,11 +230,10 @@ public class Drive extends SubsystemBase {
       Logger.recordOutput("Vision/2GlobalEstimate", cam1Result.estimatedPose);
 
       if (Constants.currentMode == Mode.REAL) {
-        // this.poseEstimator.addVisionMeasurement(
-        // cam1Result.estimatedPose, cam1Result.timestamp, cam1Result.stdDevs);
+        this.poseEstimator.addVisionMeasurement(
+            cam1Result.estimatedPose, cam1Result.timestamp, cam1Result.stdDevs);
       }
     }
-    */
 
     LimelightHelper.PoseEstimate limelightMeasurement =
         LimelightHelper.getBotPoseEstimate_wpiBlue("limelight");
@@ -303,7 +303,7 @@ public class Drive extends SubsystemBase {
 
   public Pose2d getCurrentPose() {
     Translation2d ret = poseEstimator.getEstimatedPosition().getTranslation();
-    Rotation2d ang = getRotation();
+    Rotation2d ang = new Rotation2d(getRotation().getRadians()); // getRotation()
     return new Pose2d(ret, ang);
     // return poseEstimator.getEstimatedPosition();
   }

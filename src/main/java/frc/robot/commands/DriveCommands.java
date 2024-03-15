@@ -46,7 +46,7 @@ public class DriveCommands {
       DoubleSupplier autoAlign) {
     return Commands.run(
         () -> {
-          double scle = 0.95;
+          double scle = 1.0;
 
           if (slowMode.getAsDouble() > 0.5) {
             scle = 0.7;
@@ -58,7 +58,7 @@ public class DriveCommands {
                   DEADBAND);
           Rotation2d linearDirection =
               new Rotation2d(xSupplier.getAsDouble(), ySupplier.getAsDouble());
-          double omega = MathUtil.applyDeadband(omegaSupplier.getAsDouble(), DEADBAND) * 0.75;
+          double omega = MathUtil.applyDeadband(omegaSupplier.getAsDouble(), DEADBAND) * 0.65;
           //   double omega = 0;
           // Square values
           linearMagnitude = linearMagnitude * linearMagnitude;

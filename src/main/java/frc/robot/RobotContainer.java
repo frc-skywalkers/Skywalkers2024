@@ -25,7 +25,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Constants.IndexerConstants;
-import frc.robot.Constants.LightstripConstants;
+import frc.robot.Constants.IntakeConstants;
 import frc.robot.commands.DriveCommands;
 import frc.robot.commands.FeedForwardCharacterization;
 import frc.robot.commands.FlywheelCommands;
@@ -211,15 +211,17 @@ public class RobotContainer {
         IntakeCommands.intakeHandoff(intake, indexer, pivot, lightstrip)
             .andThen(IntakeCommands.indexSequence(intake, indexer, pivot)));
 
-    NamedCommands.registerCommand("Pivot Rev", FlywheelCommands.prepSubwoofer(flywheel, pivot));
+    NamedCommands.registerCommand(
+        "Pivot Rev", FlywheelCommands.prepSubwoofer(flywheel, pivot, indexer));
 
-    NamedCommands.registerCommand("Shoot", FlywheelCommands.shoot(pivot, flywheel, indexer));
+    NamedCommands.registerCommand(
+        "Shoot", FlywheelCommands.shoot(pivot, flywheel, indexer, intake));
 
     NamedCommands.registerCommand(
         "Shoot Sequence",
         Commands.race(
-            FlywheelCommands.prepSubwoofer(flywheel, pivot),
-            FlywheelCommands.shoot(pivot, flywheel, indexer)));
+            FlywheelCommands.prepSubwoofer(flywheel, pivot, indexer),
+            FlywheelCommands.shoot(pivot, flywheel, indexer, intake)));
 
     Logger.recordOutput("Alliance", DriverStation.getAlliance().isPresent());
 
@@ -392,15 +394,17 @@ public class RobotContainer {
     //         IntakeCommands.intakeHandoff(intake, indexer, pivot, lightstrip)
     //             .unless(() -> indexer.hasPiece()));
 
-    operator
-        .povDown()
-        .onTrue(
-            Commands.runOnce(
-                () -> {
-                  lightstrip.tempColor(
-                      LightstripConstants.successSignal, LightstripConstants.Ranges.full);
-                },
-                lightstrip));
+    // operator
+    //     .povDown()
+    //     .onTrue(
+    //         Commands.runOnce(
+    //             () -> {
+    //               lightstrip.tempColor(
+    //                   LightstripConstants.successSignal, LightstripConstants.Ranges.full);
+    //             },
+    //             lightstrip));
+
+    operator.povDown().onTrue(IntakeCommands.spit(intake));
 
     operator
         .povLeft()
@@ -411,6 +415,22 @@ public class RobotContainer {
                     },
                     pivot)
                 .until(() -> operator.povRight().getAsBoolean()));
+
+    operator
+        .povUp()
+        .onTrue(
+            IntakeCommands.intakeHandoff(intake, indexer, pivot, lightstrip)
+                .andThen(IntakeCommands.indexSequence(intake, indexer, pivot)));
+
+    operator
+        .rightBumper()
+        .onTrue(
+            Commands.run(
+                () -> {
+                  intake.setPosition(IntakeConstants.handoff);
+                  intake.stopWheels();
+                },
+                intake));
 
     // operator.x().onTrue(IntakeCommands.homeIntake(intake));
 
@@ -441,21 +461,10 @@ public class RobotContainer {
 
     flywheel.setDefaultCommand(Commands.run(() -> flywheel.runVelocity(0.0), flywheel));
 
-    operator
-        .rightBumper()
-        .whileTrue(FlywheelCommands.shoot(pivot, flywheel, indexer));
-
+    operator.leftBumper().whileTrue(FlywheelCommands.shoot(pivot, flywheel, indexer, intake));
+    // operator.rightBumper().whileTrue(FlywheelCommands.outtake(indexer, intake));
 
     // operator.x().onTrue()
-
-    operator
-        .leftBumper()
-        .whileTrue(
-            Commands.run(
-                () -> {
-                  indexer.runVolts(-3.00);
-                },
-                indexer));
 
     // operator
     //     .x()
@@ -530,12 +539,20 @@ public class RobotContainer {
     operator
         .leftTrigger()
         .whileTrue(
-            Commands.run(() -> {pivot.setPosition(-1.05);}, pivot));
+            Commands.run(
+                () -> {
+                  pivot.setPosition(-1.05);
+                },
+                pivot));
 
     operator
         .rightTrigger()
         .whileTrue(
-            Commands.run(() -> {flywheel.runVelocity(4500);}, flywheel));
+            Commands.run(
+                () -> {
+                  flywheel.runVelocity(4500);
+                },
+                flywheel));
 
     /*operator
         .rightTrigger()

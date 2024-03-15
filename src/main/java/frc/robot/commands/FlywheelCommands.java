@@ -26,6 +26,7 @@ import frc.robot.Constants.ShooterConstants;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.flywheel.Flywheel;
 import frc.robot.subsystems.indexer.Indexer;
+import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.pivot.Pivot;
 import org.littletonrobotics.junction.Logger;
 
@@ -102,11 +103,12 @@ public class FlywheelCommands {
     return Commands.waitUntil(() -> pivot.atPosition() && flywheel.atDesiredRPM());
   }
 
-  public static Command outtake(Indexer indexer) {
+  public static Command outtake(Indexer indexer, Intake intake) {
     return Commands.run(
             () -> {
               indexer.runVolts(IndexerConstants.outtakeVolts);
               Logger.recordOutput("Indexer/outtaking", true);
+              intake.setPosition(0.3);
             },
             indexer)
         .until(() -> !indexer.hasPiece())
@@ -118,8 +120,8 @@ public class FlywheelCommands {
             indexer);
   }
 
-  public static Command shoot(Pivot pivot, Flywheel flywheel, Indexer indexer) {
-    return waiting(pivot, flywheel).andThen(outtake(indexer));
+  public static Command shoot(Pivot pivot, Flywheel flywheel, Indexer indexer, Intake intake) {
+    return waiting(pivot, flywheel).andThen(outtake(indexer, intake));
     // return outtake(indexer, intake);
   }
 
@@ -147,15 +149,17 @@ public class FlywheelCommands {
         .andThen(() -> indexer.stop(), indexer);
   }
 
-  public static Command prepSubwoofer(Flywheel flywheel, Pivot pivot) {
-    return Commands.run(
-            () -> {
-              Logger.recordOutput("Pivot/aiming", true);
-              pivot.setPosition(-1.05);
-              flywheel.runVelocity(5000);
-            },
-            flywheel,
-            pivot)
+  public static Command prepSubwoofer(Flywheel flywheel, Pivot pivot, Indexer indexer) {
+    return Commands.waitUntil(() -> indexer.hasPiece())
+        .andThen(
+            Commands.run(
+                () -> {
+                  Logger.recordOutput("Pivot/aiming", true);
+                  pivot.setPosition(-1.05);
+                  flywheel.runVelocity(5000);
+                },
+                flywheel,
+                pivot))
         .handleInterrupt(
             () -> {
               Logger.recordOutput("Pivot/aiming", false);

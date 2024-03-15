@@ -77,26 +77,26 @@ public final class Constants {
   }
 
   public static final class IntakeConstants {
-    public static final double dropDown = 2.875;
+    public static final double dropDown = 3.050;
     public static final double home = Math.PI / 2;
     public static final double handoff = 0.0;
 
-    public static final double intakeVolts = -9.0;
+    public static final double intakeVolts = -10.5;
     public static final double holdVolts = -0.25;
     public static final double outtakeVolts = 4.0;
 
-    public static final double tolerance = 0.105;
+    public static final double tolerance = 0.05;
 
     public static final double tofTolerance = 30.00;
 
-    public static final double mm_cruisevel = 2.0;
+    public static final double mm_cruisevel = 3.0;
     public static final double mm_accel = mm_cruisevel * 4.0;
     public static final double mm_jerk = mm_accel * 4.0;
   }
 
   public static final class IndexerConstants {
     public static final double indexVolts = -6.0;
-    public static final double outtakeVolts = -5.0;
+    public static final double outtakeVolts = -9.0;
     public static final double holdVolts = -0.2;
     public static final double slowVolts = -1.5;
   }

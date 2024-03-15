@@ -56,7 +56,7 @@ public class IntakeIOTalonFX implements IntakeIO {
 
   public IntakeIOTalonFX() {
     var leaderConfig = new TalonFXConfiguration();
-    leaderConfig.CurrentLimits.StatorCurrentLimit = 45.0;
+    leaderConfig.CurrentLimits.StatorCurrentLimit = 60.0;
     leaderConfig.CurrentLimits.StatorCurrentLimitEnable = true;
     leaderConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
 
