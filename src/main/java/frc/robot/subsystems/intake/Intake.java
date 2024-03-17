@@ -140,7 +140,7 @@ public class Intake extends SubsystemBase {
   }
 
   public boolean atDropDown() {
-    return Math.abs(getPositionRad() - IntakeConstants.dropDown) < IntakeConstants.tolerance;
+    return Math.abs(getPositionRad() - IntakeConstants.dropDown) < IntakeConstants.downtolerance;
   }
 
   public boolean isHoned() {

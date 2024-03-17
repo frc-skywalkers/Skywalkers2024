@@ -238,7 +238,7 @@ public class Drive extends SubsystemBase {
     LimelightHelper.PoseEstimate limelightMeasurement =
         LimelightHelper.getBotPoseEstimate_wpiBlue("limelight");
     if (limelightMeasurement.tagCount >= 1) {
-      poseEstimator.setVisionMeasurementStdDevs(VecBuilder.fill(.7, .7, 9999999));
+      poseEstimator.setVisionMeasurementStdDevs(VecBuilder.fill(.1, .1, 9999999));
       poseEstimator.addVisionMeasurement(
           limelightMeasurement.pose, limelightMeasurement.timestampSeconds);
     }

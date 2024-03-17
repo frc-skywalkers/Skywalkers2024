@@ -100,11 +100,11 @@ public class Lightstrip extends SubsystemBase {
         }
       }
     } else if (state.getEffect() == "Fast Blink") {
-      if ((timer.get() % 0.5) < 0.25) {
+      if ((timer.get() % 0.125) < 0.0626) {
         for (int i = range.getStart(); i < range.getEnd(); i++) {
           buffer.setRGB(i, state.getRed(), state.getGreen(), state.getBlue());
         }
-      } else if ((timer.get() % 0.5) >= 0.25) {
+      } else if ((timer.get() % 0.125) >= 0.0625) {
         for (int i = range.getStart(); i < range.getEnd(); i++) {
           buffer.setRGB(i, 0, 0, 0);
         }
@@ -222,6 +222,9 @@ public class Lightstrip extends SubsystemBase {
   }
 
   public void setColor(LedState state, Range range) {
+    currentColor = new ArrayList<LedState>();
+    currentRange = new ArrayList<Range>();
+
     toggleOffColor(state, range);
 
     currentColor.add(state);

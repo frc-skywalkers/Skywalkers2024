@@ -23,11 +23,16 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DigitalInput;
+import frc.robot.Constants.LightstripConstants;
+import frc.robot.Constants.LightstripConstants.Ranges;
+import frc.robot.subsystems.Lightstrip;
 
 public class IndexerIOTalonFX implements IndexerIO {
   private static final double GEAR_RATIO = 1.5;
 
   private final TalonFX leader = new TalonFX(20);
+
+  private Lightstrip lightstrip;
 
   private final StatusSignal<Double> leaderPosition = leader.getPosition();
   private final StatusSignal<Double> leaderVelocity = leader.getVelocity();
@@ -40,7 +45,9 @@ public class IndexerIOTalonFX implements IndexerIO {
 
   // private final TimeOfFlight tofSensor = new TimeOfFlight(15);
 
-  public IndexerIOTalonFX() {
+  public IndexerIOTalonFX(Lightstrip ls) {
+    lightstrip = ls;
+
     var config = new TalonFXConfiguration();
     config.CurrentLimits.StatorCurrentLimit = 45.0;
     config.CurrentLimits.StatorCurrentLimitEnable = true;
@@ -68,6 +75,12 @@ public class IndexerIOTalonFX implements IndexerIO {
     inputs.superHasPiece = superHasPiece();
     // inputs.tofDistance = tofSensor.getRange();
     // inputs.tofSD = tofSensor.getRangeSigma();
+
+    if (inputs.hasPiece) {
+      lightstrip.setColor(LightstripConstants.holdingState, Ranges.full);
+    } else {
+      lightstrip.setColor(LightstripConstants.defaultState, Ranges.full);
+    }
   }
 
   @Override

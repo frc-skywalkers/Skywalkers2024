@@ -65,12 +65,12 @@ public class FlywheelIOTalonFX implements FlywheelIO {
 
     Slot0Configs slot0 = config.Slot0;
 
-    slot0.kP = 0.00009;
+    slot0.kP = 0.0009;
     slot0.kI = 0.0;
     slot0.kD = 0.0000025;
     slot0.kS = 0.466;
     slot0.kV = 0.018 * (2 * Math.PI) * GEAR_RATIO;
-    slot0.kA = 0.001;
+    slot0.kA = 0.01;
 
     leader.getConfigurator().apply(config);
     follower.getConfigurator().apply(config);

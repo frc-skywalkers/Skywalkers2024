@@ -100,7 +100,7 @@ public class FlywheelCommands {
   }
 
   public static Command waiting(Pivot pivot, Flywheel flywheel) {
-    return Commands.waitUntil(() -> pivot.atPosition() && flywheel.atDesiredRPM());
+    return Commands.waitUntil(() -> pivot.atPosition(-1.05) && flywheel.atDesiredRPM(4500));
   }
 
   public static Command outtake(Indexer indexer, Intake intake) {
@@ -108,7 +108,7 @@ public class FlywheelCommands {
             () -> {
               indexer.runVolts(IndexerConstants.outtakeVolts);
               Logger.recordOutput("Indexer/outtaking", true);
-              intake.setPosition(0.3);
+              intake.setPosition(0.6);
             },
             indexer)
         .until(() -> !indexer.hasPiece())
@@ -123,6 +123,10 @@ public class FlywheelCommands {
   public static Command shoot(Pivot pivot, Flywheel flywheel, Indexer indexer, Intake intake) {
     return waiting(pivot, flywheel).andThen(outtake(indexer, intake));
     // return outtake(indexer, intake);
+  }
+
+  public static Command deepenIndexer(Indexer indexer) {
+    return Commands.run(() -> indexer.runVolts(-4.0), indexer).withTimeout(0.3);
   }
 
   public static Command aimAmp(Pivot pivot, Flywheel flywheel) {
@@ -156,7 +160,7 @@ public class FlywheelCommands {
                 () -> {
                   Logger.recordOutput("Pivot/aiming", true);
                   pivot.setPosition(-1.05);
-                  flywheel.runVelocity(5000);
+                  flywheel.runVelocity(4500);
                 },
                 flywheel,
                 pivot))
@@ -164,6 +168,15 @@ public class FlywheelCommands {
             () -> {
               Logger.recordOutput("Pivot/aiming", false);
             });
+  }
+
+  public static Command rev(Flywheel flywheel, Indexer indexer) {
+    return Commands.waitUntil(() -> indexer.hasPiece())
+        .andThen(
+            Commands.run(
+                () -> {
+                  flywheel.runVelocity(5000);
+                }));
   }
 
   // public static Command subwooferShot(Flywheel flywheel, Pivot pivot, Indexer indexer, Intake

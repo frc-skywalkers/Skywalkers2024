@@ -17,7 +17,7 @@ import org.littletonrobotics.junction.Logger;
 public class Vision {
 
   private Camera arducam1;
-  private Camera arducam2;
+  // private Camera arducam2;
 
   // private VisionSystemSim visionSim;
 

@@ -25,7 +25,6 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Constants.IndexerConstants;
-import frc.robot.Constants.IntakeConstants;
 import frc.robot.commands.DriveCommands;
 import frc.robot.commands.FeedForwardCharacterization;
 import frc.robot.commands.FlywheelCommands;
@@ -125,7 +124,7 @@ public class RobotContainer {
         flywheel = new Flywheel(new FlywheelIOTalonFX());
         pivot = new Pivot(new PivotIOTalonFX());
         intake = new Intake(new IntakeIOTalonFX());
-        indexer = new Indexer(new IndexerIOTalonFX());
+        indexer = new Indexer(new IndexerIOTalonFX(lightstrip));
         visualizer = new Visualizer(intake, pivot);
 
         // drive =
@@ -209,7 +208,7 @@ public class RobotContainer {
     NamedCommands.registerCommand(
         "intake handoff",
         IntakeCommands.intakeHandoff(intake, indexer, pivot, lightstrip)
-            .andThen(IntakeCommands.indexSequence(intake, indexer, pivot)));
+            .andThen(IntakeCommands.indexSequence(intake, indexer, pivot, lightstrip)));
 
     NamedCommands.registerCommand(
         "Pivot Rev", FlywheelCommands.prepSubwoofer(flywheel, pivot, indexer));
@@ -220,8 +219,11 @@ public class RobotContainer {
     NamedCommands.registerCommand(
         "Shoot Sequence",
         Commands.race(
-            FlywheelCommands.prepSubwoofer(flywheel, pivot, indexer),
-            FlywheelCommands.shoot(pivot, flywheel, indexer, intake)));
+                FlywheelCommands.prepSubwoofer(flywheel, pivot, indexer),
+                FlywheelCommands.shoot(pivot, flywheel, indexer, intake))
+            .andThen(IntakeCommands.resetIntake(intake)));
+
+    NamedCommands.registerCommand("Reset Intake", IntakeCommands.resetIntake(intake));
 
     Logger.recordOutput("Alliance", DriverStation.getAlliance().isPresent());
 
@@ -292,7 +294,7 @@ public class RobotContainer {
     // controller.a().onTrue(Commands.run(() -> pivot.setPosition(-0.25), pivot));
     // controller.b().onTrue(Commands.run(() -> pivot.setPosition(0.0), pivot));
 
-    indexer.setDefaultCommand(Commands.runOnce(() -> indexer.runVolts(0), indexer));
+    // indexer.setDefaultCommand(Commands.runOnce(() -> indexer.runVolts(0), indexer));
 
     // flywheel.setDefaultCommand(
     //     FlywheelCommands.shootWhileMove(
@@ -404,9 +406,24 @@ public class RobotContainer {
     //             },
     //             lightstrip));
 
-    operator.povDown().onTrue(IntakeCommands.spit(intake));
+    operator.povUp().onTrue(IntakeCommands.spit(intake)); // PUT BACK IN FOR MATCH
 
-    operator
+    operator.povDown().onTrue(IntakeCommands.deepen(intake));
+
+    // operator
+    //     .povUp()
+    //     .onTrue(
+    //         IntakeCommands.intakeHandoff(intake, indexer, pivot, lightstrip)
+    //             .andThen(IntakeCommands.indexSequence(intake, indexer, pivot)));
+    // operator
+    //     .povDown()
+    //     .onTrue(
+    //         Commands.race(
+    //                 FlywheelCommands.prepSubwoofer(flywheel, pivot, indexer),
+    //                 FlywheelCommands.shoot(pivot, flywheel, indexer, intake))
+    //             .andThen(IntakeCommands.resetIntake(intake)));
+
+    operator // HANG PUT THIS BACK IN!!
         .povLeft()
         .onTrue(
             Commands.run(
@@ -416,22 +433,22 @@ public class RobotContainer {
                     pivot)
                 .until(() -> operator.povRight().getAsBoolean()));
 
-    operator
-        .povUp()
-        .onTrue(
-            IntakeCommands.intakeHandoff(intake, indexer, pivot, lightstrip)
-                .andThen(IntakeCommands.indexSequence(intake, indexer, pivot)));
+    // operator
+    //     .a()
+    //     .onTrue(
+    //         IntakeCommands.intakeHandoff(intake, indexer, pivot, lightstrip)
+    //             .andThen(IntakeCommands.indexSequence(intake, indexer, pivot, lightstrip))
+    //             .andThen(FlywheelCommands.prepSubwoofer(flywheel, pivot, indexer)));
+    operator.a().onTrue(FlywheelCommands.deepenIndexer(indexer));
 
-    operator
-        .rightBumper()
-        .onTrue(
-            Commands.run(
-                () -> {
-                  intake.setPosition(IntakeConstants.handoff);
-                  intake.stopWheels();
-                },
-                intake));
-
+    operator.rightBumper().onTrue(IntakeCommands.resetIntake(intake));
+    // operator
+    //     .rightBumper()
+    //     .onTrue(
+    //         Commands.run(
+    //             () -> {
+    //               intake.runWheelVolts(-10.0);
+    //             }));
     // operator.x().onTrue(IntakeCommands.homeIntake(intake));
 
     // operator.x().onTrue(IntakeCommands.spit(intake));
@@ -461,7 +478,15 @@ public class RobotContainer {
 
     flywheel.setDefaultCommand(Commands.run(() -> flywheel.runVelocity(0.0), flywheel));
 
-    operator.leftBumper().whileTrue(FlywheelCommands.shoot(pivot, flywheel, indexer, intake));
+    // operator
+    //     .leftBumper()
+    //     .onTrue(
+    //         Commands.race(
+    //             FlywheelCommands.shoot(pivot, flywheel, indexer, intake),
+    //             FlywheelCommands.prepSubwoofer(flywheel, pivot, indexer)));
+
+    operator.leftBumper().onTrue(FlywheelCommands.shoot(pivot, flywheel, indexer, intake));
+
     // operator.rightBumper().whileTrue(FlywheelCommands.outtake(indexer, intake));
 
     // operator.x().onTrue()
@@ -550,7 +575,7 @@ public class RobotContainer {
         .whileTrue(
             Commands.run(
                 () -> {
-                  flywheel.runVelocity(4500);
+                  flywheel.runVelocity(5000);
                 },
                 flywheel));
 
@@ -573,7 +598,7 @@ public class RobotContainer {
                 .andThen(FlywheelCommands.outtakeAmp(indexer, flywheel, pivot)));
 
     operator.b().onTrue(IntakeCommands.intakeHandoff(intake, indexer, pivot, lightstrip));
-    operator.y().onTrue(IntakeCommands.indexSequence(intake, indexer, pivot));
+    operator.y().onTrue(IntakeCommands.indexSequence(intake, indexer, pivot, lightstrip));
     // controller.x().onTrue(IntakeCommands.bringOutPiece(indexer));
     // operator.leftBumper().onTrue(FlywheelCommands.outtake(indexer, intake));
     // operator.rightBumper().onTrue(FlywheelCommands.outtakeAmp(indexer, flywheel, pivot));

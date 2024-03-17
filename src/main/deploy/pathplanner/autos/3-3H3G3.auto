@@ -2,16 +2,41 @@
   "version": 1.0,
   "startingPose": {
     "position": {
-      "x": 1.35,
-      "y": 5.52
+      "x": 0.7,
+      "y": 4.42
     },
-    "rotation": 180.0
+    "rotation": 120.0
   },
   "command": {
     "type": "sequential",
     "data": {
       "commands": [
         {
+          "type": "race",
+          "data": {
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "Shoot"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "Pivot Rev"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "3H3"
+          }
+        },
+        {
           "type": "named",
           "data": {
             "name": "Shoot Sequence"
@@ -20,31 +45,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "2B2"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "Shoot Sequence"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "2C2"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "Shoot Sequence"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "2A2"
+            "pathName": "3G3"
           }
         },
         {

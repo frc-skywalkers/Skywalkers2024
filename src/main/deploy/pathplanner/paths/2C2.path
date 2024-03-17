@@ -8,24 +8,24 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 1.8031790045061573,
-        "y": 5.41876511067837
+        "x": 1.5950797094176201,
+        "y": 4.883418839590889
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 2.4448865934768906,
-        "y": 4.212787161685434
+        "x": 2.4733924503512332,
+        "y": 4.11050362756931
       },
       "prevControl": {
-        "x": 2.0556219955032504,
-        "y": 4.341057418225948
+        "x": 1.6050504866772903,
+        "y": 4.51178606492179
       },
       "nextControl": {
-        "x": 2.6995002098047496,
-        "y": 4.1288870226666425
+        "x": 2.7167446205517067,
+        "y": 3.998044531869393
       },
       "isLocked": false,
       "linkedName": null
@@ -36,8 +36,8 @@
         "y": 5.521618853422892
       },
       "prevControl": {
-        "x": 2.0338279287669687,
-        "y": 5.266503565414538
+        "x": 1.7121880748754352,
+        "y": 5.515804013063089
       },
       "nextControl": null,
       "isLocked": false,
@@ -47,7 +47,12 @@
   "rotationTargets": [
     {
       "waypointRelativePos": 0.55,
-      "rotationDegrees": 142.5935139648836,
+      "rotationDegrees": 180.0,
+      "rotateFast": false
+    },
+    {
+      "waypointRelativePos": 1,
+      "rotationDegrees": 180.0,
       "rotateFast": false
     }
   ],
@@ -57,30 +62,13 @@
       "name": "Drop Down Piece",
       "waypointRelativePos": 0.05,
       "command": {
-        "type": "sequential",
+        "type": "parallel",
         "data": {
           "commands": [
             {
               "type": "named",
               "data": {
                 "name": "intake handoff"
-              }
-            }
-          ]
-        }
-      }
-    },
-    {
-      "name": "Aim Piece",
-      "waypointRelativePos": 0.7,
-      "command": {
-        "type": "sequential",
-        "data": {
-          "commands": [
-            {
-              "type": "named",
-              "data": {
-                "name": "Pivot Rev"
               }
             }
           ]

@@ -51,30 +51,13 @@
       "name": "Drop Down Piece",
       "waypointRelativePos": 0.05,
       "command": {
-        "type": "sequential",
+        "type": "parallel",
         "data": {
           "commands": [
             {
               "type": "named",
               "data": {
                 "name": "intake handoff"
-              }
-            }
-          ]
-        }
-      }
-    },
-    {
-      "name": "Aim Piece",
-      "waypointRelativePos": 0.7,
-      "command": {
-        "type": "sequential",
-        "data": {
-          "commands": [
-            {
-              "type": "named",
-              "data": {
-                "name": "Pivot Rev"
               }
             }
           ]

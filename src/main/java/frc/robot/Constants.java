@@ -52,7 +52,7 @@ public final class Constants {
     REPLAY
   }
 
-  public static final Boolean isRed = false;
+  public static final Boolean isRed = true;
 
   public static final class ShooterConstants {
     public static final double[] RPMEquation = {350.0, 500.000}; // need to tune; [0] -> m, [1] -> b
@@ -77,7 +77,7 @@ public final class Constants {
   }
 
   public static final class IntakeConstants {
-    public static final double dropDown = 3.050;
+    public static final double dropDown = 2.95;
     public static final double home = Math.PI / 2;
     public static final double handoff = 0.0;
 
@@ -86,6 +86,7 @@ public final class Constants {
     public static final double outtakeVolts = 4.0;
 
     public static final double tolerance = 0.05;
+    public static final double downtolerance = 0.075;
 
     public static final double tofTolerance = 30.00;
 
@@ -95,9 +96,9 @@ public final class Constants {
   }
 
   public static final class IndexerConstants {
-    public static final double indexVolts = -6.0;
+    public static final double indexVolts = -5.0;
     public static final double outtakeVolts = -9.0;
-    public static final double holdVolts = -0.2;
+    public static final double holdVolts = 0.1;
     public static final double slowVolts = -1.5;
   }
 
@@ -172,7 +173,7 @@ public final class Constants {
     public static final CameraInformation kArducam1Info =
         new CameraInformation("arducam1", CAMERA_TO_ROBOT1.inverse());
     public static final CameraInformation kArducam2Info =
-        new CameraInformation("arducam2", CAMERA_TO_ROBOT2.inverse());
+        new CameraInformation("arducam1", CAMERA_TO_ROBOT2.inverse());
 
     public static final class CameraResult {
       public final Pose2d estimatedPose;
@@ -210,7 +211,8 @@ public final class Constants {
     }
 
     public static LedState defaultState = new LedState(50, 0, 0, "Fade");
-    public static TempLedState successSignal = new TempLedState(68, 17, 99, "Solid", 2);
+    public static LedState holdingState = new LedState(0, 0, 55, "Fade");
+    public static TempLedState successSignal = new TempLedState(0, 55, 0, "Fast Blink", 1);
     public static TempLedState intake = new TempLedState(255, 255, 0, "Solid", 10);
   }
 }

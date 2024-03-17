@@ -82,7 +82,7 @@ public class ModuleIOTalonFX implements ModuleIO {
         driveTalon = new TalonFX(4, "CANivore");
         turnTalon = new TalonFX(5, "CANivore");
         cancoder = new CANcoder(6, "CANivore");
-        absoluteEncoderOffset = new Rotation2d(-0.354736 * 2 * Math.PI); // MUST BE CALIBRATED
+        absoluteEncoderOffset = new Rotation2d((-0.354736 * 2 * Math.PI)); // MUST BE CALIBRATED
         break;
       case 2:
         driveTalon = new TalonFX(10, "CANivore");
@@ -102,7 +102,7 @@ public class ModuleIOTalonFX implements ModuleIO {
     }
 
     var driveConfig = new TalonFXConfiguration();
-    driveConfig.CurrentLimits.StatorCurrentLimit = 40.0;
+    driveConfig.CurrentLimits.StatorCurrentLimit = 50.0;
     driveConfig.CurrentLimits.StatorCurrentLimitEnable = true;
     driveConfig.Feedback.SensorToMechanismRatio = DRIVE_GEAR_RATIO;
     driveConfig.Slot0.kP = 0.25;
@@ -121,7 +121,7 @@ public class ModuleIOTalonFX implements ModuleIO {
     // drive_mm.withUpdateFreqHz(index)
 
     var turnConfig = new TalonFXConfiguration();
-    turnConfig.CurrentLimits.StatorCurrentLimit = 30.0;
+    turnConfig.CurrentLimits.StatorCurrentLimit = 35.0;
     turnConfig.CurrentLimits.StatorCurrentLimitEnable = true;
     turnConfig.Feedback.SensorToMechanismRatio = TURN_GEAR_RATIO;
     turnConfig.ClosedLoopGeneral.ContinuousWrap = true;
