@@ -61,6 +61,10 @@ public class Intake extends SubsystemBase {
     runWheelVolts(IntakeConstants.intakeVolts);
   }
 
+  public void runWheelDouble() {
+    runWheelVolts(1.5 * IntakeConstants.intakeVolts);
+  }
+
   public void runWheelHalf() {
     runWheelVolts(IntakeConstants.intakeVolts / 1.5);
   }

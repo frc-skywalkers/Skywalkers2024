@@ -81,9 +81,9 @@ public final class Constants {
     public static final double home = Math.PI / 2;
     public static final double handoff = 0.0;
 
-    public static final double intakeVolts = -10.5;
+    public static final double intakeVolts = -6.5;
     public static final double holdVolts = -0.25;
-    public static final double outtakeVolts = 7.0;
+    public static final double outtakeVolts = 5.0;
 
     public static final double tolerance = 0.05;
     public static final double downtolerance = 0.1;
@@ -96,10 +96,10 @@ public final class Constants {
   }
 
   public static final class IndexerConstants {
-    public static final double indexVolts = -4.25;
+    public static final double indexVolts = -3.50;
     public static final double outtakeVolts = -9.0;
-    public static final double holdVolts = 0.1;
-    public static final double slowVolts = -1.25;
+    public static final double holdVolts = 0.125;
+    public static final double slowVolts = -1.0;
   }
 
   public static final class FieldConstants {
@@ -108,9 +108,9 @@ public final class Constants {
     public static final double robotSubwooferSpeakerDistance = 57.341456693; // in inches
 
     public static final Pose2d RED_AMP_POSE =
-        new Pose2d(14.483249, 7.57, new Rotation2d(0.5 * Math.PI));
+        new Pose2d(14.483249, 7.57, new Rotation2d(1.5 * Math.PI));
     public static final Pose2d BLUE_AMP_POSE =
-        new Pose2d(1.82, 7.57, new Rotation2d(1.5 * Math.PI));
+        new Pose2d(1.82, 7.57, new Rotation2d(0.5 * Math.PI));
 
     public static Translation2d getSpeaker() {
       // if (DriverStation.getAlliance().isPresent()) {

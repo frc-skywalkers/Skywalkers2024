@@ -104,15 +104,15 @@ public class FlywheelCommands {
   }
 
   public static Command waiting(Pivot pivot, Flywheel flywheel) {
-    return Commands.waitUntil(() -> pivot.atPosition(-1.05) && flywheel.atDesiredRPM(5000));
+    return Commands.waitUntil(() -> pivot.atPosition(-1.05) && flywheel.atDesiredRPM(2000));
   }
 
-  public static Command outtake(Indexer indexer, Intake intake) {
+  public static Command outtake(Indexer indexer) {
     return Commands.run(
             () -> {
               indexer.runVolts(IndexerConstants.outtakeVolts);
               Logger.recordOutput("Indexer/outtaking", true);
-              intake.setPosition(0.6);
+              // intake.setPosition(1.0);
             },
             indexer)
         .until(() -> !indexer.hasPiece())
@@ -124,8 +124,8 @@ public class FlywheelCommands {
             indexer);
   }
 
-  public static Command shoot(Pivot pivot, Flywheel flywheel, Indexer indexer, Intake intake) {
-    return waiting(pivot, flywheel).andThen(outtake(indexer, intake));
+  public static Command shoot(Pivot pivot, Flywheel flywheel, Indexer indexer) {
+    return waiting(pivot, flywheel).andThen(outtake(indexer));
     // return outtake(indexer, intake);
   }
 
@@ -157,17 +157,20 @@ public class FlywheelCommands {
         .andThen(() -> indexer.stop(), indexer);
   }
 
-  public static Command prepSubwoofer(Flywheel flywheel, Pivot pivot, Indexer indexer) {
+  public static Command prepSubwoofer(
+      Flywheel flywheel, Pivot pivot, Indexer indexer, Intake intake) {
     return Commands.waitUntil(() -> indexer.hasPiece())
         .andThen(
             Commands.run(
                 () -> {
                   Logger.recordOutput("Pivot/aiming", true);
                   pivot.setPosition(-1.05);
-                  flywheel.runVelocity(5000);
+                  flywheel.runVelocity(2000);
+                  intake.setPosition(1.0);
                 },
                 flywheel,
-                pivot))
+                pivot,
+                intake))
         .handleInterrupt(
             () -> {
               Logger.recordOutput("Pivot/aiming", false);

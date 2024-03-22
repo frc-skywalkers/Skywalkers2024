@@ -99,6 +99,7 @@ public class Flywheel extends SubsystemBase {
 
   public boolean atDesiredRPM(double requestRPM) {
     boolean ret = (Math.abs(getVelocityRPM() - requestRPM) < ShooterConstants.tolerance);
+    Logger.recordOutput("Flywheel/atSetpointRPM", ret);
     return ret;
   }
 

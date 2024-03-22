@@ -60,16 +60,16 @@ public class FlywheelIOTalonFX implements FlywheelIO {
     MotionMagicConfigs mm_configs = config.MotionMagic;
 
     mm_configs.MotionMagicCruiseVelocity = 200.0;
-    mm_configs.MotionMagicAcceleration = 600.0;
-    mm_configs.MotionMagicJerk = 1200.0;
+    mm_configs.MotionMagicAcceleration = 400.0;
+    mm_configs.MotionMagicJerk = 800.0;
 
     Slot0Configs slot0 = config.Slot0;
 
-    slot0.kP = 0.0009;
+    slot0.kP = 0.0015;
     slot0.kI = 0.0;
     slot0.kD = 0.0000025;
-    slot0.kS = 0.466;
-    slot0.kV = 0.018 * (2 * Math.PI) * GEAR_RATIO;
+    slot0.kS = 0.2;
+    slot0.kV = (12.00 / (100.000 / GEAR_RATIO));
     slot0.kA = 0.01;
 
     leader.getConfigurator().apply(config);

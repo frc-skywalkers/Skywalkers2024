@@ -96,7 +96,7 @@ public class IntakeCommands {
     return Commands.run(
             () -> {
               intake.setPosition(IntakeConstants.handoff);
-              intake.runWheel();
+              intake.runWheelDouble();
               // intake.holdPiece();
               // pivot.setPosition(PivotConstants.handoff);
               Logger.recordOutput("Intake/intaking", true);
@@ -117,13 +117,17 @@ public class IntakeCommands {
     // .withTimeout(5.0);
   }
 
-  public static Command pivotHandoff(Pivot pivot) {
+  public static Command pivotHandoff(Pivot pivot, Intake intake) {
     return Commands.run(
             () -> {
               pivot.setPosition(PivotConstants.handoff);
+              intake.setPosition(IntakeConstants.handoff);
             },
             pivot)
-        .until(() -> (pivot.atPosition(PivotConstants.handoff)));
+        .until(
+            () ->
+                (pivot.atPosition(PivotConstants.handoff)
+                    && intake.atPosition(IntakeConstants.handoff)));
     // .withTimeout(5.0);
   }
 
@@ -132,14 +136,14 @@ public class IntakeCommands {
     return Commands.run(
             () -> {
               intake.outtakeWheel();
-              indexer.runVolts(-4.0);
+              indexer.runVolts(IndexerConstants.indexVolts);
               pivot.setPosition(PivotConstants.handoff);
             },
             intake,
             indexer,
             pivot)
-        .until(() -> indexer.hasPiece())
-        .withTimeout(2.5);
+        .until(() -> indexer.hasPiece());
+    // .withTimeout(2.5);
 
     // .andThen(
     //     () -> {
@@ -147,6 +151,19 @@ public class IntakeCommands {
     //     },
     //     indexer,
     //     intake);
+  }
+
+  public static Command transferPiece3(Intake intake, Indexer indexer, Pivot pivot) {
+    return Commands.run(
+            () -> {
+              intake.runWheel();
+              indexer.runVolts(-IndexerConstants.indexVolts);
+              pivot.setPosition(PivotConstants.handoff);
+            },
+            intake,
+            indexer,
+            pivot)
+        .until(() -> !indexer.hasPiece());
   }
 
   public static Command transferPiecept2(Intake intake, Indexer indexer, Pivot pivot) {
@@ -168,7 +185,7 @@ public class IntakeCommands {
             intake,
             pivot)
         .until(() -> indexer.superHasPiece())
-        .withTimeout(0.75)
+        // .withTimeout(0.75)
         .andThen(
             () -> {
               intake.stopWheels();
@@ -200,14 +217,16 @@ public class IntakeCommands {
 
   public static Command indexSequence(
       Intake intake, Indexer indexer, Pivot pivot, Lightstrip lightstrip) {
-    return pivotHandoff(pivot)
+    return pivotHandoff(pivot, intake)
         .andThen(transferPiece(intake, indexer, pivot, lightstrip))
+        // .andThen(transferPiece3(intake, indexer, pivot))
+        // .andThen(transferPiece(intake, indexer, pivot, lightstrip))
         .andThen(transferPiecept2(intake, indexer, pivot));
   }
 
   public static Command ampPrep(
       Intake intake, Indexer indexer, Pivot pivot, Lightstrip lightstrip) {
-    return pivotHandoff(pivot).andThen(transferPiece(intake, indexer, pivot, lightstrip));
+    return pivotHandoff(pivot, intake).andThen(transferPiece(intake, indexer, pivot, lightstrip));
     // .andThen(
     //     Commands.run(
     //         () -> {
