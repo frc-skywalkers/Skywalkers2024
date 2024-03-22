@@ -52,7 +52,7 @@ public final class Constants {
     REPLAY
   }
 
-  public static final Boolean isRed = true;
+  public static final Boolean isRed = false;
 
   public static final class ShooterConstants {
     public static final double[] RPMEquation = {350.0, 500.000}; // need to tune; [0] -> m, [1] -> b
@@ -83,23 +83,23 @@ public final class Constants {
 
     public static final double intakeVolts = -10.5;
     public static final double holdVolts = -0.25;
-    public static final double outtakeVolts = 4.0;
+    public static final double outtakeVolts = 7.0;
 
     public static final double tolerance = 0.05;
-    public static final double downtolerance = 0.075;
+    public static final double downtolerance = 0.1;
 
     public static final double tofTolerance = 30.00;
 
-    public static final double mm_cruisevel = 3.0;
-    public static final double mm_accel = mm_cruisevel * 4.0;
+    public static final double mm_cruisevel = 3.25;
+    public static final double mm_accel = mm_cruisevel * 4.5;
     public static final double mm_jerk = mm_accel * 4.0;
   }
 
   public static final class IndexerConstants {
-    public static final double indexVolts = -5.0;
+    public static final double indexVolts = -4.25;
     public static final double outtakeVolts = -9.0;
     public static final double holdVolts = 0.1;
-    public static final double slowVolts = -1.5;
+    public static final double slowVolts = -1.25;
   }
 
   public static final class FieldConstants {
@@ -147,6 +147,9 @@ public final class Constants {
   }
 
   public static final class VisionConstants {
+
+    public static int redprioritytag = 7;
+    public static int blueprioritytag = 8;
 
     public static final Transform3d CAMERA_TO_ROBOT2 =
         new Transform3d(

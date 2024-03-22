@@ -110,7 +110,8 @@ public class IntakeCommands {
         .andThen(
             Commands.runOnce(
                 () -> {
-                  intake.holdPiece();
+                  Logger.recordOutput("bro guys whats going on", true);
+                  intake.runWheelHalf();
                 },
                 intake));
     // .withTimeout(5.0);

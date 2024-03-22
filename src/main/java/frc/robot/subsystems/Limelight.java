@@ -133,6 +133,17 @@ public class Limelight extends SubsystemBase {
     // tx: left/right, ty: up/down, tz: forward/backward
   }
 
+  public double[] getRobottoTarget() {
+    limelightTable.getEntry("pipeline").setNumber(3);
+    double[] robottotarget =
+        limelightTable
+            .getEntry("targetpose_robotspace")
+            .getDoubleArray(
+                new double[6]); // x, y, z, in meters. roll, pitch, yaw in degrees  (translation +
+    // rotation)
+    return (robottotarget);
+  }
+
   public Transform3d CamtoTarget() { // order maybe incorrect??
     var t = getCamtoTarget();
     /*

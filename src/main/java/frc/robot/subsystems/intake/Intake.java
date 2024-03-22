@@ -115,7 +115,7 @@ public class Intake extends SubsystemBase {
     // return inputs.tofDistance > IntakeConstants.tofTolerance;
     // return inputs.currentAmps[1] > 25.0;
     if (Constants.currentMode == Mode.SIM) return true;
-    return inputs.currentAmps[1] < (-25.0);
+    return inputs.currentAmps[1] < (-35.0);
     // return false;
   }
 

@@ -19,6 +19,7 @@ import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.filter.LinearFilter;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants.IntakeConstants;
 
 public class IntakeIOTalonFX implements IntakeIO {
@@ -61,7 +62,7 @@ public class IntakeIOTalonFX implements IntakeIO {
     leaderConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
 
     var wheelConfig = new TalonFXConfiguration();
-    wheelConfig.CurrentLimits.StatorCurrentLimit = 35.0;
+    wheelConfig.CurrentLimits.StatorCurrentLimit = 40.0;
     wheelConfig.CurrentLimits.StatorCurrentLimitEnable = true;
     wheelConfig.MotorOutput.NeutralMode = NeutralModeValue.Coast;
 
@@ -69,12 +70,12 @@ public class IntakeIOTalonFX implements IntakeIO {
 
     pidConfigs.GravityType = GravityTypeValue.Arm_Cosine;
     pidConfigs.kS = 0.1;
-    pidConfigs.kG = 0.35;
-    pidConfigs.kP = 6.0;
+    pidConfigs.kG = 0.2;
+    pidConfigs.kP = 7.0;
     pidConfigs.kI = 0.0;
     pidConfigs.kD = 0.06;
     pidConfigs.kV = 12.00 / (100.0000 / GEAR_RATIO);
-    pidConfigs.kA = 0.03;
+    pidConfigs.kA = 0.045;
 
     MotionMagicConfigs mm_configs = leaderConfig.MotionMagic;
     mm_configs.MotionMagicCruiseVelocity = IntakeConstants.mm_cruisevel;
@@ -142,6 +143,8 @@ public class IntakeIOTalonFX implements IntakeIO {
     inputs.appliedVolts = leaderAppliedVolts.getValueAsDouble();
     inputs.currentAmps =
         new double[] {leaderCurrent.getValueAsDouble(), wheelCurrent.getValueAsDouble()};
+    SmartDashboard.putNumber("YOOOO Wheel Current", wheelCurrent.getValueAsDouble());
+    SmartDashboard.putNumber("YOOOO Wheel Volts", wheelAppliedVolts.getValueAsDouble());
     inputs.goalPos = goalPos;
     inputs.goalVel = goalVel;
 

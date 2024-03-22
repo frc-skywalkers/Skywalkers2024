@@ -39,8 +39,11 @@ public class FlywheelCommands {
   /** Rev's up shooter depending on distance from goal using a linear regression */
   static Translation2d goalTranslation2d = new Translation2d(0.000, 0.000);
 
+  static double[] pos;
+
   public static double calcShootRPM(Translation2d curPose, Translation2d goalPose) {
     double shootDistance = curPose.getDistance(goalPose);
+    shootDistance = pos[0];
     double shootRPM = ShooterConstants.RPMAngleMap.get(shootDistance);
 
     return shootRPM;
@@ -56,6 +59,7 @@ public class FlywheelCommands {
 
   public static double calcPivotPos(Translation2d curPose, Translation2d goalPose) {
     double shootDistance = curPose.getDistance(goalPose);
+    shootDistance = pos[0];
     shootDistance = Units.metersToInches(shootDistance);
 
     return PivotConstants.pivotAngleMap.get(shootDistance);
@@ -94,13 +98,13 @@ public class FlywheelCommands {
           } else {
             goalPos = FieldConstants.getSpeaker();
           }
-          pivot.setPosition(calcPivotPos(curTranslation, goalPos));
+          pivot.setPosition(calcPivotPos(curTranslation, goalPos) + 0.040);
         },
         pivot);
   }
 
   public static Command waiting(Pivot pivot, Flywheel flywheel) {
-    return Commands.waitUntil(() -> pivot.atPosition(-1.05) && flywheel.atDesiredRPM(4500));
+    return Commands.waitUntil(() -> pivot.atPosition(-1.05) && flywheel.atDesiredRPM(5000));
   }
 
   public static Command outtake(Indexer indexer, Intake intake) {
@@ -160,7 +164,7 @@ public class FlywheelCommands {
                 () -> {
                   Logger.recordOutput("Pivot/aiming", true);
                   pivot.setPosition(-1.05);
-                  flywheel.runVelocity(4500);
+                  flywheel.runVelocity(5000);
                 },
                 flywheel,
                 pivot))

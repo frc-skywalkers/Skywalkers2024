@@ -56,14 +56,14 @@ public class Flywheel extends SubsystemBase {
   }
 
   public void updateTable() {
-    ShooterConstants.RPMAngleMap.put(FieldConstants.robotSubwooferSpeakerDistance + 0.0, 4500.0);
-    ShooterConstants.RPMAngleMap.put(FieldConstants.robotSubwooferSpeakerDistance + 25.0, 4500.0);
-    ShooterConstants.RPMAngleMap.put(FieldConstants.robotSubwooferSpeakerDistance + 13.5, 4500.0);
-    ShooterConstants.RPMAngleMap.put(FieldConstants.robotSubwooferSpeakerDistance + 34.0, 4750.0);
-    ShooterConstants.RPMAngleMap.put(FieldConstants.robotSubwooferSpeakerDistance + 43.0, 4750.0);
-    ShooterConstants.RPMAngleMap.put(FieldConstants.robotSubwooferSpeakerDistance + 50.0, 5000.0);
-    ShooterConstants.RPMAngleMap.put(FieldConstants.robotSubwooferSpeakerDistance + 84.75, 6250.0);
-    ShooterConstants.RPMAngleMap.put(FieldConstants.robotSubwooferSpeakerDistance + 68.0, 6500.0);
+    ShooterConstants.RPMAngleMap.put(FieldConstants.robotSubwooferSpeakerDistance + 0.0, 5000.0);
+    ShooterConstants.RPMAngleMap.put(FieldConstants.robotSubwooferSpeakerDistance + 25.0, 5000.0);
+    ShooterConstants.RPMAngleMap.put(FieldConstants.robotSubwooferSpeakerDistance + 13.5, 5000.0);
+    ShooterConstants.RPMAngleMap.put(FieldConstants.robotSubwooferSpeakerDistance + 34.0, 5550.0);
+    ShooterConstants.RPMAngleMap.put(FieldConstants.robotSubwooferSpeakerDistance + 43.0, 5550.0);
+    ShooterConstants.RPMAngleMap.put(FieldConstants.robotSubwooferSpeakerDistance + 50.0, 6000.0);
+    ShooterConstants.RPMAngleMap.put(FieldConstants.robotSubwooferSpeakerDistance + 84.75, 6750.0);
+    ShooterConstants.RPMAngleMap.put(FieldConstants.robotSubwooferSpeakerDistance + 68.0, 7250.0);
     ShooterConstants.RPMAngleMap.put(FieldConstants.robotSubwooferSpeakerDistance + 101.0, 8250.0);
   }
 

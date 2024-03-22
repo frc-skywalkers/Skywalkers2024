@@ -42,7 +42,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Constants.FieldConstants;
-import frc.robot.Constants.Mode;
 import frc.robot.Constants.ShooterConstants;
 import frc.robot.Constants.VisionConstants;
 import frc.robot.subsystems.Limelight;
@@ -81,7 +80,7 @@ public class Drive extends SubsystemBase {
   private static final Vector<N3> stateStdDevs =
       VecBuilder.fill(0.39, 0.39, Units.degreesToRadians(2));
   private static final Vector<N3> visionStdDevs =
-      VecBuilder.fill(0.02, 0.02, Units.degreesToRadians(60));
+      VecBuilder.fill(0.1, 0.1, Units.degreesToRadians(60));
 
   public final SwerveDrivePoseEstimator poseEstimator;
   private final Field2d field2d = new Field2d();
@@ -102,6 +101,8 @@ public class Drive extends SubsystemBase {
   private double alignTolerance = 0.05;
   private double transTolerance = 0.15;
   private double initTime = 0.0;
+
+  double[] robotToTarget;
 
   public Drive(
       GyroIO gyroIO,
@@ -149,6 +150,7 @@ public class Drive extends SubsystemBase {
             new Pose2d(),
             stateStdDevs,
             visionStdDevs);
+    robotToTarget = limelight.getRobottoTarget();
   }
 
   public void periodic() {
@@ -216,6 +218,10 @@ public class Drive extends SubsystemBase {
     SmartDashboard.putNumber("estimatedY", getCurrentPose().getY());
     SmartDashboard.putNumber("estimatedR", getCurrentPose().getRotation().getDegrees());
 
+    robotToTarget = limelight.getRobottoTarget();
+
+    Logger.recordOutput("Odometry/robotToTarget", robotToTarget);
+
     field2d.setRobotPose(getCurrentPose());
     Logger.recordOutput("Odometry/Estimated Pose", getCurrentPose());
 
@@ -224,28 +230,33 @@ public class Drive extends SubsystemBase {
     Logger.recordOutput("Vision/cam2x", cam1Result.estimatedPose.getX());
     Logger.recordOutput("Vision/cam2y", cam1Result.estimatedPose.getY());
 
-    if (cam1Result.timestamp != 0.0
-        && cam1Result.estimatedPose.getX() != 0
-        && cam1Result.estimatedPose.getY() != 0) {
-      Logger.recordOutput("Vision/2GlobalEstimate", cam1Result.estimatedPose);
+    // if (cam1Result.timestamp != 0.0
+    //     && cam1Result.estimatedPose.getX() != 0
+    //     && cam1Result.estimatedPose.getY() != 0) {
+    //   Logger.recordOutput("Vision/2GlobalEstimate", cam1Result.estimatedPose);
 
-      if (Constants.currentMode == Mode.REAL) {
-        this.poseEstimator.addVisionMeasurement(
-            cam1Result.estimatedPose, cam1Result.timestamp, cam1Result.stdDevs);
-      }
-    }
+    //   if (Constants.currentMode == Mode.REAL) {
+    //     this.poseEstimator.addVisionMeasurement(
+    //         cam1Result.estimatedPose, cam1Result.timestamp, cam1Result.stdDevs);
+    //   }
+    // }
 
     LimelightHelper.PoseEstimate limelightMeasurement =
         LimelightHelper.getBotPoseEstimate_wpiBlue("limelight");
-    if (limelightMeasurement.tagCount >= 1) {
-      poseEstimator.setVisionMeasurementStdDevs(VecBuilder.fill(.1, .1, 9999999));
+    // if (limelightMeasurement.tagCount >= 1) {
+    // poseEstimator.setVisionMeasurementStdDevs(VecBuilder.fill(.1, .1, 9999999));
+    if (limelightMeasurement.pose.getX() != 0.0) {
       poseEstimator.addVisionMeasurement(
           limelightMeasurement.pose, limelightMeasurement.timestampSeconds);
     }
+    Logger.recordOutput("hi guys/im here", true);
+    // }
 
     Logger.recordOutput("Vision/cam1x", limelightMeasurement.pose.getX());
     Logger.recordOutput("Vision/cam1y", limelightMeasurement.pose.getY());
     Logger.recordOutput("Vision/limelightPose", limelightMeasurement.pose);
+
+    Logger.recordOutput("Vision/poseEstimatorPose", poseEstimator.getEstimatedPosition());
 
     /*poseEstimator.addVisionMeasurement(limelight.campose().toPose2d(), timer.get() - initTime);
 
@@ -306,6 +317,16 @@ public class Drive extends SubsystemBase {
     Rotation2d ang = new Rotation2d(getRotation().getRadians()); // getRotation()
     return new Pose2d(ret, ang);
     // return poseEstimator.getEstimatedPosition();
+  }
+
+  public double[] getRobotToTarget() {
+    // return robotToTarget;
+    double[] ret = {0.0, 0.0};
+    ret[0] = robotToTarget[2];
+    ret[1] = robotToTarget[4];
+    // Pose2d ret = new Pose2d(new Translation2d(robotToTarget[0], robotToTarget[1]), new
+    // Rotation2d);
+    return ret;
   }
 
   public void addVisionMeasurement(
@@ -452,7 +473,8 @@ public class Drive extends SubsystemBase {
   /** Returns the current odometry pose. */
   @AutoLogOutput(key = "Odometry/Robot")
   public Pose2d getPose() {
-    return pose; // wo vision
+    return pose;
+    // return getCurrentPose(); // wo vision
     // return getCurrentPose(); // vision measurement
   }
 

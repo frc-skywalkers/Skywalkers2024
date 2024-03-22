@@ -278,6 +278,8 @@ public class RobotContainer {
     // flywheel.setDefaultCommand(FlywheelCommands.autoShoot(flywheel, drive));
     // controller.x().onTrue(IntakeCommands.spit(intake));
 
+    // controller.leftBumper().onTrue(DriveCommands.autoAlignAmp(drive, controller));
+
     controller.leftBumper().onTrue(DriveCommands.autoAlignAmp(drive, controller));
 
     // intake.setDefaultCommand(
@@ -439,7 +441,7 @@ public class RobotContainer {
     //         IntakeCommands.intakeHandoff(intake, indexer, pivot, lightstrip)
     //             .andThen(IntakeCommands.indexSequence(intake, indexer, pivot, lightstrip))
     //             .andThen(FlywheelCommands.prepSubwoofer(flywheel, pivot, indexer)));
-    operator.a().onTrue(FlywheelCommands.deepenIndexer(indexer));
+    // operator.a().onTrue(FlywheelCommands.deepenIndexer(indexer));
 
     operator.rightBumper().onTrue(IntakeCommands.resetIntake(intake));
     // operator
@@ -478,14 +480,15 @@ public class RobotContainer {
 
     flywheel.setDefaultCommand(Commands.run(() -> flywheel.runVelocity(0.0), flywheel));
 
-    // operator
-    //     .leftBumper()
-    //     .onTrue(
-    //         Commands.race(
-    //             FlywheelCommands.shoot(pivot, flywheel, indexer, intake),
-    //             FlywheelCommands.prepSubwoofer(flywheel, pivot, indexer)));
+    operator
+        .leftBumper()
+        .onTrue(
+            Commands.race(
+                FlywheelCommands.shoot(pivot, flywheel, indexer, intake),
+                FlywheelCommands.prepSubwoofer(flywheel, pivot, indexer)));
 
-    operator.leftBumper().onTrue(FlywheelCommands.shoot(pivot, flywheel, indexer, intake));
+    // operator.leftBumper().onTrue(FlywheelCommands.deepenIndexer(indexer));
+    operator.a().onTrue(IntakeCommands.deepen(intake));
 
     // operator.rightBumper().whileTrue(FlywheelCommands.outtake(indexer, intake));
 
@@ -547,8 +550,8 @@ public class RobotContainer {
     //     .whileTrue(
     //         Commands.run(
     //             () -> {
-    //               pivot.setPosition(SmartDashboard.getNumber("Pivot Angle Wanted", 0.0));
-    //               flywheel.runVelocity(SmartDashboard.getNumber("Shooter RPM Wanted", 0.0));
+    //               //   pivot.setPosition(SmartDashboard.getNumber("Pivot Angle Wanted", 0.0));
+    //               //   flywheel.runVelocity(SmartDashboard.getNumber("Shooter RPM Wanted", 0.0));
     //               //   pivot.setPosition(SmartDashboard.getNumber("Pivot Angle Wanted", -1.0));
     //               //   flywheel.runVelocity(SmartDashboard.getNumber("Shooter RPM Wanted", 0.0));
     //             },
