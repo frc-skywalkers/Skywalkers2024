@@ -217,9 +217,12 @@ public class RobotContainer {
 
     NamedCommands.registerCommand(
         "Shoot Sequence",
-        Commands.race(
-                FlywheelCommands.prepSubwoofer(flywheel, pivot, indexer, intake),
-                FlywheelCommands.shoot(pivot, flywheel, indexer))
+        IntakeCommands.indexSequence(intake, indexer, pivot, lightstrip)
+            .unless(() -> indexer.hasPiece())
+            .andThen(
+                Commands.race(
+                    FlywheelCommands.shoot(pivot, flywheel, indexer),
+                    FlywheelCommands.prepSubwoofer(flywheel, pivot, indexer, intake)))
             .andThen(IntakeCommands.resetIntake(intake)));
 
     NamedCommands.registerCommand("Reset Intake", IntakeCommands.resetIntake(intake));
@@ -479,15 +482,7 @@ public class RobotContainer {
 
     flywheel.setDefaultCommand(Commands.run(() -> flywheel.runVelocity(0.0), flywheel));
 
-    operator
-        .leftBumper()
-        .onTrue(
-            IntakeCommands.indexSequence(intake, indexer, pivot, lightstrip)
-                .unless(() -> indexer.hasPiece())
-                .andThen(
-                    Commands.race(
-                        FlywheelCommands.shoot(pivot, flywheel, indexer),
-                        FlywheelCommands.prepSubwoofer(flywheel, pivot, indexer, intake))));
+    operator.leftBumper().onTrue(FlywheelCommands.shoot(pivot, flywheel, indexer));
 
     // operator.leftBumper().onTrue(FlywheelCommands.deepenIndexer(indexer));
     operator.a().onTrue(IntakeCommands.deepen(intake));
@@ -582,7 +577,7 @@ public class RobotContainer {
         .whileTrue(
             Commands.run(
                 () -> {
-                  flywheel.runVelocity(2000);
+                  flywheel.runVelocity(5000);
                 },
                 flywheel));
 
