@@ -104,7 +104,15 @@ public class FlywheelCommands {
   }
 
   public static Command waiting(Pivot pivot, Flywheel flywheel) {
-    return Commands.waitUntil(() -> pivot.atPosition(-1.05) && flywheel.atDesiredRPM(5000));
+    return Commands.waitUntil(() -> pivot.atPosition() && flywheel.atDesiredRPM());
+  }
+
+  public static Command waiting(Pivot pivot, Flywheel flywheel, Drive drive) {
+    return Commands.waitUntil(
+        () ->
+            pivot.atPosition()
+                && flywheel.atDesiredRPM()
+                && drive.isAligned(FieldConstants.getSpeaker()));
   }
 
   public static Command outtake(Indexer indexer) {
@@ -127,6 +135,10 @@ public class FlywheelCommands {
   public static Command shoot(Pivot pivot, Flywheel flywheel, Indexer indexer) {
     return waiting(pivot, flywheel).andThen(outtake(indexer));
     // return outtake(indexer, intake);
+  }
+
+  public static Command shoot(Pivot pivot, Flywheel flywheel, Indexer indexer, Drive drive) {
+    return waiting(pivot, flywheel, drive).andThen(outtake(indexer));
   }
 
   public static Command deepenIndexer(Indexer indexer) {

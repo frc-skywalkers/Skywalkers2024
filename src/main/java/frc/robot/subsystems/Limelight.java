@@ -18,7 +18,6 @@ import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 // import frc.robot.Dashboard.Limelight.Debugging;
 import java.io.IOException;
@@ -37,9 +36,12 @@ public class Limelight extends SubsystemBase {
     CameraServer.startAutomaticCapture(1); // LL2
 
     UsbCamera LL3 = CameraServer.startAutomaticCapture(0);
+
+    // if (false) {
+
     LL3.setBrightness(50); // idk
     LL3.setExposureManual(15);
-
+    // }
     AprilTagFieldLayout layout;
 
     try {
@@ -283,7 +285,7 @@ public class Limelight extends SubsystemBase {
   public void periodic() {
 
     int pipeline = limelightTable.getEntry("pipeline").getNumber(0).intValue();
-    SmartDashboard.putNumber("hello i am pipeline limelight", pipeline);
+
     if (pipeline == 1) {
 
       /*double currentXdistance = (LimelightConstants.RTheight - LimelightConstants.cameraheight)/Math.tan(getRTTY()*Math.PI/180); //radians

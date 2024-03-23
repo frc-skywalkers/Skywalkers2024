@@ -125,4 +125,16 @@ public class DriveCommands {
             drive)
         .until(() -> joystick.rightBumper().getAsBoolean());
   }
+
+  public static Command autoAlignSpeaker(Drive drive) {
+
+    return Commands.run(
+        () -> {
+          double omega = drive.getAlignOutput();
+
+          drive.runVelocity(
+              ChassisSpeeds.fromFieldRelativeSpeeds(0, 0, omega, drive.getRotation()));
+        },
+        drive);
+  }
 }

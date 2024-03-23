@@ -473,21 +473,21 @@ public class RobotContainer {
     //             () -> flywheel.runVelocity(SmartDashboard.getNumber("Shooter RPM Wanted",
     // 3500))));
 
-    pivot.setDefaultCommand(
-        Commands.run(
-            () -> {
-              // pivot.runVolts(0.0);
-              pivot.setPosition(-1.5);
-              //   pivot.runVolts(operator.getLeftX() * 6.0);
-              Logger.recordOutput("Pivot/I'm super evil", true);
-            },
-            pivot));
+    // pivot.setDefaultCommand(
+    //     Commands.run(
+    //         () -> {
+    //           // pivot.runVolts(0.0);
+    //           pivot.setPosition(-1.5);
+    //           //   pivot.runVolts(operator.getLeftX() * 6.0);
+    //           Logger.recordOutput("Pivot/I'm super evil", true);
+    //         },
+    //         pivot));
 
     flywheel.setDefaultCommand(Commands.run(() -> flywheel.runVelocity(0.0), flywheel));
 
-    // operator.leftBumper().onTrue(FlywheelCommands.shoot(pivot, flywheel, indexer));
+    operator.leftBumper().onTrue(FlywheelCommands.shoot(pivot, flywheel, indexer));
 
-    operator.leftBumper().onTrue(FlywheelCommands.deepenIndexer(indexer));
+    // operator.leftBumper().onTrue(FlywheelCommands.deepenIndexer(indexer));
 
     operator.a().onTrue(IntakeCommands.deepen(intake));
 
