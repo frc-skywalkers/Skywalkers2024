@@ -62,7 +62,7 @@ public class IntakeIOTalonFX implements IntakeIO {
     leaderConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
 
     var wheelConfig = new TalonFXConfiguration();
-    wheelConfig.CurrentLimits.StatorCurrentLimit = 40.0;
+    wheelConfig.CurrentLimits.StatorCurrentLimit = 50.0;
     wheelConfig.CurrentLimits.StatorCurrentLimitEnable = true;
     wheelConfig.MotorOutput.NeutralMode = NeutralModeValue.Coast;
 

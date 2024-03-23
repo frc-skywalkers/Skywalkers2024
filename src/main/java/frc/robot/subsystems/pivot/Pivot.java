@@ -8,7 +8,6 @@ import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
-import frc.robot.Constants.FieldConstants;
 import frc.robot.Constants.Mode;
 import frc.robot.Constants.PivotConstants;
 import org.littletonrobotics.junction.AutoLogOutput;
@@ -46,15 +45,25 @@ public class Pivot extends SubsystemBase {
 
   public void updateTable() {
     // PivotConstants.pivotAngleMap.put(125.0, 450.0);
-    PivotConstants.pivotAngleMap.put(FieldConstants.robotSubwooferSpeakerDistance + 0.0, -1.05);
-    PivotConstants.pivotAngleMap.put(FieldConstants.robotSubwooferSpeakerDistance + 25.0, -0.95);
-    PivotConstants.pivotAngleMap.put(FieldConstants.robotSubwooferSpeakerDistance + 13.5, -1.00);
-    PivotConstants.pivotAngleMap.put(FieldConstants.robotSubwooferSpeakerDistance + 34.0, -0.90);
-    PivotConstants.pivotAngleMap.put(FieldConstants.robotSubwooferSpeakerDistance + 43.0, -0.85);
-    PivotConstants.pivotAngleMap.put(FieldConstants.robotSubwooferSpeakerDistance + 50.0, -0.82);
-    PivotConstants.pivotAngleMap.put(FieldConstants.robotSubwooferSpeakerDistance + 84.75, -0.73);
-    PivotConstants.pivotAngleMap.put(FieldConstants.robotSubwooferSpeakerDistance + 68.0, -0.757);
-    PivotConstants.pivotAngleMap.put(FieldConstants.robotSubwooferSpeakerDistance + 101.0, -0.700);
+    PivotConstants.pivotAngleMap.put(1.414, -1.1);
+    PivotConstants.pivotAngleMap.put(1.892, -0.95);
+    PivotConstants.pivotAngleMap.put(2.225, -0.8);
+    PivotConstants.pivotAngleMap.put(2.071, -0.83);
+    PivotConstants.pivotAngleMap.put(2.416, -0.765);
+    PivotConstants.pivotAngleMap.put(2.652, -0.735);
+
+    // PivotConstants.pivotAngleMap.put(FieldConstants.robotSubwooferSpeakerDistance + 0.0, -1.05);
+    // PivotConstants.pivotAngleMap.put(FieldConstants.robotSubwooferSpeakerDistance + 25.0, -0.95);
+    // PivotConstants.pivotAngleMap.put(FieldConstants.robotSubwooferSpeakerDistance + 13.5, -1.00);
+    // PivotConstants.pivotAngleMap.put(FieldConstants.robotSubwooferSpeakerDistance + 34.0, -0.90);
+    // PivotConstants.pivotAngleMap.put(FieldConstants.robotSubwooferSpeakerDistance + 43.0, -0.85);
+    // PivotConstants.pivotAngleMap.put(FieldConstants.robotSubwooferSpeakerDistance + 50.0, -0.82);
+    // PivotConstants.pivotAngleMap.put(FieldConstants.robotSubwooferSpeakerDistance + 84.75,
+    // -0.73);
+    // PivotConstants.pivotAngleMap.put(FieldConstants.robotSubwooferSpeakerDistance + 68.0,
+    // -0.757);
+    // PivotConstants.pivotAngleMap.put(FieldConstants.robotSubwooferSpeakerDistance + 101.0,
+    // -0.700);
   }
 
   @Override

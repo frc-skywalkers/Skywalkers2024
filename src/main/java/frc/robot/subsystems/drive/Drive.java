@@ -151,6 +151,9 @@ public class Drive extends SubsystemBase {
             stateStdDevs,
             visionStdDevs);
     robotToTarget = limelight.getRobottoTarget();
+    SmartDashboard.putNumber(
+        "Distance From Speaker",
+        getCurrentPose().getTranslation().getDistance(FieldConstants.getSpeaker()));
   }
 
   public void periodic() {
@@ -223,12 +226,17 @@ public class Drive extends SubsystemBase {
     Logger.recordOutput("Odometry/robotToTarget", robotToTarget);
 
     field2d.setRobotPose(getCurrentPose());
-    Logger.recordOutput("Odometry/Estimated Pose", getCurrentPose());
 
+    Logger.recordOutput("Odometry/Estimated Pose", getCurrentPose());
+    SmartDashboard.putNumber(
+        "Distance From Speaker",
+        getCurrentPose().getTranslation().getDistance(FieldConstants.getSpeaker()));
     var cam1Result = vision.getCam1Result();
 
     Logger.recordOutput("Vision/cam2x", cam1Result.estimatedPose.getX());
     Logger.recordOutput("Vision/cam2y", cam1Result.estimatedPose.getY());
+
+    Logger.recordOutput("Vision/PVPose", cam1Result.estimatedPose);
 
     // if (cam1Result.timestamp != 0.0
     //     && cam1Result.estimatedPose.getX() != 0
@@ -315,6 +323,9 @@ public class Drive extends SubsystemBase {
   public Pose2d getCurrentPose() {
     Translation2d ret = poseEstimator.getEstimatedPosition().getTranslation();
     Rotation2d ang = new Rotation2d(getRotation().getRadians()); // getRotation()
+    // Rotation2d ang = new
+    // Rotation2d(poseEstimator.getEstimatedPosition().getRotation().getRadians()); // getRotation()
+
     return new Pose2d(ret, ang);
     // return poseEstimator.getEstimatedPosition();
   }
@@ -473,8 +484,8 @@ public class Drive extends SubsystemBase {
   /** Returns the current odometry pose. */
   @AutoLogOutput(key = "Odometry/Robot")
   public Pose2d getPose() {
-    return pose;
-    // return getCurrentPose(); // wo vision
+    // return pose;
+    return getCurrentPose(); // wo vision
     // return getCurrentPose(); // vision measurement
   }
 

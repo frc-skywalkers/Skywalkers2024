@@ -65,10 +65,10 @@ public class FlywheelIOTalonFX implements FlywheelIO {
 
     Slot0Configs slot0 = config.Slot0;
 
-    slot0.kP = 0.0015;
+    slot0.kP = 0.0018;
     slot0.kI = 0.0;
-    slot0.kD = 0.0000025;
-    slot0.kS = 0.2;
+    slot0.kD = 0.000005;
+    slot0.kS = 0.125;
     slot0.kV = (12.00 / (100.000 / GEAR_RATIO));
     slot0.kA = 0.01;
 

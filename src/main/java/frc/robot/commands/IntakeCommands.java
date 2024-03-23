@@ -20,6 +20,7 @@ import frc.robot.Constants.IntakeConstants;
 import frc.robot.Constants.LightstripConstants;
 import frc.robot.Constants.PivotConstants;
 import frc.robot.subsystems.Lightstrip;
+import frc.robot.subsystems.flywheel.Flywheel;
 import frc.robot.subsystems.indexer.Indexer;
 import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.pivot.Pivot;
@@ -77,7 +78,7 @@ public class IntakeCommands {
     return Commands.run(
             () -> {
               intake.setPosition(IntakeConstants.dropDown);
-              intake.runWheel();
+              intake.runWheelDouble();
               Logger.recordOutput("Intake/intakingPiece", true);
             },
             intake)
@@ -111,7 +112,7 @@ public class IntakeCommands {
             Commands.runOnce(
                 () -> {
                   Logger.recordOutput("bro guys whats going on", true);
-                  intake.runWheelHalf();
+                  intake.runWheelDouble();
                 },
                 intake));
     // .withTimeout(5.0);
@@ -143,6 +144,27 @@ public class IntakeCommands {
             indexer,
             pivot)
         .until(() -> indexer.hasPiece());
+  }
+
+  public static Command feeding(Intake intake, Indexer indexer, Pivot pivot, Flywheel flywheel) {
+    return Commands.run(
+            () -> {
+              intake.setPosition(1.0);
+              indexer.runVolts(-IndexerConstants.indexVolts);
+              flywheel.runVelocity(-1750.000);
+              pivot.setPosition(-1.00);
+            },
+            intake,
+            indexer,
+            pivot,
+            flywheel)
+        .until(() -> indexer.hasPiece() && !indexer.superHasPiece())
+        .andThen(
+            Commands.runOnce(
+                () -> {
+                  indexer.holdVolt();
+                }));
+
     // .withTimeout(2.5);
 
     // .andThen(

@@ -43,7 +43,7 @@ public class FlywheelCommands {
 
   public static double calcShootRPM(Translation2d curPose, Translation2d goalPose) {
     double shootDistance = curPose.getDistance(goalPose);
-    shootDistance = pos[0];
+    // shootDistance = pos[0];
     double shootRPM = ShooterConstants.RPMAngleMap.get(shootDistance);
 
     return shootRPM;
@@ -59,8 +59,8 @@ public class FlywheelCommands {
 
   public static double calcPivotPos(Translation2d curPose, Translation2d goalPose) {
     double shootDistance = curPose.getDistance(goalPose);
-    shootDistance = pos[0];
-    shootDistance = Units.metersToInches(shootDistance);
+    // shootDistance = pos[0];
+    // shootDistance = Units.metersToInches(shootDistance);
 
     return PivotConstants.pivotAngleMap.get(shootDistance);
   }
@@ -98,7 +98,7 @@ public class FlywheelCommands {
           } else {
             goalPos = FieldConstants.getSpeaker();
           }
-          pivot.setPosition(calcPivotPos(curTranslation, goalPos) + 0.040);
+          pivot.setPosition(calcPivotPos(curTranslation, goalPos));
         },
         pivot);
   }

@@ -74,19 +74,21 @@ public final class Constants {
     public static final double handoff = -1.1;
 
     public static final double tolerance = 0.075;
+
+    public static final double feeding = 0.0;
   }
 
   public static final class IntakeConstants {
-    public static final double dropDown = 2.95;
+    public static final double dropDown = 3.025;
     public static final double home = Math.PI / 2;
     public static final double handoff = 0.0;
 
-    public static final double intakeVolts = -6.5;
-    public static final double holdVolts = -0.25;
-    public static final double outtakeVolts = 5.0;
+    public static final double intakeVolts = -8.0;
+    public static final double holdVolts = -1.0;
+    public static final double outtakeVolts = 6.0;
 
     public static final double tolerance = 0.05;
-    public static final double downtolerance = 0.1;
+    public static final double downtolerance = 0.085;
 
     public static final double tofTolerance = 30.00;
 
@@ -96,7 +98,7 @@ public final class Constants {
   }
 
   public static final class IndexerConstants {
-    public static final double indexVolts = -3.50;
+    public static final double indexVolts = -6.0;
     public static final double outtakeVolts = -9.0;
     public static final double holdVolts = 0.125;
     public static final double slowVolts = -1.0;

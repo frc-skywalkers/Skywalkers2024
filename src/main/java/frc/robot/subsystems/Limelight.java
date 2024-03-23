@@ -18,6 +18,7 @@ import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 // import frc.robot.Dashboard.Limelight.Debugging;
 import java.io.IOException;
@@ -104,7 +105,7 @@ public class Limelight extends SubsystemBase {
   // fiducial markers pipeline
 
   public int getId() {
-    limelightTable.getEntry("pipe line").setNumber(3);
+    limelightTable.getEntry("pipe line").setNumber(0);
     targetID = 7;
     // targetID = (int) limelightTable.getEntry("tid").getInteger(0);
     return (targetID);
@@ -134,7 +135,7 @@ public class Limelight extends SubsystemBase {
   }
 
   public double[] getRobottoTarget() {
-    limelightTable.getEntry("pipeline").setNumber(3);
+    limelightTable.getEntry("pipeline").setNumber(0);
     double[] robottotarget =
         limelightTable
             .getEntry("targetpose_robotspace")
@@ -282,7 +283,7 @@ public class Limelight extends SubsystemBase {
   public void periodic() {
 
     int pipeline = limelightTable.getEntry("pipeline").getNumber(0).intValue();
-
+    SmartDashboard.putNumber("hello i am pipeline limelight", pipeline);
     if (pipeline == 1) {
 
       /*double currentXdistance = (LimelightConstants.RTheight - LimelightConstants.cameraheight)/Math.tan(getRTTY()*Math.PI/180); //radians
