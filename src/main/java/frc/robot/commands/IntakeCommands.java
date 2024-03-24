@@ -118,13 +118,18 @@ public class IntakeCommands {
     // .withTimeout(5.0);
   }
 
-  public static Command pivotHandoff(Pivot pivot, Intake intake) {
+  public static Command pivotHandoff(
+      Pivot pivot, Intake intake, Flywheel flywheel, Indexer indexer) {
     return Commands.run(
             () -> {
               pivot.setPosition(PivotConstants.handoff);
               intake.setPosition(IntakeConstants.handoff);
+              indexer.stop();
+              // flywheel.runVelocity(0.00);
+              flywheel.stop();
             },
-            pivot)
+            pivot,
+            flywheel)
         .until(
             () ->
                 (pivot.atPosition(PivotConstants.handoff)
@@ -133,16 +138,18 @@ public class IntakeCommands {
   }
 
   public static Command transferPiece(
-      Intake intake, Indexer indexer, Pivot pivot, Lightstrip lightstrip) {
+      Intake intake, Indexer indexer, Pivot pivot, Lightstrip lightstrip, Flywheel flywheel) {
     return Commands.run(
             () -> {
               intake.outtakeWheel();
               indexer.runVolts(IndexerConstants.indexVolts);
               pivot.setPosition(PivotConstants.handoff);
+              flywheel.stop();
             },
             intake,
             indexer,
-            pivot)
+            pivot,
+            flywheel)
         .until(() -> indexer.hasPiece());
   }
 
@@ -188,7 +195,8 @@ public class IntakeCommands {
         .until(() -> !indexer.hasPiece());
   }
 
-  public static Command transferPiecept2(Intake intake, Indexer indexer, Pivot pivot) {
+  public static Command transferPiecept2(
+      Intake intake, Indexer indexer, Pivot pivot, Flywheel flywheel) {
     return Commands.run(
             () -> {
               // intake.runWheelHalf();
@@ -200,12 +208,15 @@ public class IntakeCommands {
               // intake.runWheelHalf();
               // }
               pivot.setPosition(-1.4);
+              flywheel.stop();
+
               // intake.stopWheels();
 
             },
             indexer,
             intake,
-            pivot)
+            pivot,
+            flywheel)
         .until(() -> indexer.superHasPiece())
         // .withTimeout(0.75)
         .andThen(
@@ -238,17 +249,18 @@ public class IntakeCommands {
   }
 
   public static Command indexSequence(
-      Intake intake, Indexer indexer, Pivot pivot, Lightstrip lightstrip) {
-    return pivotHandoff(pivot, intake)
-        .andThen(transferPiece(intake, indexer, pivot, lightstrip))
+      Intake intake, Indexer indexer, Pivot pivot, Lightstrip lightstrip, Flywheel flywheel) {
+    return pivotHandoff(pivot, intake, flywheel, indexer)
+        .andThen(transferPiece(intake, indexer, pivot, lightstrip, flywheel))
         // .andThen(transferPiece3(intake, indexer, pivot))
         // .andThen(transferPiece(intake, indexer, pivot, lightstrip))
-        .andThen(transferPiecept2(intake, indexer, pivot));
+        .andThen(transferPiecept2(intake, indexer, pivot, flywheel));
   }
 
   public static Command ampPrep(
-      Intake intake, Indexer indexer, Pivot pivot, Lightstrip lightstrip) {
-    return pivotHandoff(pivot, intake).andThen(transferPiece(intake, indexer, pivot, lightstrip));
+      Intake intake, Indexer indexer, Pivot pivot, Lightstrip lightstrip, Flywheel flywheel) {
+    return pivotHandoff(pivot, intake, flywheel, indexer)
+        .andThen(transferPiece(intake, indexer, pivot, lightstrip, flywheel));
     // .andThen(
     //     Commands.run(
     //         () -> {

@@ -317,7 +317,7 @@ public class Drive extends SubsystemBase {
     }
 
     */
-
+    Logger.recordOutput("Odometry/silly pose", pose);
   }
 
   public Pose2d getCurrentPose() {
@@ -479,6 +479,10 @@ public class Drive extends SubsystemBase {
 
   public FieldRelativeAccel getFieldRelativeAccel() {
     return m_fieldRelAccel;
+  }
+
+  public Pose2d getRealPose() {
+    return pose;
   }
 
   /** Returns the current odometry pose. */

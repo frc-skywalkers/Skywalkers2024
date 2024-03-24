@@ -44,7 +44,7 @@ public class FlywheelCommands {
   public static double calcShootRPM(Translation2d curPose, Translation2d goalPose) {
     double shootDistance = curPose.getDistance(goalPose);
     // shootDistance = pos[0];
-    double shootRPM = ShooterConstants.RPMAngleMap.get(shootDistance);
+    double shootRPM = ShooterConstants.RPMAngleMap.get(shootDistance - 0.02);
 
     return shootRPM;
   }
@@ -62,7 +62,7 @@ public class FlywheelCommands {
     // shootDistance = pos[0];
     // shootDistance = Units.metersToInches(shootDistance);
 
-    return PivotConstants.pivotAngleMap.get(shootDistance);
+    return PivotConstants.pivotAngleMap.get(shootDistance - 0.02);
   }
 
   public static Command autoShoot(Flywheel shooter, Drive drive) {
@@ -82,7 +82,9 @@ public class FlywheelCommands {
           // double shootDistance = curTranslation.getDistance(goalTranslation2d);
           // double shootRPM =
           // ShooterConstants.RPMEquation[0] * shootDistance + ShooterConstants.RPMEquation[1];
-          shooter.runVelocity(calcShootRPM(curTranslation, goalPos));
+          double rpm = calcShootRPM(curTranslation, goalPos);
+          shooter.updateAutoShoot(rpm);
+          shooter.runVelocity(rpm);
         },
         shooter);
   }
@@ -98,13 +100,19 @@ public class FlywheelCommands {
           } else {
             goalPos = FieldConstants.getSpeaker();
           }
-          pivot.setPosition(calcPivotPos(curTranslation, goalPos));
+          double ang = calcPivotPos(curTranslation, goalPos);
+          pivot.setPosition(ang);
+          pivot.updateAutoPivot(ang);
         },
         pivot);
   }
 
   public static Command waiting(Pivot pivot, Flywheel flywheel) {
-    return Commands.waitUntil(() -> pivot.atPosition() && flywheel.atDesiredRPM());
+    return Commands.waitUntil(() -> pivot.atPosition(-1.05) && flywheel.atDesiredRPM(5000));
+  }
+
+  public static Command superWaiting(Pivot pivot, Flywheel flywheel) {
+    return Commands.waitUntil(() -> pivot.pivotAligned() && flywheel.shootRevved());
   }
 
   public static Command waiting(Pivot pivot, Flywheel flywheel, Drive drive) {
@@ -134,6 +142,11 @@ public class FlywheelCommands {
 
   public static Command shoot(Pivot pivot, Flywheel flywheel, Indexer indexer) {
     return waiting(pivot, flywheel).andThen(outtake(indexer));
+    // return outtake(indexer, intake);
+  }
+
+  public static Command superShoot(Pivot pivot, Flywheel flywheel, Indexer indexer) {
+    return superWaiting(pivot, flywheel).andThen(outtake(indexer));
     // return outtake(indexer, intake);
   }
 
@@ -196,6 +209,17 @@ public class FlywheelCommands {
                 () -> {
                   flywheel.runVelocity(5000);
                 }));
+  }
+
+  public static Command stupidShooter(Flywheel flywheel, Pivot pivot) {
+    return Commands.run(
+            () -> {
+              flywheel.runVelocity(0.00);
+              pivot.setPosition(-1.500);
+            },
+            flywheel,
+            pivot)
+        .withTimeout(0.75);
   }
 
   // public static Command subwooferShot(Flywheel flywheel, Pivot pivot, Indexer indexer, Intake

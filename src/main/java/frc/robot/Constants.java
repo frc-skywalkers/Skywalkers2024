@@ -100,15 +100,15 @@ public final class Constants {
   }
 
   public static final class IndexerConstants {
-    public static final double indexVolts = -6.0;
+    public static final double indexVolts = -4.0;
     public static final double outtakeVolts = -9.0;
-    public static final double holdVolts = 0.125;
-    public static final double slowVolts = -1.0;
+    public static final double holdVolts = 0.05;
+    public static final double slowVolts = -1.5;
   }
 
   public static final class FieldConstants {
-    public static final Translation2d BLUE_SPEAKER_POSE = new Translation2d(-0.086473, 5.757474);
-    public static final Translation2d RED_SPEAKER_POSE = new Translation2d(16.389722, 5.757474);
+    public static final Translation2d BLUE_SPEAKER_POSE = new Translation2d(-0.086473, 5.53);
+    public static final Translation2d RED_SPEAKER_POSE = new Translation2d(16.389722, 5.53);
     public static final double robotSubwooferSpeakerDistance = 57.341456693; // in inches
 
     public static final Pose2d RED_AMP_POSE =

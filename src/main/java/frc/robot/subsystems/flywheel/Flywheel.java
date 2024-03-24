@@ -28,6 +28,8 @@ public class Flywheel extends SubsystemBase {
 
   private double desiredRPM = 0.000;
 
+  private double autoShootRPM = 0.000;
+
   /** Creates a new Flywheel. */
   public Flywheel(FlywheelIO io) {
     this.io = io;
@@ -56,12 +58,20 @@ public class Flywheel extends SubsystemBase {
 
   public void updateTable() {
     // ShooterConstants.RPMAngleMap.put(FieldConstants.robotSubwooferSpeakerDistance + 0.0, 5000.0);
-    ShooterConstants.RPMAngleMap.put(1.414, 5000.0);
-    ShooterConstants.RPMAngleMap.put(1.892, 5500.0);
-    ShooterConstants.RPMAngleMap.put(2.225, 5750.0);
-    ShooterConstants.RPMAngleMap.put(2.071, 5750.0);
-    ShooterConstants.RPMAngleMap.put(2.416, 6000.0);
-    ShooterConstants.RPMAngleMap.put(2.6521, 6750.0);
+    // ShooterConstants.RPMAngleMap.put(1.414, 5000.0);
+    // ShooterConstants.RPMAngleMap.put(1.892, 5500.0);
+    // ShooterConstants.RPMAngleMap.put(2.225, 5750.0);
+    // ShooterConstants.RPMAngleMap.put(2.071, 5750.0);
+    // ShooterConstants.RPMAngleMap.put(2.416, 6000.0);
+    // ShooterConstants.RPMAngleMap.put(2.6521, 6750.0);
+
+    ShooterConstants.RPMAngleMap.put(2.405, 5500.0);
+    ShooterConstants.RPMAngleMap.put(2.128, 5500.0);
+    ShooterConstants.RPMAngleMap.put(1.950, 5250.0);
+    ShooterConstants.RPMAngleMap.put(1.448, 5000.0);
+    ShooterConstants.RPMAngleMap.put(2.807, 6000.0);
+    ShooterConstants.RPMAngleMap.put(3.251, 6500.0);
+    ShooterConstants.RPMAngleMap.put(3.658, 6800.0);
 
     // ShooterConstants.RPMAngleMap.put(FieldConstants.robotSubwooferSpeakerDistance + 25.0,
     // 5000.0);
@@ -104,7 +114,8 @@ public class Flywheel extends SubsystemBase {
 
   /** Stops the flywheel. */
   public void stop() {
-    io.stop();
+    // io.stop();
+    io.setVoltage(-0.75);
   }
 
   public boolean atDesiredRPM() {
@@ -115,6 +126,14 @@ public class Flywheel extends SubsystemBase {
     boolean ret = (Math.abs(getVelocityRPM() - requestRPM) < ShooterConstants.tolerance);
     Logger.recordOutput("Flywheel/atSetpointRPM", ret);
     return ret;
+  }
+
+  public void updateAutoShoot(double ang) {
+    this.autoShootRPM = ang;
+  }
+
+  public boolean shootRevved() {
+    return atDesiredRPM(this.autoShootRPM);
   }
 
   /** Returns the current velocity in RPM. */

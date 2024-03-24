@@ -19,6 +19,8 @@ public class Pivot extends SubsystemBase {
   private final PivotIOInputsAutoLogged inputs = new PivotIOInputsAutoLogged();
   private final ArmFeedforward ffModel;
 
+  private double autoPivotAngle = -1.5;
+
   /** Creates a new Pivot. */
   public Pivot(PivotIO io) {
     this.io = io;
@@ -45,12 +47,13 @@ public class Pivot extends SubsystemBase {
 
   public void updateTable() {
     // PivotConstants.pivotAngleMap.put(125.0, 450.0);
-    PivotConstants.pivotAngleMap.put(1.414, -1.1);
-    PivotConstants.pivotAngleMap.put(1.892, -0.95);
-    PivotConstants.pivotAngleMap.put(2.225, -0.8);
-    PivotConstants.pivotAngleMap.put(2.071, -0.83);
-    PivotConstants.pivotAngleMap.put(2.416, -0.765);
-    PivotConstants.pivotAngleMap.put(2.652, -0.735);
+    PivotConstants.pivotAngleMap.put(2.405, -0.825);
+    PivotConstants.pivotAngleMap.put(2.128, -0.89);
+    PivotConstants.pivotAngleMap.put(1.950, -0.925);
+    PivotConstants.pivotAngleMap.put(1.448, -1.05);
+    PivotConstants.pivotAngleMap.put(2.807, -0.75);
+    PivotConstants.pivotAngleMap.put(3.251, -0.72);
+    PivotConstants.pivotAngleMap.put(3.658, -0.665);
 
     // PivotConstants.pivotAngleMap.put(FieldConstants.robotSubwooferSpeakerDistance + 0.0, -1.05);
     // PivotConstants.pivotAngleMap.put(FieldConstants.robotSubwooferSpeakerDistance + 25.0, -0.95);
@@ -107,6 +110,14 @@ public class Pivot extends SubsystemBase {
 
   public boolean atPosition() {
     return Math.abs(getPositionRad() - inputs.goalPos) < PivotConstants.tolerance;
+  }
+
+  public void updateAutoPivot(double ang) {
+    this.autoPivotAngle = ang;
+  }
+
+  public boolean pivotAligned() {
+    return atPosition(this.autoPivotAngle);
   }
 
   public boolean atPosition(double goalPos) {

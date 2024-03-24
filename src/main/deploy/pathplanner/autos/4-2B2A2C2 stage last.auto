@@ -28,6 +28,30 @@
           "data": {
             "name": "Shoot Sequence"
           }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "2A2"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Shoot Sequence"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "2C2"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Shoot Sequence"
+          }
         }
       ]
     }
