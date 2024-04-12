@@ -125,8 +125,8 @@ public class IntakeCommands {
               pivot.setPosition(PivotConstants.handoff);
               intake.setPosition(IntakeConstants.handoff);
               indexer.stop();
-              // flywheel.runVelocity(0.00);
-              flywheel.stop();
+              flywheel.runVelocity(5000.00);
+              // flywheel.stop();
             },
             pivot,
             flywheel)
@@ -144,7 +144,8 @@ public class IntakeCommands {
               intake.outtakeWheel();
               indexer.runVolts(IndexerConstants.indexVolts);
               pivot.setPosition(PivotConstants.handoff);
-              flywheel.stop();
+              // flywheel.stop();
+              flywheel.runVelocity(5000.00);
             },
             intake,
             indexer,
@@ -208,7 +209,8 @@ public class IntakeCommands {
               // intake.runWheelHalf();
               // }
               pivot.setPosition(-1.4);
-              flywheel.stop();
+              // flywheel.stop();
+              flywheel.runVelocity(5000.00);
 
               // intake.stopWheels();
 

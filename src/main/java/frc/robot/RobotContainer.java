@@ -220,8 +220,7 @@ public class RobotContainer {
         Commands.race(
                 FlywheelCommands.shoot(pivot, flywheel, indexer),
                 FlywheelCommands.prepSubwoofer(flywheel, pivot, indexer, intake))
-            .andThen(FlywheelCommands.stupidShooter(flywheel, pivot))
-            .andThen(IntakeCommands.resetIntake(intake)));
+            .andThen(FlywheelCommands.stupidShooter(flywheel, pivot)));
 
     NamedCommands.registerCommand("Reset Intake", IntakeCommands.resetIntake(intake));
 
@@ -481,11 +480,11 @@ public class RobotContainer {
             },
             pivot));
 
-    flywheel.setDefaultCommand(Commands.run(() -> flywheel.runVelocity(0.0), flywheel));
+    flywheel.setDefaultCommand(Commands.run(() -> flywheel.runVelocity(1000.0), flywheel));
 
-    operator.leftBumper().onTrue(FlywheelCommands.superShoot(pivot, flywheel, indexer));
+    // operator.leftBumper().onTrue(FlywheelCommands.superShoot(pivot, flywheel, indexer));
 
-    // operator.leftBumper().onTrue(FlywheelCommands.deepenIndexer(indexer));
+    operator.leftBumper().onTrue(FlywheelCommands.deepenIndexer(indexer));
 
     operator.a().onTrue(IntakeCommands.deepen(intake));
 
@@ -628,7 +627,14 @@ public class RobotContainer {
                 .andThen(FlywheelCommands.outtakeAmp(indexer, flywheel, pivot)));
 
     operator.b().onTrue(IntakeCommands.intakeHandoff(intake, indexer, pivot, lightstrip));
-    operator.y().onTrue(IntakeCommands.indexSequence(intake, indexer, pivot, lightstrip, flywheel));
+
+    operator
+        .y()
+        .onTrue(
+            IntakeCommands.indexSequence(
+                intake, indexer, pivot, lightstrip, flywheel)); // PUT BACK FO RMATCH
+
+    // operator.y().onTrue(DriveCommands.autoAlignAmp(drive, operator));
 
     // operator.y().onTrue(IntakeCommands.feeding(intake, indexer, pivot, flywheel));
     // controller.x().onTrue(IntakeCommands.bringOutPiece(indexer));

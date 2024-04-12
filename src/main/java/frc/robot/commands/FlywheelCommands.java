@@ -44,7 +44,7 @@ public class FlywheelCommands {
   public static double calcShootRPM(Translation2d curPose, Translation2d goalPose) {
     double shootDistance = curPose.getDistance(goalPose);
     // shootDistance = pos[0];
-    double shootRPM = ShooterConstants.RPMAngleMap.get(shootDistance - 0.02);
+    double shootRPM = ShooterConstants.RPMAngleMap.get(shootDistance - 0.06);
 
     return shootRPM;
   }
@@ -62,7 +62,7 @@ public class FlywheelCommands {
     // shootDistance = pos[0];
     // shootDistance = Units.metersToInches(shootDistance);
 
-    return PivotConstants.pivotAngleMap.get(shootDistance - 0.02);
+    return PivotConstants.pivotAngleMap.get(shootDistance - 0.06);
   }
 
   public static Command autoShoot(Flywheel shooter, Drive drive) {
@@ -219,7 +219,7 @@ public class FlywheelCommands {
             },
             flywheel,
             pivot)
-        .withTimeout(0.75);
+        .withTimeout(0.25);
   }
 
   // public static Command subwooferShot(Flywheel flywheel, Pivot pivot, Indexer indexer, Intake

@@ -54,7 +54,7 @@ public final class Constants {
 
   public static final Boolean isRed = false;
 
-  public static final Boolean isSim = true;
+  // public static final Boolean isSim = true;
 
   public static final class ShooterConstants {
     public static final double[] RPMEquation = {350.0, 500.000}; // need to tune; [0] -> m, [1] -> b

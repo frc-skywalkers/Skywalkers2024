@@ -121,7 +121,7 @@ public class Drive extends SubsystemBase {
 
     // Configure AutoBuilder for PathPlanner
     AutoBuilder.configureHolonomic(
-        this::getPose,
+        this::getRealPose,
         this::setPose,
         () -> kinematics.toChassisSpeeds(getModuleStates()),
         this::runVelocity,
@@ -150,7 +150,7 @@ public class Drive extends SubsystemBase {
             new Pose2d(),
             stateStdDevs,
             visionStdDevs);
-    robotToTarget = limelight.getRobottoTarget();
+    // robotToTarget = limelight.getRobottoTarget();
     SmartDashboard.putNumber(
         "Distance From Speaker",
         getCurrentPose().getTranslation().getDistance(FieldConstants.getSpeaker()));
@@ -221,9 +221,11 @@ public class Drive extends SubsystemBase {
     SmartDashboard.putNumber("estimatedY", getCurrentPose().getY());
     SmartDashboard.putNumber("estimatedR", getCurrentPose().getRotation().getDegrees());
 
-    robotToTarget = limelight.getRobottoTarget();
+    robotToTarget = getRobotToTarget();
 
-    Logger.recordOutput("Odometry/robotToTarget", robotToTarget);
+    if (limelight.getId() != -1) Logger.recordOutput("Odometry/robotToTarget", robotToTarget);
+
+    SmartDashboard.putNumber("hello new speaker distnacce", robotToTarget[0]);
 
     field2d.setRobotPose(getCurrentPose());
 
@@ -333,10 +335,28 @@ public class Drive extends SubsystemBase {
   public double[] getRobotToTarget() {
     // return robotToTarget;
     double[] ret = {0.0, 0.0};
-    ret[0] = robotToTarget[2];
-    ret[1] = robotToTarget[4];
-    // Pose2d ret = new Pose2d(new Translation2d(robotToTarget[0], robotToTarget[1]), new
-    // Rotation2d);
+
+    if (limelight.hasTargets()) {
+
+      double ang = limelight.getTX();
+
+      double limelightAng = 25.000;
+      double height = 0.563;
+      double centeroffset = Units.inchesToMeters(13.5);
+
+      double tagHeight = Units.inchesToMeters(57.125);
+
+      double difHeight = tagHeight - height;
+      double totAng = limelightAng + ang;
+
+      double realDist = difHeight / Math.tan(Units.degreesToRadians(totAng));
+
+      ret[0] = realDist;
+      ret[1] = robotToTarget[4];
+      // Pose2d ret = new Pose2d(new Translation2d(robotToTarget[0], robotToTarget[1]), new
+      // Rotation2d);
+    }
+
     return ret;
   }
 
@@ -489,7 +509,7 @@ public class Drive extends SubsystemBase {
   @AutoLogOutput(key = "Odometry/Robot")
   public Pose2d getPose() {
     // return pose;
-    return getCurrentPose(); // wo vision
+    return getCurrentPose(); // w vision
     // return getCurrentPose(); // vision measurement
   }
 

@@ -281,6 +281,10 @@ public class Limelight extends SubsystemBase {
     return y;
   }
 
+  public boolean hasTargets() {
+    return limelightTable.getEntry("tv").getBoolean(false);
+  }
+
   @Override
   public void periodic() {
 
